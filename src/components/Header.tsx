@@ -25,7 +25,7 @@ const Header = () => {
   return (
     <header className="h-[72px] px-5">
       <nav className="flex justify-between items-center h-full">
-        <div className="flex items-center gap-2">
+        <Link href={'/'} className="flex items-center gap-2">
           <span className="font-jua text-[40px] font-medium text-transparent bg-gradient-to-b from-custom-rose to-pink-500 bg-clip-text relative">
             Sugar Paws
           </span>
@@ -35,7 +35,7 @@ const Header = () => {
             height={50}
             width={40}
           />
-        </div>
+        </Link>
         <ul className="flex space-x-[30px]">
           {navbarItems.map((item) => (
             <li
