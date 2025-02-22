@@ -1,7 +1,4 @@
 import type { Metadata } from "next";
-import React from "react";
-import "./globals.css";
-import "../lib/fontawesome";
 
 export const metadata: Metadata = {
   title: "Sugar Paws",
@@ -16,6 +13,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <div className="h-[72px] w-full"></div>
         {children}
       </body>
     </html>

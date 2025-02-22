@@ -11,6 +11,14 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        custom: {
+          yellow: "#FFF4DD",
+          pink: "#FFD1DC",
+          rose: "#FE6E94",
+          dark: "#232023",
+          purple: "#331048",
+          wine: "#AA2823",
+        },
       },
     },
   },
