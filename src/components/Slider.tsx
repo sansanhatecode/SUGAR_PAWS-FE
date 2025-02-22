@@ -2,23 +2,97 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
+import CtaButton from "./CtaButton";
+import { useRouter } from "next/navigation";
 
-const images = [
-  "assets/images/slider-img/slider-img1.png",
-  "assets/images/slider-img/slider-img2.webp",
-  "assets/images/slider-img/slider-img3.png",
-  "assets/images/slider-img/slider-img4.png",
-  "assets/images/slider-img/slider-img5.webp",
+type CtaButton = { text: string; link: string };
+
+type SliderItem = {
+  imageSrc: string;
+  align: "left" | "right";
+  textColor?: string;
+  subTitle?: string;
+  title?: string[];
+  description?: string[];
+  ctaButtons?: CtaButton[];
+};
+
+const sliderItems: SliderItem[] = [
+  {
+    imageSrc: "/assets/images/slider-img/slider-img1.png",
+    align: "left",
+    subTitle: "IN STOCK NOW",
+    title: ["EMILY TEMPLE", "CUTE"],
+    description: ["New Plus Sizes for", "ETC & Melody Basket"],
+    ctaButtons: [
+      { text: "SHOP EMILY TEMPLE CUTE", link: "/" },
+      { text: "SHOP MELODY BASKET", link: "/" },
+    ],
+  },
+  {
+    imageSrc: "/assets/images/slider-img/slider-img2.webp",
+    textColor: "text-custom-purple",
+    align: "left",
+    subTitle: "GIVE THE CHOICE OFF",
+    title: ["GIFT CARD"],
+    ctaButtons: [{ text: "GRAB A GIFT CARD", link: "/" }],
+  },
+  {
+    imageSrc: "/assets/images/slider-img/slider-img3.png",
+    textColor: "text-custom-dark ",
+    align: "right",
+    title: ["Halloween is Here!"],
+    description: [
+      "Shop our special Halloween Collection",
+      "from October 1st - 31st",
+    ],
+    ctaButtons: [{ text: "HAPPY HAUNTINGS!", link: "/" }],
+  },
+  {
+    imageSrc: "/assets/images/slider-img/slider-img4.png",
+    align: "left",
+    textColor: "text-custom-dark ",
+    title: ["PLUS SIZE"],
+    description: ["We've made it even easier to find the perfect fit."],
+    ctaButtons: [{ text: "ALL PLUS SIZE CLOTHING", link: "/" }],
+  },
+  {
+    imageSrc: "/assets/images/slider-img/slider-img5.webp",
+    textColor: "text-custom-purple",
+    align: "left",
+    subTitle: "LOVELY HEART GINGHAM CUTSEW DRESS",
+    title: ["Pre-Order Today"],
+    ctaButtons: [{ text: "SHOP NOW", link: "/" }],
+  },
 ];
 
 const Slider = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(1);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const router = useRouter();
+
+  const extendedItems = [
+    sliderItems[sliderItems.length - 1],
+    ...sliderItems,
+    sliderItems[0],
+  ];
+
+  const handleTransitionEnd = () => {
+    setIsTransitioning(false);
+    if (currentIndex === 0) {
+      setCurrentIndex(sliderItems.length);
+    } else if (currentIndex === sliderItems.length + 1) {
+      setCurrentIndex(1);
+    }
+  };
 
   const startAutoSlide = useCallback(() => {
     intervalRef.current = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 3000);
+      setIsTransitioning(true);
+      setCurrentIndex((prev) => prev + 1);
+    }, 5000);
   }, []);
 
   const stopAutoSlide = () => {
@@ -27,15 +101,17 @@ const Slider = () => {
 
   const goToPrevious = () => {
     stopAutoSlide();
+    setIsTransitioning(true);
     setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + images.length) % images.length
+      (prevIndex) => (prevIndex - 1) % sliderItems.length
     );
     startAutoSlide();
   };
 
   const goToNext = () => {
     stopAutoSlide();
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    setIsTransitioning(true);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % extendedItems.length);
     startAutoSlide();
   };
 
@@ -45,18 +121,20 @@ const Slider = () => {
   }, [startAutoSlide]);
 
   return (
-    <div className="relative w-full h-[620px] overflow-hidden group">
-      {/* Nút điều hướng (Ẩn mặc định, chỉ hiển thị khi hover) */}
-      <div className="absolute flex items-center justify-between z-10 px-5 w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+    <div className="relative w-full h-[620px] overflow-hidden group mt-[72px]">
+      <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button
           onClick={goToPrevious}
-          className="w-8 h-8 flex justify-center items-center shadow-md bg-custom-yellow text-custom-rose rounded-full transition-transform duration-300 hover:scale-125"
+          className="absolute left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex justify-center items-center shadow-md bg-custom-yellow text-custom-rose rounded-full transition-transform duration-300 hover:scale-125"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
+      </div>
+
+      <div className="absolute right-5 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button
           onClick={goToNext}
-          className="w-8 h-8 flex justify-center items-center shadow-md bg-custom-yellow text-custom-rose rounded-full transition-transform duration-300 hover:scale-125"
+          className="w-10 h-10 flex justify-center items-center shadow-md bg-custom-yellow text-custom-rose rounded-full transition-transform duration-300 hover:scale-125"
         >
           <FontAwesomeIcon icon={faArrowRight} />
         </button>
@@ -64,29 +142,70 @@ const Slider = () => {
 
       <div className="w-full h-full overflow-hidden">
         <div
-          className="flex w-full h-full transition-transform duration-700 ease-in-out"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+          className="flex w-full h-full"
+          style={{
+            transform: `translateX(-${currentIndex * 100}%)`,
+            transition: isTransitioning ? 'transform 700ms ease-in-out' : 'none',
+          }}
+          onTransitionEnd={handleTransitionEnd}
         >
-          {images.map((image, index) => (
-            <img
-              key={index}
-              src={image}
-              alt={`Slide ${index + 1}`}
-              className="w-full h-full object-cover flex-shrink-0"
-            />
-          ))}
+          {extendedItems.map(
+            ({ imageSrc, align, subTitle, title, description, ctaButtons, textColor }, index) => (
+              <div key={index} className="relative w-full h-full flex-shrink-0">
+                <Image
+                  src={imageSrc}
+                  alt={`Slide ${index}`}
+                  width={1000}
+                  height={620}
+                  className="object-cover w-full h-full"
+                />
+                {index === currentIndex && (
+                  <div
+                    className={`absolute h-full flex flex-col justify-center z-50 top-0 ${align === "left" ? "left-24 items-start" : "right-24 items-end"}`}
+                  >
+                    {subTitle && (
+                      <p className={`${textColor ? textColor : "text-white"} font-medium text-[21px]`}>
+                        {subTitle}
+                      </p>
+                    )}
+                    {title?.length &&
+                      title.map((text) => (
+                        <p
+                          key={text}
+                          className={`${textColor ? textColor : "text-white"} font-bold text-[64px] leading-tight drop-shadow-lg`}
+                        >
+                          {text}
+                        </p>
+                      ))}
+                    {description?.length &&
+                      description.map((text) => (
+                        <p key={text} className={`${textColor ? textColor : "text-white"} text-[21px]`}>
+                          {text}
+                        </p>
+                      ))}
+                    {ctaButtons?.length && 
+                      <div className="flex space-x-4 mt-4">
+                        {ctaButtons.map(({ text, link }) => 
+                          <CtaButton key={text} text={text} onClick={() => router.push(link)} />
+                        )}
+                      </div>
+                    }
+                  </div>
+                )}
+              </div>
+            )
+          )}
         </div>
       </div>
 
-      {/* Dots indicator */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-        {images.map((_, index) => (
+      <div className="absolute z-20 bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+        {sliderItems.map((_, index) => (
           <div
             key={index}
             className={`rounded-full border-[1px] transition-all duration-300 ease-in-out ${
-              index === currentIndex ? "w-8 h-3" : "w-3 h-3 opacity-60"
+              index + 1 === currentIndex ? "w-8 h-3" : "w-3 h-3 opacity-60"
             } ${
-              currentIndex !== 0
+              currentIndex !== 1
                 ? "border-custom-purple"
                 : "border-custom-yellow"
             }`}

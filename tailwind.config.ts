@@ -17,6 +17,7 @@ const config: Config = {
           rose: "#FE6E94",
           dark: "#232023",
           purple: "#331048",
+          wine: "#AA2823",
         },
       },
     },
