@@ -121,7 +121,7 @@ const Slider = () => {
   }, [startAutoSlide]);
 
   return (
-    <div className="relative w-full h-[620px] overflow-hidden group mt-[72px]">
+    <div className="relative w-full h-[620px] overflow-hidden group">
       <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button
           onClick={goToPrevious}
@@ -155,9 +155,8 @@ const Slider = () => {
                 <Image
                   src={imageSrc}
                   alt={`Slide ${index}`}
-                  width={1000}
-                  height={620}
-                  className="object-cover w-full h-full"
+                  fill
+                  className="object-cover"
                 />
                 {index === currentIndex && (
                   <div

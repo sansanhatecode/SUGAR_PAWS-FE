@@ -1,18 +1,13 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSearch,
-  faShoppingCart,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faShoppingCart, faUser } from "@fortawesome/free-solid-svg-icons";
 
 type NavBarItem = {
   name: string;
   link: string;
-  image?: string;
-  children?: NavBarItem[];
 };
 
 const Header = () => {
@@ -26,19 +21,33 @@ const Header = () => {
     { name: "BRAND", link: "/brand" },
   ];
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="h-[72px] px-5 fixed top-0 left-0 shadow-md w-full z-50">
-      <nav className="flex justify-between items-center h-full">
-        <Link href={'/'} className="flex items-center gap-2">
-          <span className="font-jua text-[40px] font-medium text-transparent bg-gradient-to-b from-custom-rose to-pink-500 bg-clip-text relative">
+    <header
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 shadow-md hover:bg-custom-yellow ${
+        isScrolled ? "backdrop-blur-md h-[52px] bg-white/30" : "bg-custom-yellow h-[72px]"
+      }`}
+    >
+      <nav className="flex justify-between items-center h-full px-5">
+        <Link href="/" className="flex items-center gap-2">
+          <span className={`font-jua ${isScrolled ? "text-[32px]" : "text-[40px]"} font-medium text-transparent bg-gradient-to-b from-custom-rose to-pink-500 bg-clip-text`}>
             Sugar Paws
           </span>
-          <Image
-            src={"/assets/favicon/sugar-paws-logo.png"}
-            alt="Sugar Paws logo"
-            height={50}
-            width={40}
-          />
+          <Image src="/assets/favicon/sugar-paws-logo.png" alt="Sugar Paws logo" height={isScrolled ? 40 : 50} width={isScrolled ? 32 : 40} className="w-auto"/>
         </Link>
         <ul className="flex space-x-[30px] h-full">
           {navbarItems.map((item) => (
