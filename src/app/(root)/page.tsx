@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import Slider from "@/components/Slider";
 import Image from "next/image";
 import React from "react";
@@ -21,7 +20,6 @@ export default function HomePage() {
 
   return (
     <div>
-      <Header />
       <Slider />
       <div className="text-center text-[12px] h-8 bg-custom-rose py-2">
         NOW SHIPPING ALL VIETNAM - 7 days free return!
