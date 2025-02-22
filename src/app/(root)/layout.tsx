@@ -1,3 +1,5 @@
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,8 +15,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Header />
         <div className="h-[72px] w-full"></div>
         {children}
+        <Footer />
       </body>
     </html>
   );
