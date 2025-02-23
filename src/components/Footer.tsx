@@ -1,11 +1,26 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
+import FooterButtonList from "./FooterButtonList";
 
 const Footer = () => {
   return (
     <>
-      <div className="relative w-full h-[100px] bg-custom-yellow text-custom-pink overflow-hidden">
+      <div className="relative w-full h-[390px]">
+        <div className="relative w-full h-[490px]">
+          <Image
+            src="/assets/images/footer-img.png"
+            alt="footer-bg"
+            layout="fill"
+            objectFit="cover"
+          />
+        </div>
+        <div className="z-10 absolute top-72 max-w-[1200px] min-w-[928px] w-[60%] left-1/2 transform -translate-x-1/2 h-full flex justify-between gap-10 items-start text-white">
+          <FooterButtonList />
+        </div>
+      </div>
+      <div className="relative w-full h-[120px] bg-transparent text-custom-pink overflow-hidden">
         <svg
           className="absolute bottom-0 left-0 w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
