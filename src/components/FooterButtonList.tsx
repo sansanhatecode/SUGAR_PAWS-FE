@@ -12,9 +12,7 @@ const FooterButtonList = () => {
         <CtaButton text="LEARN MORE" onClick={() => {}} />
       </div>
       <div>
-        <h6 className="font-[500] text-[20px]">
-          JOIN WITH SUGAR PAWS
-        </h6>
+        <h6 className="font-[500] text-[20px]">JOIN WITH SUGAR PAWS</h6>
         <p className="mb-4 text-[12px] font-light">
           We are looking for designers, artists and creators.
         </p>
