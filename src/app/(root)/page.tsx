@@ -11,6 +11,7 @@ import Image from "next/image";
 import React from "react";
 import InfiniteCarousel from "@/components/InfiniteCarousel";
 import CtaButton from "@/components/CtaButton";
+import FooterButtonList from "@/components/FooterButtonList";
 
 type PopularItem = { imgSrc: string; name: string };
 
@@ -328,6 +329,19 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      <div className="relative w-full h-[380px]">
+        <div className="relative w-full h-[490px]">
+          <Image
+            src="/assets/images/footer-img.png"
+            alt="footer-bg"
+            layout="fill"
+            objectFit="cover"
+          />
+        </div>
+        <div className="z-10 absolute top-72 max-w-[1200px] min-w-[928px] w-[60%] left-1/2 transform -translate-x-1/2 h-full flex justify-between gap-10 items-start text-white">
+          <FooterButtonList />
+        </div>
+      </div>
     </div>
   );
 }
