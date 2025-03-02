@@ -20,7 +20,7 @@ const SignInPage = () => {
   };
 
   return (
-    <div className="w-full min-h-screen flex justify-center items-center">
+    <main className="w-full min-h-screen flex justify-center items-center">
       <div className="max-w-[1200px] min-w-[928px] w-[60%] flex bg-white rounded-xl overflow-hidden">
         <div className="w-1/2 relative">
           <Image
@@ -103,7 +103,7 @@ const SignInPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

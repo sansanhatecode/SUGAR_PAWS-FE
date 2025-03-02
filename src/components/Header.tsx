@@ -8,24 +8,27 @@ import {
   faShoppingCart,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
+import { usePathname } from "next/navigation";
 
 type NavBarItem = {
   name: string;
   link: string;
 };
 
-const Header = () => {
-  const navbarItems: NavBarItem[] = [
-    { name: "ABOUT", link: "/about" },
-    { name: "ACCESSORIES", link: "/accessories" },
-    { name: "CLOTHING", link: "/clothing" },
-    { name: "JEWELRY", link: "/jewelry" },
-    { name: "PLUS SIZE", link: "/plus-size" },
-    { name: "MORE", link: "/more" },
-    { name: "BRAND", link: "/brand" },
-  ];
+const navbarItems: NavBarItem[] = [
+  { name: "ABOUT", link: "/about" },
+  { name: "ACCESSORIES", link: "/accessories" },
+  { name: "CLOTHING", link: "/clothing" },
+  { name: "JEWELRY", link: "/jewelry" },
+  { name: "PLUS SIZE", link: "/plus-size" },
+  { name: "MORE", link: "/more" },
+  { name: "BRAND", link: "/brand" },
+];
 
+const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,16 +70,22 @@ const Header = () => {
           />
         </Link>
         <ul className="flex space-x-[30px] h-full">
-          {navbarItems.map((item) => (
-            <li key={item.name} className="h-full">
-              <Link
-                href={item.link}
-                className="relative flex items-center h-full text-[13px] tracking-wider after:content-[''] after:absolute after:w-full after:h-[1px] after:bg-black after:left-0 after:bottom-4 after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100"
-              >
-                {item.name}
-              </Link>
-            </li>
-          ))}
+          {navbarItems.map((item) => {
+            const isActive =
+              pathname === item.link || pathname.startsWith(`${item.link}/`);
+            return (
+              <li key={item.name} className="h-full">
+                <Link
+                  href={item.link}
+                  className={`relative flex items-center h-full text-[13px] tracking-wider after:content-[''] after:absolute after:w-full after:h-[1px] after:bg-black after:left-0 after:bottom-4 after:transition-transform after:duration-300 ${
+                    isActive ? "after:scale-x-100" : "after:scale-x-0"
+                  } hover:after:scale-x-100`}
+                >
+                  {item.name}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
         <div className="flex space-x-[40px]">
           <FontAwesomeIcon icon={faSearch} className="text-[14px]" />
