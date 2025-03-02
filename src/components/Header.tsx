@@ -8,19 +8,59 @@ import {
   faShoppingCart,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+
+type NestedNavBarItem = {
+  imageSrc?: string;
+  itemlist: {
+    name: string;
+    link: string;
+  }[];
+};
 
 type NavBarItem = {
   name: string;
   link: string;
+  children?: NestedNavBarItem[];
 };
 
 const navbarItems: NavBarItem[] = [
-  { name: "ABOUT", link: "/about" },
+  {
+    name: "ABOUT",
+    link: "/about",
+    children: [
+      {
+        itemlist: [
+          { name: "about us", link: "/about" },
+          { name: "retail localtion", link: "/retail-location" },
+          { name: "faq's", link: "/faqs" },
+          { name: "event calendar", link: "/event-calendar" },
+          { name: "event booking", link: "/event-booking" },
+        ],
+      },
+    ],
+  },
   { name: "ACCESSORIES", link: "/accessories" },
   { name: "CLOTHING", link: "/clothing" },
   { name: "JEWELRY", link: "/jewelry" },
-  { name: "PLUS SIZE", link: "/plus-size" },
+  {
+    name: "PLUS SIZE",
+    link: "/plus-size",
+    children: [
+      {
+        itemlist: [
+          { name: "plus size dresses", link: "/plus-size/dresses" },
+          { name: "plus size skirts", link: "/plus-size/skirts" },
+          { name: "plus size blouses", link: "/plus-size/blouses" },
+          {
+            name: "plus size petticoat & bloomers",
+            link: "/plus-size/petticoat-bloomer",
+          },
+          { name: "⭐ all plus size clothing ⭐", link: "/plus-size" },
+        ],
+      },
+    ],
+  },
   { name: "MORE", link: "/more" },
   { name: "BRAND", link: "/brand" },
 ];
@@ -29,6 +69,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,7 +98,7 @@ const Header = () => {
           className="flex items-center gap-2 hover:text-custom-rose"
         >
           <span
-            className={`font-jua ${isScrolled ? "text-[32px]" : "text-[40px]"} font-medium text-transparent bg-gradient-to-b from-custom-rose to-pink-500 bg-clip-text`}
+            className={`font-jua ${isScrolled ? "text-[32px]" : "text-[40px]"} font-medium text-transparent bg-gradient-to-b from-custom-rose to-pink-500 bg-clip-text hover:text-custom-rose`}
           >
             Sugar Paws
           </span>
@@ -69,12 +110,12 @@ const Header = () => {
             className="w-auto"
           />
         </Link>
-        <ul className="flex space-x-[30px] h-full">
+        <ul className="flex h-full">
           {navbarItems.map((item) => {
             const isActive =
               pathname === item.link || pathname.startsWith(`${item.link}/`);
             return (
-              <li key={item.name} className="h-full">
+              <li key={item.name} className="h-full px-4 relative group">
                 <Link
                   href={item.link}
                   className={`relative flex items-center h-full text-[13px] tracking-wider after:content-[''] after:absolute after:w-full after:h-[1px] after:bg-black after:left-0 after:bottom-4 after:transition-transform after:duration-300 ${
@@ -83,13 +124,30 @@ const Header = () => {
                 >
                   {item.name}
                 </Link>
+                {item.children?.length === 1 && (
+                  <div className="absolute top-full left-0 bg-custom-yellow rounded-b-md shadow-xl hidden group-hover:flex group-hover:flex-col overflow-hidden text-[12px] w-auto">
+                    {item.children[0].itemlist.map((subItem) => (
+                      <Link
+                        key={subItem.name}
+                        href={subItem.link}
+                        className="hover:text-custom-rose hover:font-semibold hover:bg-custom-pink uppercase py-2 px-5 whitespace-nowrap"
+                      >
+                        {subItem.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </li>
             );
           })}
         </ul>
         <div className="flex space-x-[40px]">
           <FontAwesomeIcon icon={faSearch} className="text-[14px]" />
-          <FontAwesomeIcon icon={faUser} className="text-[14px]" />
+          <FontAwesomeIcon
+            icon={faUser}
+            className="text-[14px] hover:text-custom-rose"
+            onClick={() => router.push("/signin")}
+          />
           <FontAwesomeIcon icon={faShoppingCart} className="text-[14px]" />
         </div>
       </nav>

@@ -7,7 +7,7 @@ const AboutUsPage = () => {
       <div className="w-full h-[140px] bg-custom-pink font-semibold text-[40px] flex items-center justify-center">
         About Us
       </div>
-      <div className="w-full flex flex-col justify-center items-center gap-20 py-20 text-[12px]">
+      <div className="w-full flex flex-col justify-center items-center gap-20 pt-20 text-[12px]">
         <div className="w-[60%] max-w-[1200px] min-w-[928px] flex justify-between items-center">
           <div className="w-1/2 min-h-[340px] relative rounded-[10px] overflow-hidden">
             <Image
