@@ -12,6 +12,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 type NestedNavBarItem = {
   imageSrc?: string;
+  titleItem?: { name: string; link: string };
   itemlist: {
     name: string;
     link: string;
@@ -40,7 +41,62 @@ const navbarItems: NavBarItem[] = [
       },
     ],
   },
-  { name: "ACCESSORIES", link: "/accessories" },
+  {
+    name: "ACCESSORIES",
+    link: "/accessories",
+    children: [
+      {
+        imageSrc: "/assets/images/accessories/access-1.png",
+        titleItem: {
+          name: "accessories",
+          link: "/accessories",
+        },
+        itemlist: [
+          { name: "GLOVES", link: "/accessories/gloves" },
+          { name: "harnesses and belts", link: "/retail-location" },
+          { name: "LASHES", link: "/faqs" },
+          { name: "NECKWEAR", link: "/event-booking" },
+          { name: "PARASOLS", link: "/event-booking" },
+          { name: "WRIRSTCUFFS", link: "/event-booking" },
+          { name: "⭐ ALL ACCESSORIES ⭐", link: "/event-booking" },
+        ],
+      },
+      {
+        titleItem: {
+          name: "bags",
+          link: "/accessories/bags",
+        },
+        imageSrc: "/assets/images/accessories/access-2.png",
+        itemlist: [
+          { name: "purses", link: "/about" },
+          { name: "retail localtion", link: "/retail-location" },
+          { name: "faq's", link: "/faqs" },
+          { name: "event calendar", link: "/event-calendar" },
+          { name: "event booking", link: "/event-booking" },
+        ],
+      },
+      {
+        imageSrc: "/assets/images/accessories/access-3.png",
+        itemlist: [
+          { name: "about us", link: "/about" },
+          { name: "retail localtion", link: "/retail-location" },
+          { name: "faq's", link: "/faqs" },
+          { name: "event calendar", link: "/event-calendar" },
+          { name: "event booking", link: "/event-booking" },
+        ],
+      },
+      {
+        imageSrc: "/assets/images/accessories/access-4.png",
+        itemlist: [
+          { name: "about us", link: "/about" },
+          { name: "retail localtion", link: "/retail-location" },
+          { name: "faq's", link: "/faqs" },
+          { name: "event calendar", link: "/event-calendar" },
+          { name: "event booking", link: "/event-booking" },
+        ],
+      },
+    ],
+  },
   { name: "CLOTHING", link: "/clothing" },
   { name: "JEWELRY", link: "/jewelry" },
   {
@@ -124,6 +180,44 @@ const Header = () => {
                 >
                   {item.name}
                 </Link>
+                {item.children?.length && item.children.length > 1 && (
+                  <div
+                    className={`fixed ${isScrolled ? "top-[60px}" : "top-[72px]"} w-[100vw] gap-10 items-center left-0 bg-custom-yellow rounded-b-md shadow-xl hidden group-hover:flex overflow-hidden text-[12px] px-[10%] py-5`}
+                  >
+                    {item.children.map((subItem) => (
+                      <div
+                        key={subItem.imageSrc}
+                        className="flex flex-1 flex-col justify-center items-center"
+                      >
+                        {subItem.imageSrc && (
+                          <div className="relative rounded-[10px] h-[140px] w-full overflow-hidden mb-3">
+                            <Image
+                              src={subItem.imageSrc}
+                              alt="access logo"
+                              fill
+                              className="object-cover hover:scale-125 transition-all duration-500"
+                            />
+                          </div>
+                        )}
+                        {subItem.titleItem && (
+                          <Link href={subItem.titleItem.link}>
+                            {subItem.titleItem.name}
+                          </Link>
+                        )}
+                        {subItem.itemlist.map((item, index) => (
+                          <Link
+                            href={item.link}
+                            key={index}
+                            className="hover:text-custom-rose w-full hover:font-semibold uppercase py-2 whitespace-nowrap"
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {item.children?.length === 1 && (
                   <div className="absolute top-full left-0 bg-custom-yellow rounded-b-md shadow-xl hidden group-hover:flex group-hover:flex-col overflow-hidden text-[12px] w-auto">
                     {item.children[0].itemlist.map((subItem) => (
