@@ -61,6 +61,7 @@ const navbarItems: NavBarItem[] = [
           { name: "⭐ ALL ACCESSORIES ⭐", link: "/event-booking" },
         ],
       },
+      // comment
       {
         titleItem: {
           name: "bags",
