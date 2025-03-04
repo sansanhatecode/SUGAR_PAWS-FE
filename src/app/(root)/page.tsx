@@ -206,7 +206,7 @@ export default function HomePage() {
                     />
                   </div>
                   <div className="mt-2 flex justify-between w-full text-[12px]">
-                    <h3 className="font-medium group-hover:text-gray-700">
+                    <h3 className="font-medium group-hover:font-semibold">
                       {product.name}
                     </h3>
                     <p className="font-light">{product.price}</p>
@@ -298,9 +298,8 @@ export default function HomePage() {
                 <Image
                   src={card.image}
                   alt={card.title}
-                  layout="fill"
-                  objectFit="cover"
-                  className="brightness-75"
+                  fill
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center p-4">
                   <h2 className="text-[32px] font-bold">{card.title}</h2>
@@ -316,9 +315,8 @@ export default function HomePage() {
                 <Image
                   src={card.image}
                   alt={card.title}
-                  layout="fill"
-                  objectFit="cover"
-                  className="brightness-75"
+                  fill
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center p-4">
                   <h2 className="text-[32px] font-bold">{card.title}</h2>
