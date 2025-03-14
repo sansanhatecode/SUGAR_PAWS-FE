@@ -166,7 +166,7 @@ export default function HomePage() {
             <div className="mt-4 text-[12px]">
               <p className="leading-relaxed">Thursday - Sunday: 11 am - 7 pm</p>
               <p className="leading-relaxed">Monday & Tuesday: closed</p>
-              <p className="leading-relaxed">Wednesday: by appointment only</p>
+              <p className="leading-relaxed">Wednesday: by appointment only</p>
             </div>
           </div>
         </div>
