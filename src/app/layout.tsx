@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import React from "react";
 import "./globals.css";
 import "../lib/fontawesome";
+import { ReactQueryProvider } from "@/provider/ReactQueryProvider";
 
 export const metadata: Metadata = {
   title: "Sugar Paws",
@@ -15,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><ReactQueryProvider>{children}</ReactQueryProvider></body>
     </html>
   );
 }

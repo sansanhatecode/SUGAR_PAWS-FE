@@ -5,18 +5,47 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { useAuthorization } from "@/hooks/queries/useAuthorization";
+import { REGEX } from "@/const/common";
+import { useRouter } from "next/navigation";
+import { setAuthToken } from "@/helper/storage";
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [usernameErrorMessage, setUsernameErrorMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
+  const { signIn } = useAuthorization();
+
+  const router = useRouter();
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSignIn = () => {
-    setErrorMessage("Invalid username or password.");
+  const handleSignIn = async () => {
+    if (usernameErrorMessage) return;
+
+    try {
+      const {accessToken} = await signIn.mutateAsync({ identifier: username, password });
+      setAuthToken(accessToken);
+      router.push("/");
+    } catch (error) {
+      setErrorMessage("Invalid username or password.");
+    }
+    
+  };
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUsername(value);
+    if (!REGEX.USERNAME.test(value) && !REGEX.EMAIL.test(value)) {
+      setUsernameErrorMessage("Invalid username or email format.");
+    } else {
+      setUsernameErrorMessage("");
+    }
   };
 
   return (
@@ -41,10 +70,12 @@ const SignInPage = () => {
               <input
                 type="text"
                 placeholder="Enter your username/email"
+                value={username}
+                onChange={handleUsernameChange}
                 className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose"
               />
-              {errorMessage && (
-                <p className="text-red-500 text-[12px]">{errorMessage}</p>
+              {usernameErrorMessage && (
+                <p className="text-red-500 text-[12px]">{usernameErrorMessage}</p>
               )}
             </div>
             <div className="w-full">
@@ -52,6 +83,8 @@ const SignInPage = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose"
                 />
                 <FontAwesomeIcon
