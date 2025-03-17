@@ -453,14 +453,28 @@ const Header = () => {
             );
           })}
         </ul>
-        <div className="flex space-x-[40px]">
-          <FontAwesomeIcon icon={faSearch} className="text-[14px]" />
+        <div className="flex space-x-[40px] group h-full items-center">
+          <FontAwesomeIcon icon={faSearch} className="text-[14px] hover:text-custom-rose h-full" />
           <FontAwesomeIcon
             icon={faUser}
-            className="text-[14px] hover:text-custom-rose"
+            className="text-[14px] hover:text-custom-rose h-full"
             onClick={() => router.push("/signin")}
           />
-          <FontAwesomeIcon icon={faShoppingCart} className="text-[14px]" />
+          <FontAwesomeIcon
+            icon={faShoppingCart}
+            className="text-[14px] hover:text-custom-rose h-full group"
+          />
+          <div
+            className={`fixed ${isScrolled ? "top-[52px] h-[calc(100vh-52px)]" : "top-[72px] h-[calc(100vh-72px)]"} right-0 w-[400px]  bg-white shadow-lg z-50 transition-transform transform translate-x-full group-hover:translate-x-0`}
+          >
+            <div className="p-4 overflow-y-auto h-[calc(100%-60px)]">
+              <p>Your cart items will be displayed here.</p>
+            </div>
+            <div className="p-4 flex justify-between">
+              <button className="bg-custom-yellow px-4 py-2 rounded">View Cart</button>
+              <button className="bg-custom-rose px-4 py-2 rounded">Checkout</button>
+            </div>
+          </div>
         </div>
       </nav>
     </header>
