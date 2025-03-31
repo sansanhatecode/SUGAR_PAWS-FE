@@ -102,9 +102,7 @@ const Slider = () => {
   const goToPrevious = () => {
     stopAutoSlide();
     setIsTransitioning(true);
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1) % sliderItems.length
-    );
+    setCurrentIndex((prevIndex) => (prevIndex - 1) % sliderItems.length);
     startAutoSlide();
   };
 
@@ -145,12 +143,25 @@ const Slider = () => {
           className="flex w-full h-full"
           style={{
             transform: `translateX(-${currentIndex * 100}%)`,
-            transition: isTransitioning ? 'transform 700ms ease-in-out' : 'none',
+            transition: isTransitioning
+              ? "transform 700ms ease-in-out"
+              : "none",
           }}
           onTransitionEnd={handleTransitionEnd}
         >
           {extendedItems.map(
-            ({ imageSrc, align, subTitle, title, description, ctaButtons, textColor }, index) => (
+            (
+              {
+                imageSrc,
+                align,
+                subTitle,
+                title,
+                description,
+                ctaButtons,
+                textColor,
+              },
+              index,
+            ) => (
               <div key={index} className="relative w-full h-full flex-shrink-0">
                 <Image
                   src={imageSrc}
@@ -163,7 +174,9 @@ const Slider = () => {
                     className={`absolute h-full flex flex-col justify-center z-50 top-0 ${align === "left" ? "left-24 items-start" : "right-24 items-end"}`}
                   >
                     {subTitle && (
-                      <p className={`${textColor ? textColor : "text-white"} font-medium text-[21px]`}>
+                      <p
+                        className={`${textColor ? textColor : "text-white"} font-medium text-[21px]`}
+                      >
                         {subTitle}
                       </p>
                     )}
@@ -178,21 +191,28 @@ const Slider = () => {
                       ))}
                     {description?.length &&
                       description.map((text) => (
-                        <p key={text} className={`${textColor ? textColor : "text-white"} text-[21px]`}>
+                        <p
+                          key={text}
+                          className={`${textColor ? textColor : "text-white"} text-[21px]`}
+                        >
                           {text}
                         </p>
                       ))}
-                    {ctaButtons?.length && 
+                    {ctaButtons?.length && (
                       <div className="flex space-x-4 mt-4">
-                        {ctaButtons.map(({ text, link }) => 
-                          <CtaButton key={text} text={text} onClick={() => router.push(link)} />
-                        )}
+                        {ctaButtons.map(({ text, link }) => (
+                          <CtaButton
+                            key={text}
+                            text={text}
+                            onClick={() => router.push(link)}
+                          />
+                        ))}
                       </div>
-                    }
+                    )}
                   </div>
                 )}
               </div>
-            )
+            ),
           )}
         </div>
       </div>

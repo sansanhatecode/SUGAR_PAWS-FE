@@ -19,7 +19,6 @@ const InfiniteCarousel = () => {
     <div className={styles.sliderContainer}>
       <div className={styles.slider}>
         <div className={styles.slideTrack}>
-          {/* First set of images */}
           {brands.map((brand, index) => (
             <div key={`brand-${index}`} className={styles.slide}>
               <Image
@@ -30,7 +29,6 @@ const InfiniteCarousel = () => {
               />
             </div>
           ))}
-          {/* Duplicate set of images for seamless scrolling */}
           {brands.map((brand, index) => (
             <div key={`brand-duplicate-${index}`} className={styles.slide}>
               <Image
