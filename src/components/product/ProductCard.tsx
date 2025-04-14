@@ -4,7 +4,8 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../Modal";
-import CtaButton from "../CtaButton";
+import CtaButton from "../ui/CtaButton";
+import Link from "next/link";
 
 type ProductCardProps = {
   product: Product;
@@ -12,6 +13,7 @@ type ProductCardProps = {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const {
+    id,
     name,
     minPrice,
     maxPrice,
@@ -118,7 +120,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </Modal>
       )}
 
-      <h2 className="font-semibold text-gray-800 line-clamp-2 mb-2">{name}</h2>
+      <Link
+        className="font-semibold text-gray-800 line-clamp-2 mb-2 hover:text-custom-rose transition-all duration-300"
+        href={`/collections/${id}`}
+      >
+        {name}
+      </Link>
 
       {!availability && (
         <div className="text-sm font-medium mb-2 text-red-600">

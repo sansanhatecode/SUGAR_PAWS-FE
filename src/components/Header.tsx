@@ -395,23 +395,24 @@ const Header = () => {
                         key={subItem.imageSrc}
                         className="flex flex-1 flex-col items-start"
                       >
-                        {subItem.imageSrc && (
-                          <div
-                            className={`relative rounded-[10px] h-[140px] w-full overflow-hidden mb-3 z-10`}
-                          >
-                            <Image
-                              src={subItem.imageSrc}
-                              alt="access logo"
-                              fill
-                              className="object-cover hover:scale-125 transition-all duration-500 z-10"
-                            />
-                          </div>
-                        )}
-                        {subItem.titleItem && (
+                        {/* {subItem.imageSrc && (
+
+                        )} */}
+                        {subItem.titleItem && subItem.imageSrc && (
                           <Link
                             href={subItem.titleItem.link}
                             className="hover:text-custom-rose text-[16px] w-full hover:font-semibold uppercase py-2 whitespace-nowrap"
                           >
+                            <div
+                              className={`relative rounded-[10px] h-[140px] w-full overflow-hidden mb-3 z-10`}
+                            >
+                              <Image
+                                src={subItem.imageSrc}
+                                alt="access logo"
+                                fill
+                                className="object-cover hover:scale-125 transition-all duration-500 z-10"
+                              />
+                            </div>
                             {subItem.titleItem.name}
                           </Link>
                         )}

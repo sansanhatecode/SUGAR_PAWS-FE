@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
-import CtaButton from "./CtaButton";
+import CtaButton from "./ui/CtaButton";
 import { useRouter } from "next/navigation";
 
 type CtaButton = { text: string; link: string };
@@ -160,7 +160,7 @@ const Slider = () => {
                 ctaButtons,
                 textColor,
               },
-              index,
+              index
             ) => (
               <div key={index} className="relative w-full h-full flex-shrink-0">
                 <Image
@@ -212,7 +212,7 @@ const Slider = () => {
                   </div>
                 )}
               </div>
-            ),
+            )
           )}
         </div>
       </div>

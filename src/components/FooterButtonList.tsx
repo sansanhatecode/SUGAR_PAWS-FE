@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import CtaButton from "./CtaButton";
+import CtaButton from "./ui/CtaButton";
 
 const FooterButtonList = () => {
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import CtaButton from "@/components/CtaButton";
+import CtaButton from "@/components/ui/CtaButton";
 import Image from "next/image";
 import React from "react";
 

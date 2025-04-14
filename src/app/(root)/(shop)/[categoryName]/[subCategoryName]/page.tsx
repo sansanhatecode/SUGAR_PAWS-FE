@@ -4,16 +4,18 @@ import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import FilterSection from "../../../components/FilterSection";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { AccessoryPageBanner } from "@/types/accessory";
 import { Product } from "@/types/product";
 import ProductsSection from "@/components/product/ProductsSection";
+import FilterSection from "@/components/FilterSection";
 
 const CategoryPage = () => {
   const pathname = usePathname();
-  const categoryName = pathname.split("/").pop();
+  const pathSegments = pathname.split("/");
+  const subCategoryName = pathSegments.pop();
+  const categoryName = pathSegments.pop();
 
   const sizes = ["S", "M", "L", "XL"];
   const availability = ["In Stock", "Out of Stock"];
@@ -192,7 +194,7 @@ const CategoryPage = () => {
   ];
 
   return (
-    <div className="w-[100vw]">
+    <>
       <div className="w-full">
         <div className="bg-custom-pink h-[250px] flex items-center justify-center relative">
           {sampleAccessoryPageBanner.imageSrc && (
@@ -222,13 +224,17 @@ const CategoryPage = () => {
               Home
             </Link>{" "}
             /{" "}
-            <Link href={pathname} className="hover:underline">
+            <Link href={`/${categoryName}`} className="hover:underline">
               {(categoryName ?? "").charAt(0).toUpperCase() +
                 (categoryName ?? "").slice(1)}
+            </Link>{" "}
+            /{" "}
+            <Link href={pathname} className="hover:underline">
+              {(subCategoryName ?? "").charAt(0).toUpperCase() +
+                (subCategoryName ?? "").slice(1)}
             </Link>
           </div>
 
-          {/* Display selected filters */}
           <div className="mt-4 mb-4 border-b-2 border-b-custom-rose">
             <div className="flex justify-between w-full">
               <h1 className="text-[14px] font-bold">
@@ -313,11 +319,9 @@ const CategoryPage = () => {
             handleColorChange={handleColorChange}
           />
         </div>
-        <div className="min-h-[100vh] py-8 w-full">
-          <ProductsSection products={exampleProducts} />
-        </div>
+        <ProductsSection products={exampleProducts} />
       </div>
-    </div>
+    </>
   );
 };
 

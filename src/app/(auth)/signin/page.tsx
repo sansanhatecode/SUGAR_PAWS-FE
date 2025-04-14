@@ -29,13 +29,15 @@ const SignInPage = () => {
     if (usernameErrorMessage) return;
 
     try {
-      const {accessToken} = await signIn.mutateAsync({ identifier: username, password });
+      const { accessToken } = await signIn.mutateAsync({
+        identifier: username,
+        password,
+      });
       setAuthToken(accessToken);
       router.push("/");
     } catch (error) {
       setErrorMessage("Invalid username or password.");
     }
-    
   };
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +77,9 @@ const SignInPage = () => {
                 className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose"
               />
               {usernameErrorMessage && (
-                <p className="text-red-500 text-[12px]">{usernameErrorMessage}</p>
+                <p className="text-red-500 text-[12px]">
+                  {usernameErrorMessage}
+                </p>
               )}
             </div>
             <div className="w-full">
