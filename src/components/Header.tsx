@@ -395,9 +395,6 @@ const Header = () => {
                         key={subItem.imageSrc}
                         className="flex flex-1 flex-col items-start"
                       >
-                        {/* {subItem.imageSrc && (
-
-                        )} */}
                         {subItem.titleItem && subItem.imageSrc && (
                           <Link
                             href={subItem.titleItem.link}

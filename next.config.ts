@@ -3,7 +3,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["store.lolitacollective.com", "example.com"], // Thêm domain của nguồn hình ảnh
+    domains: [
+      "store.lolitacollective.com",
+      "example.com",
+      "via.placeholder.com",
+    ],
   },
 };
 

@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const DefaultLoading = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-custom-rose bg-opacity-75">
+    <div className="flex flex-col items-center justify-center bg-custom-rose bg-opacity-75 absolute w-full h-full top-0 left-0 z-50">
       <div className="relative w-40 h-40">
         <Image
           src="/assets/images/loading/default-load.png"
