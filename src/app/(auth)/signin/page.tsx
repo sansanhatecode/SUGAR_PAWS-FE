@@ -9,6 +9,7 @@ import { useAuthorization } from "@/hooks/queries/useAuthorization";
 import { REGEX } from "@/const/common";
 import { useRouter } from "next/navigation";
 import { setAuthToken } from "@/helper/storage";
+import DefaultLoading from "@/components/loading/DefaultLoading";
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -17,6 +18,7 @@ const SignInPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { signIn } = useAuthorization();
 
@@ -26,16 +28,30 @@ const SignInPage = () => {
   };
 
   const handleSignIn = async () => {
+    if (!username) {
+      setUsernameErrorMessage("Username or email is required.");
+      return;
+    }
+    if (!password) {
+      setErrorMessage("Password is required.");
+      return;
+    }
     if (usernameErrorMessage) return;
 
     try {
-      const {accessToken} = await signIn.mutateAsync({ identifier: username, password });
+      setLoading(true);
+      const { accessToken } = await signIn.mutateAsync({
+        identifier: username,
+        password,
+      });
       setAuthToken(accessToken);
+      setLoading(false);
       router.push("/");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      setLoading(false);
       setErrorMessage("Invalid username or password.");
     }
-    
   };
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +65,7 @@ const SignInPage = () => {
   };
 
   return (
-    <main className="w-full min-h-screen flex justify-center items-center">
+    <main className="w-full min-h-screen flex justify-center items-center relative">
       <div className="max-w-[1200px] min-w-[928px] w-[60%] flex bg-white rounded-xl overflow-hidden">
         <div className="w-1/2 relative">
           <Image
@@ -75,7 +91,9 @@ const SignInPage = () => {
                 className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose"
               />
               {usernameErrorMessage && (
-                <p className="text-red-500 text-[12px]">{usernameErrorMessage}</p>
+                <p className="text-red-500 text-[12px]">
+                  {usernameErrorMessage}
+                </p>
               )}
             </div>
             <div className="w-full">
@@ -136,6 +154,7 @@ const SignInPage = () => {
           </div>
         </div>
       </div>
+      {loading && <DefaultLoading />}
     </main>
   );
 };

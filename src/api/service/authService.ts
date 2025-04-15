@@ -7,20 +7,28 @@ export function useAuthService() {
 
   const signIn = async ({ identifier, password }: SigninRequest) => {
     try {
-      const {data} = await Request.post<LoginResponseData>(API.LOGIN, { identifier, password });
+      const { data } = await Request.post<LoginResponseData>(API.LOGIN, {
+        identifier,
+        password,
+      });
       return data;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("SignIn Error:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Sign in failed.");
     }
   };
 
-  const signUp = async ({ name, identifier, password }: SignupRequest) => {
+  const signUp = async ({ name, username, email, password }: SignupRequest) => {
     try {
-      const { data } = await Request.post(API.REGISTER, { name, identifier, password });
+      const { data } = await Request.post(API.REGISTER, {
+        name,
+        username,
+        email,
+        password,
+      });
       return data;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("SignUp Error:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Sign up failed.");
@@ -31,7 +39,7 @@ export function useAuthService() {
     try {
       const { data } = await Request.get(API.VERIFY, { code });
       return data;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Verify Error:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Verification failed.");

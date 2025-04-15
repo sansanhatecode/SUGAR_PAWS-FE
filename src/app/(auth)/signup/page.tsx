@@ -5,10 +5,14 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { useAuthorization } from "@/hooks/queries/useAuthorization";
+import { useRouter } from "next/navigation";
+import DefaultLoading from "@/components/loading/DefaultLoading";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -17,16 +21,34 @@ const SignUpPage = () => {
     reenterPassword: "",
   });
 
+  const { signUp } = useAuthorization();
+  const router = useRouter();
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     if (formData.password !== formData.reenterPassword) {
       setErrorMessage("Passwords do not match.");
     } else {
       setErrorMessage("");
-      // Handle sign-up logic here
+      setLoading(true);
+
+      try {
+        await signUp.mutateAsync({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+        });
+        router.push("/verify-code");
+      } catch (error) {
+        console.error("Sign Up Error:", error);
+        setErrorMessage("Invalid username or password.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -143,6 +165,7 @@ const SignUpPage = () => {
           </div>
         </div>
       </div>
+      {loading && <DefaultLoading />}
     </main>
   );
 };

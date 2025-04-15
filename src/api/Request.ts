@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { getAuthToken } from "@/helper/storage";
 import axios, { AxiosResponse } from "axios";
 
@@ -22,7 +23,6 @@ export type Params = {
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export function useRequest() {
-  
   axios.interceptors.request.use(
     (config) => {
       const token = getAuthToken();

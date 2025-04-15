@@ -178,9 +178,9 @@ export default function HomePage() {
                 <path
                   id="circlePath"
                   d="M 125, 125
-         m -60, 0
-         a 60,60 0 1,1 130,0
-         a 60,60 0 1,1 -130,0"
+                     m -60, 0
+                     a 60,60 0 1,1 130,0
+                     a 60,60 0 1,1 -130,0"
                 />
               </defs>
               <text

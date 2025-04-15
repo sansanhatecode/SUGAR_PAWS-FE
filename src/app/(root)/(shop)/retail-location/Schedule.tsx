@@ -1,6 +1,6 @@
 "use client";
 
-import CtaButton from "@/components/CtaButton";
+import CtaButton from "@/components/ui/CtaButton";
 import React from "react";
 
 const Schedule = () => {
