@@ -53,9 +53,12 @@ const navbarItems: NavBarItem[] = [
         },
         itemlist: [
           { name: "GLOVES", link: "/accessories/gloves" },
-          { name: "harnesses and belts", link: "/accessories/harnesses-belts" },
+          {
+            name: "harnesses and belts",
+            link: "/accessories/harnesses-and-belts",
+          },
           { name: "LASHES", link: "/accessories/lashes" },
-          { name: "NECKWEAR", link: "/accessories/neckwears" },
+          { name: "NECKWEARS", link: "/accessories/neckwears" },
           { name: "PARASOLS", link: "/accessories/parasols" },
           { name: "WRIRSTCUFFS", link: "/accessories/wrirstcuffs" },
           { name: "⭐ ALL ACCESSORIES ⭐", link: "/accessories" },
@@ -78,7 +81,7 @@ const navbarItems: NavBarItem[] = [
       {
         titleItem: {
           name: "PINS AND PATCHES",
-          link: "/accessories/pins-patches",
+          link: "/accessories/pins-and-patches",
         },
         imageSrc: "/assets/images/accessories/access-3.png",
         itemlist: [
@@ -173,8 +176,8 @@ const navbarItems: NavBarItem[] = [
           { name: "button up shirts", link: "/clothing/button-up" },
           { name: "cardigans", link: "/clothing/cardigans" },
           { name: "cutsews", link: "/clothing/cutsews" },
-          { name: "outerwears", link: "/clothing/outerwears" },
-          { name: "t-shirts", link: "/clothing/tshirts" },
+          { name: "sweaters", link: "/clothing/sweaters" },
+          { name: "t-shirts", link: "/clothing/t-shirts" },
           { name: "⭐ ALL tops ⭐", link: "/clothing/tops" },
         ],
       },
@@ -194,18 +197,17 @@ const navbarItems: NavBarItem[] = [
       {
         titleItem: {
           name: "bottoms",
-          link: "/clothing/pins-patches",
+          link: "/clothing/bottoms",
         },
         imageSrc: "/assets/images/clothing/clothing-3.png",
         itemlist: [
-          { name: "bottoms", link: "/clothing/bottoms" },
-          { name: "skirts", link: "/accesories/skirts" },
+          { name: "skirts", link: "/clothing/skirts" },
           { name: "petticoats", link: "/clothing/petticoats" },
           { name: "bloomers", link: "/clothing/bloomers" },
-          { name: "shorts & pants", link: "/clothing/shorts-pants" },
+          { name: "shorts & pants", link: "/clothing/shorts" },
           { name: "sweetpants", link: "/clothing/sweetpants" },
           {
-            name: "⭐ ALL dresses ⭐",
+            name: "⭐ ALL bottoms ⭐",
             link: "/clothing/dresses",
           },
         ],
@@ -226,8 +228,8 @@ const navbarItems: NavBarItem[] = [
       {
         imageSrc: "/assets/images/clothing/clothing-5.png",
         titleItem: {
-          name: "swimwear",
-          link: "/clothing/swimwear",
+          name: "swimwears",
+          link: "/clothing/swimwears",
         },
       },
     ],

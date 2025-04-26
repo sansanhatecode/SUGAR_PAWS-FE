@@ -1,6 +1,6 @@
 "use client";
 
-import Breadcrumbs from "@/components/BreadCrum";
+import Breadcrumbs from "@/components/ui/BreadCrum";
 import DefaultLoading from "@/components/loading/DefaultLoading";
 import DeliveryInfo from "@/components/product/DeliveryInfo";
 import ProductDescription from "@/components/product/ProductDescription";
@@ -9,18 +9,18 @@ import ProductInfo from "@/components/product/ProductInfo";
 import ProductOptions from "@/components/product/ProductOptions";
 import QuantityAddToCart from "@/components/product/QuantityAddToCart";
 import ProductReviews from "@/components/product/rating/ProductReviews";
-import { ProductDetail, Review } from "@/types/product";
+import { Product, Review } from "@/types/product";
 import React, { useState, useEffect } from "react";
 
-const fetchProductData = async (productId: string): Promise<ProductDetail> => {
+const fetchProductData = async (productId: string): Promise<Product> => {
   // Giả lập fetch
   await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate network delay
-  const productData: ProductDetail = {
+  const productData: Product = {
     id: productId, // Thêm ID
-    title: "Embrace Sideboard",
-    brand: "Teixeira Design Studio",
-    price: 71.56,
-    oldPrice: 74.56,
+    name: "Embrace Sideboard",
+    vendor: "Teixeira Design Studio",
+    minPrice: 71.56,
+    maxPrice: 74.56,
     rating: 4.8,
     reviewsCount: 67, // Sửa tên
     colors: ["#EED9C4", "#9CA3AF", "#A5B4FC", "#FBCFE8", "#FCA5A5"],
@@ -156,9 +156,7 @@ const ProductDetailComponent: React.FC<{ productId: string }> = ({
 
   // --- Render Logic ---
   if (isLoading) {
-    return (
-      <DefaultLoading />
-    );
+    return <DefaultLoading />;
   }
 
   if (error) {

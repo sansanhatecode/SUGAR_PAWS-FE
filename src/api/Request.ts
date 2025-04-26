@@ -2,18 +2,20 @@
 import { getAuthToken } from "@/helper/storage";
 import axios, { AxiosResponse } from "axios";
 
-export type HeaderResponse = {
-  code: string | null;
-  errorMessage: string | null;
-  timestamp: number;
-  traceId: string;
-  timeElapsed: string;
-  memoryPeak: string;
-};
+// export type HeaderResponse = {
+//   code: string | null;
+//   errorMessage: string | null;
+//   timestamp: number;
+//   traceId: string;
+//   timeElapsed: string;
+//   memoryPeak: string;
+// };
 
 type Response<T> = {
-  data: T;
-  header: HeaderResponse;
+  statusCode: number;
+  message: string;
+  error?: string;
+  data?: T;
 };
 
 export type Params = {

@@ -40,11 +40,15 @@ const SignInPage = () => {
 
     try {
       setLoading(true);
-      const { accessToken } = await signIn.mutateAsync({
+      const response = await signIn.mutateAsync({
         identifier: username,
         password,
       });
-      setAuthToken(accessToken);
+      if (response && response.accessToken) {
+        setAuthToken(response.accessToken);
+      } else {
+        throw new Error("Invalid response from server.");
+      }
       setLoading(false);
       router.push("/");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

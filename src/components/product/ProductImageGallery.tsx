@@ -1,10 +1,10 @@
 // components/product/ProductImageGallery.tsx
 import React from "react";
 import Image from "next/image";
-import { ProductDetail } from "@/types/product";
+import { Product } from "@/types/product";
 
 interface ProductImageGalleryProps {
-  images: ProductDetail["images"];
+  images: Product["displayImage"];
   selectedImage: string;
   onThumbnailClick: (image: string) => void;
   productTitle: string;

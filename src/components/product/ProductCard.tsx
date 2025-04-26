@@ -3,9 +3,10 @@ import { Product } from "@/types/product";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
-import Modal from "../Modal";
+import Modal from "../ui/Modal";
 import CtaButton from "../ui/CtaButton";
 import Link from "next/link";
+import { getColorCode } from "@/helper/getColorCode";
 
 type ProductCardProps = {
   product: Product;
@@ -17,10 +18,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     name,
     minPrice,
     maxPrice,
-    imageUrl,
+    displayImage,
     colors,
     discount,
-    availability,
+    totalStock,
     sales,
     sizes,
     reviewStars,
@@ -42,19 +43,43 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const finalMaxPrice = discount ? maxPrice * (1 - discount / 100) : maxPrice;
 
   return (
-    <div className="rounded-2xl shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-300 p-3 bg-white w-full text-[12px] leading-[1.4]">
+    <div className="rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 p-3 bg-white w-full text-[12px] leading-[1.4]">
       <div
-        className="relative w-full h-48 mb-3 rounded-xl overflow-hidden group"
+        className="relative w-full mb-3 rounded-xl overflow-hidden group aspect-square"
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
+        {/* Primary image */}
         <Image
-          src={hovered && imageUrl[1] ? imageUrl[1] : imageUrl[0]}
+          src={
+            displayImage[0].startsWith("//")
+              ? `https:${displayImage[0]}`
+              : displayImage[0]
+          }
           alt={name}
           fill
           sizes="(max-width: 768px) 100vw, (min-width: 769px) 50vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className="object-cover transition-opacity duration-500"
+          style={{ opacity: hovered && displayImage[1] ? 0 : 1 }}
+          priority
         />
+
+        {/* Hover image - only rendered if it exists */}
+        {displayImage[1] && (
+          <Image
+            src={
+              displayImage[1].startsWith("//")
+                ? `https:${displayImage[1]}`
+                : displayImage[1]
+            }
+            alt={`${name} - hover view`}
+            fill
+            sizes="(max-width: 768px) 100vw, (min-width: 769px) 50vw"
+            className="object-cover transition-opacity duration-300"
+            style={{ opacity: hovered ? 1 : 0 }}
+            priority
+          />
+        )}
 
         <div className="absolute bottom-2 right-2 group">
           <button
@@ -106,7 +131,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   <button
                     key={idx}
                     className="w-6 h-6 rounded-full border"
-                    style={{ backgroundColor: color.colorCode }}
+                    style={{ backgroundColor: getColorCode(color) }}
                   />
                 ))}
               </div>
@@ -127,7 +152,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {name}
       </Link>
 
-      {!availability && (
+      {!totalStock && (
         <div className="text-sm font-medium mb-2 text-red-600">
           OUT OF STOCK
         </div>
@@ -137,9 +162,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {colors.map((color, idx) => (
           <div
             key={idx}
-            title={color.colorName}
+            title={color}
             className="w-4 h-4 rounded-full border border-gray-300"
-            style={{ backgroundColor: color.colorCode }}
+            style={{ backgroundColor: getColorCode(color) }}
           />
         ))}
       </div>

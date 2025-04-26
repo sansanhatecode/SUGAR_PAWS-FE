@@ -3,29 +3,32 @@ export type Product = {
   name: string;
   minPrice: number;
   maxPrice: number;
-  imageUrl: string[];
-  colors: { colorName: string; colorCode: string }[];
-  availability: string[];
+  displayImage: string[];
+  vendor?: string;
+  colors: string[];
+  totalStock: string[];
   discount?: number;
   sales?: number;
   sizes?: string[];
   reviewStars?: number;
+  tags?: string[];
+  rating?: number;
+  description?: string;
+  productDetails?: unknown[];
 };
 
 // components/types.ts
 export type ProductDetail = {
-  id: string | number; // Thêm ID cho sản phẩm
+  id: string | number;
   title: string;
   brand: string;
   price: number;
   oldPrice?: number;
   rating: number;
-  reviewsCount: number; // Đổi tên từ reviews
-  colors: string[];
-  sizes: string[];
-  images: string[];
-  description: string;
-  benefits: string[];
+  reviewsCount: number;
+  colors: string;
+  sizes: string;
+  images: string;
   productDetails: string[];
   moreDetails: string[];
 };
@@ -37,4 +40,18 @@ export type Review = {
   time: string;
   title: string;
   comment: string;
+};
+
+export type GetProductsRequest = {
+  categoryName: string;
+  minPrice?: number;
+  maxPrice?: number;
+};
+
+export type GetColorsRequest = {
+  categoryName: string;
+};
+
+export type GetSizesRequest = {
+  categoryName: string;
 };

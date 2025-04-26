@@ -84,7 +84,7 @@ const QuantityAddToCart: React.FC<QuantityAddToCartProps> = ({
       {/* Add To Cart Button - Styled like the image */}
       <button
         onClick={onAddToCart}
-        className="flex-grow w-full sm:w-auto bg-custom-rose hover:opacity-90 text-white font-semibold py-2.5 px-6 rounded-full flex items-center justify-center gap-2 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-pink" // Adjusted padding slightly
+        className="flex-grow w-full sm:w-auto bg-custom-wine hover:opacity-90 text-white font-semibold py-2.5 px-6 rounded-full flex items-center justify-center gap-2 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-pink" // Adjusted padding slightly
       >
         <FaShoppingBag className="w-4 h-4" /> {/* Added Icon */}
         <span>Add To Cart</span>

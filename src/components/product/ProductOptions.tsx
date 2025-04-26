@@ -2,8 +2,8 @@ import { ProductDetail } from "@/types/product";
 import React from "react";
 
 interface ProductOptionsProps {
-  colors: ProductDetail["colors"];
-  sizes: ProductDetail["sizes"];
+  colors: ProductDetail["colors"][];
+  sizes: ProductDetail["sizes"][];
   selectedColor: string;
   selectedSize: string;
   onColorSelect: (color: string) => void;
@@ -20,7 +20,6 @@ const ProductOptions: React.FC<ProductOptionsProps> = ({
 }) => {
   return (
     <div className="space-y-4 mt-4">
-      {/* Color Selector */}
       <div>
         <p className="mb-2 text-sm font-medium text-gray-700">Choose a Color</p>
         <div className="flex flex-wrap gap-2">
@@ -44,7 +43,6 @@ const ProductOptions: React.FC<ProductOptionsProps> = ({
         </div>
       </div>
 
-      {/* Size Selector */}
       <div>
         <div className="flex justify-between items-center mb-2">
           <p className="text-sm font-medium text-gray-700">Choose a Size</p>
