@@ -177,7 +177,7 @@ const navbarItems: NavBarItem[] = [
           { name: "cardigans", link: "/clothing/cardigans" },
           { name: "cutsews", link: "/clothing/cutsews" },
           { name: "sweaters", link: "/clothing/sweaters" },
-          { name: "t-shirts", link: "/clothing/t-shirts" },
+          { name: "t-shirts", link: "/clothing/tshirts" },
           { name: "⭐ ALL tops ⭐", link: "/clothing/tops" },
         ],
       },

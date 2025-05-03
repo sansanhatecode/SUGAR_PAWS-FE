@@ -5,6 +5,7 @@ const API = {
   PRODUCTS: "products/category",
   COLORS: "products/colors",
   SIZES: "products/sizes",
+  PRODUCT_DETAIL: "products/",
 };
 
 export default API;

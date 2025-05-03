@@ -6,15 +6,15 @@ export type Product = {
   displayImage: string[];
   vendor?: string;
   colors: string[];
-  totalStock: string[];
+  totalStock: number;
   discount?: number;
-  sales?: number;
+  totalSales?: number;
   sizes?: string[];
   reviewStars?: number;
   tags?: string[];
   rating?: number;
   description?: string;
-  productDetails?: unknown[];
+  productDetails?: ProductDetail[];
 };
 
 // components/types.ts
@@ -28,10 +28,17 @@ export type ProductDetail = {
   reviewsCount: number;
   colors: string;
   sizes: string;
-  images: string;
+  image: ImageDetail;
   productDetails: string[];
   moreDetails: string[];
 };
+
+export type ImageDetail = {
+  id: number | string;
+  url: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export type Review = {
   id: number;
@@ -44,6 +51,9 @@ export type Review = {
 
 export type GetProductsRequest = {
   categoryName: string;
+  colors?: string[];
+  sizes?: string[];
+  availability?: string[];
   minPrice?: number;
   maxPrice?: number;
 };

@@ -3,16 +3,15 @@
 
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
-import { AccessoryPageBanner } from "@/types/accessory";
 import {
   useGetColors,
   useGetProducts,
   useGetSizes,
 } from "@/hooks/queries/useProducts";
-import { getColorCode } from "@/helper/getColorCode";
-import CategoryPageBanner from "@/components/category/CategoryPageBanner";
+import { getColorCode } from "@/helper/colorHelper";
 import CategoryPageFilters from "@/components/category/CategoryPageFilters";
 import CategoryPageLayout from "@/components/category/CategoryPageLayout";
+import { Colors } from "@/components/ColorCheckboxes";
 
 const CategoryPage = () => {
   const pathname = usePathname();
@@ -38,18 +37,19 @@ const CategoryPage = () => {
   const { data: colorsData } = getColors;
   const availability = ["In Stock", "Out of Stock"];
   const colors =
-    colorsData?.map((color) => ({
-      colorName: color,
-      colorCode: getColorCode(color) || "",
-    })) || [];
+    colorsData?.map(
+      (color) =>
+        ({
+          colorName: color,
+          colorCode: getColorCode(color) || "",
+        }) as Colors
+    ) || [];
 
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedAvailability, setSelectedAvailability] = useState<string[]>(
     []
   );
-  const [selectedColors, setSelectedColors] = useState<
-    { colorName: string; colorCode: string }[]
-  >([]);
+  const [selectedColors, setSelectedColors] = useState<Colors[] | []>([]);
 
   const handleSizeChange = (size: string) => {
     setSelectedSizes((prevSelectedSizes) =>
@@ -67,14 +67,14 @@ const CategoryPage = () => {
     );
   };
 
-  const handleColorChange = (colorCode: string) => {
+  const handleColorChange = (colorName: string) => {
     setSelectedColors((prevSelectedColors) => {
       const selectedColor = colors.find(
-        (color) => color.colorCode === colorCode
+        (color) => color.colorName === colorName
       );
       if (!selectedColor) return prevSelectedColors;
-      return prevSelectedColors.some((color) => color.colorCode === colorCode)
-        ? prevSelectedColors.filter((color) => color.colorCode !== colorCode)
+      return prevSelectedColors.some((color) => color.colorName === colorName)
+        ? prevSelectedColors.filter((color) => color.colorName !== colorName)
         : [...prevSelectedColors, selectedColor];
     });
   };
@@ -111,14 +111,7 @@ const CategoryPage = () => {
       isLoading={isLoading}
       error={error}
       products={products}
-      isEmpty="No products found for this subcategory."
-      banner={
-        <CategoryPageBanner
-          title={pageTitle}
-          description="Explore our exclusive collection of accessories."
-          isLoading={isLoading}
-        />
-      }
+      isEmpty="Sorry, there are no products in this collection."
       filters={
         <CategoryPageFilters
           pathname={pathname}

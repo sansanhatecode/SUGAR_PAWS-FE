@@ -2,14 +2,35 @@ import React, { useState } from "react";
 import { Product } from "@/types/product";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCartPlus, faStar } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../ui/Modal";
 import CtaButton from "../ui/CtaButton";
 import Link from "next/link";
-import { getColorCode } from "@/helper/getColorCode";
+import { getColorCode } from "@/helper/colorHelper";
 
 type ProductCardProps = {
   product: Product;
+};
+
+const renderColorButton = (color: string, className: string = "") => {
+  const colorCode = getColorCode(color);
+  let backgroundStyle: string;
+
+  if (Array.isArray(colorCode) && colorCode.length === 2) {
+    backgroundStyle = `linear-gradient(to bottom right, ${colorCode[0]} 50%, ${colorCode[1]} 50%)`;
+  } else {
+    backgroundStyle =
+      typeof colorCode === "string"
+        ? colorCode
+        : (colorCode && colorCode[0]) || "transparent";
+  }
+
+  return (
+    <div
+      className={`rounded-full border border-gray-300 ${className}`}
+      style={{ background: backgroundStyle }}
+    />
+  );
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
@@ -22,10 +43,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     colors,
     discount,
     totalStock,
-    sales,
+    totalSales,
     sizes,
     reviewStars,
   } = product;
+  console.log(product);
 
   const [hovered, setHovered] = useState<boolean>(false);
   const [buttonHovered, setButtonHovered] = useState<boolean>(false);
@@ -43,7 +65,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const finalMaxPrice = discount ? maxPrice * (1 - discount / 100) : maxPrice;
 
   return (
-    <div className="rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 p-3 bg-white w-full text-[12px] leading-[1.4]">
+    <div className="rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 p-3 bg-white w-full text-[12px] leading-[1.4] relative">
       <div
         className="relative w-full mb-3 rounded-xl overflow-hidden group aspect-square"
         onMouseEnter={() => setHovered(true)}
@@ -126,13 +148,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {colors && colors.length > 0 && (
             <div className="mb-4">
               <h4 className="text-sm font-medium mb-2">Colors:</h4>
-              <div className="flex gap-2">
+              <div className="gap-2 flex flex-wrap">
                 {colors.map((color, idx) => (
-                  <button
-                    key={idx}
-                    className="w-6 h-6 rounded-full border"
-                    style={{ backgroundColor: getColorCode(color) }}
-                  />
+                  <button key={idx} className="w-6 h-6">
+                    {renderColorButton(color, "w-full h-full")}
+                  </button>
                 ))}
               </div>
             </div>
@@ -158,31 +178,33 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
       )}
 
-      <div className="flex items-center gap-1 mb-2">
+      <div className="flex items-center flex-wrap gap-1 mb-2">
         {colors.map((color, idx) => (
-          <div
-            key={idx}
-            title={color}
-            className="w-4 h-4 rounded-full border border-gray-300"
-            style={{ backgroundColor: getColorCode(color) }}
-          />
+          <div key={idx} title={color} className="w-4 h-4">
+            {renderColorButton(color, "w-full h-full")}
+          </div>
         ))}
       </div>
 
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-4">
         {discount ? (
           <div className="flex flex-col">
             <span className="text-gray-400 line-through">
-              {minPrice.toLocaleString()}₫ - {maxPrice.toLocaleString()}₫
+              {minPrice === maxPrice
+                ? `${minPrice.toLocaleString()}₫`
+                : `${minPrice.toLocaleString()}₫ - ${maxPrice.toLocaleString()}₫`}
             </span>
             <span className="text-red-500 font-semibold">
-              {finalMinPrice.toLocaleString()}₫ -{" "}
-              {finalMaxPrice.toLocaleString()}₫
+              {finalMinPrice === finalMaxPrice
+                ? `${finalMinPrice.toLocaleString()}₫`
+                : `${finalMinPrice.toLocaleString()}₫ - ${finalMaxPrice.toLocaleString()}₫`}
             </span>
           </div>
         ) : (
           <span className="text-gray-800 font-semibold">
-            {minPrice.toLocaleString()}₫ - {maxPrice.toLocaleString()}₫
+            {minPrice === maxPrice
+              ? `${minPrice.toLocaleString()}₫`
+              : `${minPrice.toLocaleString()}₫ - ${maxPrice.toLocaleString()}₫`}
           </span>
         )}
         {discount && (
@@ -192,9 +214,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         )}
       </div>
 
-      <div className="flex justify-between text-gray-500 text-[11px]">
-        <span className="text-yellow-500 font-medium">{reviewStars}★</span>
-        {sales !== undefined && <span>{sales.toLocaleString()} sold</span>}
+      <div className="absolute bottom-3 left-3 right-3 flex justify-between text-gray-500 text-[11px]">
+        <span className="text-yellow-500 font-medium">
+          {reviewStars}
+          <FontAwesomeIcon icon={faStar} />
+        </span>
+        {totalSales !== undefined && (
+          <span>{totalSales.toLocaleString()} sold</span>
+        )}
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 "use client";
 
 import Breadcrumbs from "@/components/ui/BreadCrum";
@@ -9,40 +10,15 @@ import ProductInfo from "@/components/product/ProductInfo";
 import ProductOptions from "@/components/product/ProductOptions";
 import QuantityAddToCart from "@/components/product/QuantityAddToCart";
 import ProductReviews from "@/components/product/rating/ProductReviews";
-import { Product, Review } from "@/types/product";
-import React, { useState, useEffect } from "react";
-
-const fetchProductData = async (productId: string): Promise<Product> => {
-  // Giả lập fetch
-  await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate network delay
-  const productData: Product = {
-    id: productId, // Thêm ID
-    name: "Embrace Sideboard",
-    vendor: "Teixeira Design Studio",
-    minPrice: 71.56,
-    maxPrice: 74.56,
-    rating: 4.8,
-    reviewsCount: 67, // Sửa tên
-    colors: ["#EED9C4", "#9CA3AF", "#A5B4FC", "#FBCFE8", "#FCA5A5"],
-    sizes: ["Small", "Medium", "Large", "Extra Large", "XXL"],
-    images: [
-      "https://via.placeholder.com/600x700/EED9C4/333?text=Main+View",
-      "https://via.placeholder.com/600x700/D1CFC0/333?text=Alt+1",
-      "https://via.placeholder.com/600x700/A5A8DD/333?text=Alt+2",
-      "https://via.placeholder.com/600x700/C8D8A9/333?text=Alt+3",
-    ],
-    description: "Detailed product description goes here...",
-    benefits: ["Benefit 1", "Benefit 2", "Benefit 3"],
-    productDetails: ["Detail A", "Detail B"],
-    moreDetails: ["More Detail X", "More Detail Y"],
-  };
-  return productData;
-};
+import { ImageDetail, Review } from "@/types/product";
+import { useGetProductDetail } from "@/hooks/queries/useProducts";
+import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fetchReviewsData = async (productId: string): Promise<Review[]> => {
   await new Promise((resolve) => setTimeout(resolve, 150));
-  const sampleReviews: Review[] = [
+  return [
     {
       id: 1,
       name: "Nicolas Cage",
@@ -68,54 +44,64 @@ const fetchReviewsData = async (productId: string): Promise<Review[]> => {
       comment: "Exactly what I needed.",
     },
   ];
-  return sampleReviews;
 };
 
-const ProductDetailComponent: React.FC<{ productId: string }> = ({
-  productId,
-}) => {
-  const [product, setProduct] = useState<ProductDetail | null>(null);
+export default function ProductDetailPage() {
+  const pathname = usePathname();
+  const productId = pathname.split("/").pop();
+
+  const { getProductDetail } = useGetProductDetail(productId ?? "");
+  const { data: product, isLoading, error } = getProductDetail;
+
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [selectedImage, setSelectedImage] = useState<ImageDetail | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
-  const [quantity, setQuantity] = useState<number>(1); // Bắt đầu từ 1
+  const [quantity, setQuantity] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<"description" | "reviews">(
-    "description",
+    "description"
   );
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
+  // Effect for loading reviews and initializing selected image
   useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      setError(null);
+    const loadReviews = async () => {
       try {
-        const [productData, reviewsData] = await Promise.all([
-          fetchProductData(productId),
-          fetchReviewsData(productId),
-        ]);
-
-        setProduct(productData);
+        const reviewsData = await fetchReviewsData(productId ?? "");
         setReviews(reviewsData);
-
-        // Set initial state based on fetched data
-        if (productData) {
-          setSelectedImage(productData.images[0] || "");
-          setSelectedColor(productData.colors[0] || "");
-          setSelectedSize(productData.sizes[0] || "");
-        }
       } catch (err) {
-        console.error("Failed to load product data:", err);
-        setError("Failed to load product details. Please try again later.");
-      } finally {
-        setIsLoading(false);
+        console.error("Failed to load reviews:", err);
       }
     };
-    loadData();
+    loadReviews();
   }, [productId]);
 
-  // --- Handlers ---
+  useEffect(() => {
+    if (product) {
+      const images: ImageDetail[] = product.displayImage.map((url) => ({
+        id: "NA",
+        url: url.startsWith("//") ? "https:" + url : url,
+      }));
+
+      const productDetailImages: ImageDetail[] = product.productDetails
+        ? (() => {
+            const uniqueIds = new Set<string>();
+            return product.productDetails
+              .map((productDetail) => productDetail.image)
+              .filter((image) => {
+                if (!image.id) return false;
+                if (uniqueIds.has(String(image.id))) return false;
+                uniqueIds.add(String(image.id));
+                return true;
+              });
+          })()
+        : [];
+
+      if ([...images, ...productDetailImages].length > 0 && !selectedImage) {
+        setSelectedImage([...images, ...productDetailImages][0]);
+      }
+    }
+  }, [product, selectedImage]);
+
   const handleColorSelect = (color: string) => setSelectedColor(color);
   const handleSizeSelect = (size: string) => setSelectedSize(size);
   const handleDecrementQuantity = () => setQuantity((q) => Math.max(1, q - 1));
@@ -126,12 +112,11 @@ const ProductDetailComponent: React.FC<{ productId: string }> = ({
   const handleAddToCart = () => {
     if (!product) return;
     console.log("Adding to cart:", {
-      productId: product.id, // Sử dụng ID
+      productId: product.id,
       color: selectedColor,
       size: selectedSize,
-      quantity: quantity,
+      quantity,
     });
-    // Logic thêm vào giỏ hàng
   };
 
   const handleSubmitReview = (reviewData: {
@@ -140,29 +125,22 @@ const ProductDetailComponent: React.FC<{ productId: string }> = ({
     content: string;
   }) => {
     if (!product) return;
-    console.log("Submitting review for product:", product.id, reviewData);
-    // Logic gửi review lên API
-    // Sau khi thành công, có thể fetch lại reviews hoặc thêm review mới vào state
     const newReview: Review = {
-      id: Date.now(), // ID tạm thời
-      name: "Current User", // Lấy tên user đang đăng nhập
+      id: Date.now(),
+      name: "Current User",
       rating: reviewData.rating,
       time: "Just now",
       title: reviewData.title,
       comment: reviewData.content,
     };
-    setReviews((prevReviews) => [newReview, ...prevReviews]); // Thêm vào đầu danh sách
+    setReviews((prev) => [newReview, ...prev]);
   };
 
-  // --- Render Logic ---
-  if (isLoading) {
-    return <DefaultLoading />;
-  }
-
+  if (isLoading) return <DefaultLoading />;
   if (error) {
     return (
       <div className="container mx-auto text-center py-20 text-red-600">
-        {error}
+        {error.message || "An error occurred while loading the product"}
       </div>
     );
   }
@@ -175,44 +153,50 @@ const ProductDetailComponent: React.FC<{ productId: string }> = ({
     );
   }
 
-  // Dữ liệu cho Breadcrumbs
   const breadcrumbItems = [
     { name: "Home", href: "/" },
-    { name: "Decoration", href: "/decoration" }, // Example links
-    { name: "Furniture", href: "/furniture" },
-    { name: "Storage", href: "/storage" },
-    { name: product.title }, // Current page, no link
+    { name: "Collection", href: "/collections" },
+    { name: product.name },
   ];
+
+  const images: ImageDetail[] = product.displayImage.map((url) => ({
+    id: "NA",
+    url: url.startsWith("//") ? "https:" + url : url,
+  }));
+
+  const productDetailImages: ImageDetail[] = product.productDetails
+    ? (() => {
+        const uniqueIds = new Set<string>();
+        return product.productDetails
+          .map((productDetail) => productDetail.image)
+          .filter((image) => {
+            // Skip images without an ID
+            if (!image.id) return false;
+            // Only keep if this ID hasn't been seen yet
+            if (uniqueIds.has(String(image.id))) return false;
+            uniqueIds.add(String(image.id));
+            return true;
+          });
+      })()
+    : [];
 
   return (
     <div className="container mx-auto px-4 md:px-[10%] lg:px-[15%] py-8">
       <Breadcrumbs items={breadcrumbItems} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
-        {/* Cột trái: Hình ảnh */}
         <ProductImageGallery
-          images={product.images}
+          images={[...images, ...productDetailImages]}
           selectedImage={selectedImage}
           onThumbnailClick={setSelectedImage}
-          productTitle={product.title}
+          productTitle={product.name}
         />
 
-        {/* Cột phải: Thông tin, options, actions */}
         <div className="flex flex-col gap-5">
-          <ProductInfo
-            product={{
-              title: product.title,
-              brand: product.brand,
-              price: product.price,
-              oldPrice: product.oldPrice,
-              rating: product.rating,
-              reviewsCount: reviews.length, // Lấy số lượng thực tế từ reviews đã fetch
-            }}
-            // Thêm onWishlistClick, onShareClick nếu cần
-          />
+          <ProductInfo product={product} />
           <ProductOptions
             colors={product.colors}
-            sizes={product.sizes}
+            sizes={product.sizes ?? []}
             selectedColor={selectedColor}
             selectedSize={selectedSize}
             onColorSelect={handleColorSelect}
@@ -229,7 +213,6 @@ const ProductDetailComponent: React.FC<{ productId: string }> = ({
         </div>
       </div>
 
-      {/* Phần Tabs */}
       <div id="reviews-section" className="border-t border-gray-200 pt-8">
         <div className="flex justify-center border-b border-gray-200 mb-6">
           <button
@@ -255,19 +238,11 @@ const ProductDetailComponent: React.FC<{ productId: string }> = ({
         </div>
 
         <div className="mt-6">
-          {activeTab === "description" && (
-            <ProductDescription
-              product={{
-                description: product.description,
-                benefits: product.benefits,
-                productDetails: product.productDetails,
-                moreDetails: product.moreDetails,
-              }}
-            />
-          )}
-          {activeTab === "reviews" && (
+          {activeTab === "description" ? (
+            <ProductDescription description={product.description} />
+          ) : (
             <ProductReviews
-              productRating={product.rating}
+              productRating={product.rating ?? 5}
               reviews={reviews}
               onSubmitReview={handleSubmitReview}
             />
@@ -276,6 +251,4 @@ const ProductDetailComponent: React.FC<{ productId: string }> = ({
       </div>
     </div>
   );
-};
-
-export default ProductDetailComponent;
+}

@@ -1,15 +1,26 @@
 /* eslint-disable prettier/prettier */
 import API from "@/api/api";
 import { useRequest } from "@/api/Request";
-import { GetColorsRequest, GetProductsRequest, GetSizesRequest, Product } from "@/types/product";
+import {
+  GetColorsRequest,
+  GetProductsRequest,
+  GetSizesRequest,
+  Product,
+} from "@/types/product";
 
 export function useGetProductservice() {
   const { Request } = useRequest();
 
-  const getProducts = async ({ categoryName }: GetProductsRequest) => {
+  const getProducts = async ({
+    categoryName,
+    colors,
+    sizes,
+  }: GetProductsRequest) => {
     try {
       const { data } = await Request.get<Product[]>(API.PRODUCTS, {
         category: categoryName,
+        colors: colors,
+        sizes: sizes,
       });
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,7 +35,7 @@ export function useGetProductservice() {
     }
   };
 
-  const getColors = async ({ categoryName }: GetColorsRequest) => { 
+  const getColors = async ({ categoryName }: GetColorsRequest) => {
     try {
       const { data } = await Request.get<string[]>(API.COLORS, {
         category: categoryName,
@@ -32,15 +43,12 @@ export function useGetProductservice() {
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error(
-        "GetColors Error:",
-        error.response?.data || error.message
-      );
+      console.error("GetColors Error:", error.response?.data || error.message);
       throw new Error(
         error.response?.data?.message || "Failed to fetch colors."
       );
     }
-  }
+  };
 
   const getSizes = async ({ categoryName }: GetSizesRequest) => {
     try {
@@ -57,5 +65,21 @@ export function useGetProductservice() {
     }
   };
 
-  return { getProducts, getColors, getSizes };
+  const getProductDetail = async (id: string) => {
+    try {
+      const { data } = await Request.get<Product>(API.PRODUCT_DETAIL + id);
+      return data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error(
+        "GetProductDetail Error:",
+        error.response?.data || error.message
+      );
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch product detail."
+      );
+    }
+  };
+
+  return { getProducts, getColors, getSizes, getProductDetail };
 }

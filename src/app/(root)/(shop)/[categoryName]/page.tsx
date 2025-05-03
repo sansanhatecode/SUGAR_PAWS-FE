@@ -1,24 +1,34 @@
+/* eslint-disable prettier/prettier */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { AccessoryPageBanner } from "@/types/accessory";
 import {
   useGetColors,
   useGetProducts,
   useGetSizes,
 } from "@/hooks/queries/useProducts";
-import { getColorCode } from "@/helper/getColorCode";
-import CategoryPageBanner from "@/components/category/CategoryPageBanner";
+import { getColorCode } from "@/helper/colorHelper";
 import CategoryPageFilters from "@/components/category/CategoryPageFilters";
 import CategoryPageLayout from "@/components/category/CategoryPageLayout";
+import { Colors } from "@/components/ColorCheckboxes";
 
 const CategoryPage = () => {
   const pathname = usePathname();
   const categoryName = pathname.split("/").pop();
 
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedAvailability, setSelectedAvailability] = useState<string[]>(
+    []
+  );
+  const [selectedColors, setSelectedColors] = useState<Colors[]>([]);
+
+  // Pass filter parameters to the API call
   const { getProducts } = useGetProducts({
     categoryName: categoryName || "",
+    sizes: selectedSizes,
+    colors: selectedColors.map((color) => color.colorName),
+    availability: selectedAvailability,
   });
 
   const { getColors } = useGetColors({
@@ -28,24 +38,24 @@ const CategoryPage = () => {
     categoryName: categoryName || "",
   });
 
-  const { data: productsData, isLoading, error } = getProducts;
+  const { data: productsData, isLoading, error, refetch } = getProducts;
+
+  // Refetch data when filters change
+  useEffect(() => {
+    refetch();
+  }, [selectedSizes, selectedColors, selectedAvailability, refetch]);
 
   const { data: sizes } = getSizes;
   const { data: colorsData } = getColors;
   const availability = ["In Stock", "Out of Stock"];
   const colors =
-    colorsData?.map((color) => ({
-      colorName: color,
-      colorCode: getColorCode(color) || "",
-    })) || [];
-
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedAvailability, setSelectedAvailability] = useState<string[]>(
-    []
-  );
-  const [selectedColors, setSelectedColors] = useState<
-    { colorName: string; colorCode: string }[]
-  >([]);
+    colorsData?.map(
+      (color) =>
+        ({
+          colorName: color,
+          colorCode: getColorCode(color) || "",
+        }) as Colors
+    ) || [];
 
   const handleSizeChange = (size: string) => {
     setSelectedSizes((prevSelectedSizes) =>
@@ -63,14 +73,14 @@ const CategoryPage = () => {
     );
   };
 
-  const handleColorChange = (colorCode: string) => {
+  const handleColorChange = (colorName: string) => {
     setSelectedColors((prevSelectedColors) => {
       const selectedColor = colors.find(
-        (color) => color.colorCode === colorCode
+        (color) => color.colorName === colorName
       );
       if (!selectedColor) return prevSelectedColors;
-      return prevSelectedColors.some((color) => color.colorCode === colorCode)
-        ? prevSelectedColors.filter((color) => color.colorCode !== colorCode)
+      return prevSelectedColors.some((color) => color.colorName === colorName)
+        ? prevSelectedColors.filter((color) => color.colorName !== colorName)
         : [...prevSelectedColors, selectedColor];
     });
   };
@@ -106,14 +116,7 @@ const CategoryPage = () => {
       isLoading={isLoading}
       error={error}
       products={products}
-      isEmpty="No products found for this category."
-      banner={
-        <CategoryPageBanner
-          title={pageTitle}
-          description="Explore our exclusive collection."
-          isLoading={isLoading}
-        />
-      }
+      isEmpty="Sorry, there are no products in this collection."
       filters={
         <CategoryPageFilters
           pathname={pathname}

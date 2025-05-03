@@ -3,19 +3,20 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import FilterSection from "@/components/FilterSection";
+import { Colors } from "../ColorCheckboxes";
 
 interface CategoryPageFiltersProps {
   pathname: string;
   categoryName?: string;
   subCategoryName?: string;
   sizes: string[];
-  colors: { colorName: string; colorCode: string }[];
+  colors: Colors[];
   availability: string[];
   selectedSizes: string[];
-  selectedColors: { colorName: string; colorCode: string }[];
+  selectedColors: Colors[];
   selectedAvailability: string[];
   handleSizeChange: (size: string) => void;
-  handleColorChange: (colorCode: string) => void;
+  handleColorChange: (colorName: string) => void;
   handleAvailabilityChange: (status: string) => void;
   handleRemoveSize: (size: string) => void;
   handleRemoveColor: (colorCode: string) => void;
@@ -134,14 +135,14 @@ const CategoryPageFilters = ({
             ))}
 
           {selectedColors.length > 0 &&
-            selectedColors.map((color) => (
+            selectedColors.map((color, index) => (
               <div
-                key={color.colorCode}
+                key={index}
                 className="flex items-center gap-2 bg-gray-200 py-1 px-3 rounded-full"
               >
                 {color.colorName}
                 <button
-                  onClick={() => handleRemoveColor(color.colorCode)}
+                  onClick={() => handleRemoveColor(color.colorName)}
                   className="ml-2 text-custom-rose"
                 >
                   <FontAwesomeIcon icon={faTimes} />

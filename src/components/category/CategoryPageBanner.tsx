@@ -5,14 +5,14 @@ interface CategoryPageBannerProps {
   title: string;
   description?: string;
   imageSrc?: string;
-  isLoading: boolean;
+  isLoading?: boolean;
 }
 
 const CategoryPageBanner = ({
   title,
   description = "Explore our exclusive collection.",
   imageSrc = "https://store.lolitacollective.com/cdn/shop/products/Candy-Shoppe-OTKs-Sax-x-Pink_a02047d9-622c-4238-8f34-7b4f1db67516_98x.png?v=1660765917",
-  isLoading,
+  isLoading = false,
 }: CategoryPageBannerProps) => {
   return (
     <div className="w-full">

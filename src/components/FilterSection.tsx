@@ -1,7 +1,7 @@
 import React from "react";
 import SizeCheckboxes from "./SizeCheckboxes";
 import AvailabilityCheckboxes from "./AvailabilityCheckboxes";
-import ColorCheckboxes from "./ColorCheckboxes";
+import ColorCheckboxes, { Colors } from "./ColorCheckboxes";
 
 interface FilterSectionProps {
   sizes: string[];
@@ -10,9 +10,9 @@ interface FilterSectionProps {
   availability: string[];
   selectedAvailability: string[];
   handleAvailabilityChange: (status: string) => void;
-  colors: { colorName: string; colorCode: string }[];
-  selectedColors: { colorName: string; colorCode: string }[];
-  handleColorChange: (colorCode: string) => void;
+  colors: Colors[];
+  selectedColors: Colors[];
+  handleColorChange: (colorName: string) => void;
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({

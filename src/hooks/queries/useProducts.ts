@@ -43,3 +43,19 @@ export function useGetSizes(params: GetSizesRequest) {
     getSizes: getSizesQuery,
   };
 }
+
+export function useGetProductDetail(productId: string) {
+  const { getProductDetail } = useGetProductservice();
+
+  const getProductDetailQuery = useQuery({
+    queryKey: ["productDetail", productId],
+    queryFn: () => getProductDetail(productId),
+    enabled: !!productId,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  });
+
+  return {
+    getProductDetail: getProductDetailQuery,
+  };
+}

@@ -2,13 +2,13 @@ import React, { ReactNode } from "react";
 import ProductLoading from "@/components/loading/ProductLoading";
 import ProductsSection from "@/components/product/ProductsSection";
 import { Product } from "@/types/product";
+import CtaButton from "../ui/CtaButton";
 
 interface CategoryPageLayoutProps {
   isLoading: boolean;
   error: unknown;
   products: Product[];
   filters: ReactNode;
-  banner: ReactNode;
   isEmpty?: string;
 }
 
@@ -17,12 +17,10 @@ const CategoryPageLayout = ({
   error,
   products,
   filters,
-  banner,
-  isEmpty = "No products found.",
+  isEmpty = "Sorry, there are no products in this collection.",
 }: CategoryPageLayoutProps) => {
   return (
     <>
-      {banner}
       <div className="px-10 flex gap-8 text-[12px]">
         {filters}
         <div className="w-full relative">
@@ -33,8 +31,9 @@ const CategoryPageLayout = ({
               <p>Error loading products. Please try again later.</p>
             </div>
           ) : products.length === 0 ? (
-            <div className="flex-1 flex justify-center items-center min-h-[300px]">
-              <p>{isEmpty}</p>
+            <div className="flex-1 flex flex-col gap-4 justify-center items-center min-h-[300px]">
+                  <p>{isEmpty}</p>
+                  <CtaButton text="return to home" onClick={() => console.log('hehe')}/>
             </div>
           ) : (
             <ProductsSection products={products} />
