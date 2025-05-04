@@ -20,16 +20,16 @@ export type Product = {
 // components/types.ts
 export type ProductDetail = {
   id: string | number;
-  title: string;
-  brand: string;
+  productId: string | number;
+  name?: string;
+  vendor?: string;
   price: number;
   oldPrice?: number;
   rating: number;
   reviewsCount: number;
-  colors: string;
-  sizes: string;
+  color: string;
+  size: string;
   image: ImageDetail;
-  productDetails: string[];
   moreDetails: string[];
 };
 
@@ -38,7 +38,7 @@ export type ImageDetail = {
   url: string;
   createdAt?: string;
   updatedAt?: string;
-}
+};
 
 export type Review = {
   id: number;
@@ -53,9 +53,10 @@ export type GetProductsRequest = {
   categoryName: string;
   colors?: string[];
   sizes?: string[];
-  availability?: string[];
+  availability?: string;
   minPrice?: number;
   maxPrice?: number;
+  sortBy?: string;
 };
 
 export type GetColorsRequest = {

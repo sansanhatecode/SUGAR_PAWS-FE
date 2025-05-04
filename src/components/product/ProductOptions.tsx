@@ -1,10 +1,10 @@
-import { ProductDetail } from "@/types/product";
+import { Product } from "@/types/product";
 import React from "react";
 import { getColorCode } from "@/helper/colorHelper";
 
 interface ProductOptionsProps {
-  colors: ProductDetail["colors"][];
-  sizes: ProductDetail["sizes"][];
+  colors: Product["colors"];
+  sizes: Product["sizes"];
   selectedColor: string;
   selectedSize: string;
   onColorSelect: (color: string) => void;
@@ -50,39 +50,46 @@ const ProductOptions: React.FC<ProductOptionsProps> = ({
 
   return (
     <div className="space-y-4 mt-4">
-      <div>
-        <p className="mb-2 text-sm font-medium text-gray-700">Choose a Color</p>
-        <div className="flex flex-wrap gap-2">
-          {colors.map((color, idx) => (
-            <React.Fragment key={idx}>
-              {renderColorButton(color, selectedColor === color)}
-            </React.Fragment>
-          ))}
+      {colors.length > 0 && (
+        <div>
+          <p className="mb-2 text-sm font-medium text-gray-700">
+            Choose a Color
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {colors.map((color, idx) => (
+              <React.Fragment key={idx}>
+                {renderColorButton(color, selectedColor === color)}
+              </React.Fragment>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {sizes.length > 0 && <div>
-        <div className="flex justify-between items-center mb-2">
-          <p className="text-sm font-medium text-gray-700">Choose a Size</p>
-          <a href="#" className="text-sm text-custom-rose hover:underline">
-            Size Guide
-          </a>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {sizes.map((size) => (
-            <button
-              key={size}
-              onClick={() => onSizeSelect(size)}
-              className={`px-4 py-1.5 rounded-full border text-sm font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-custom-pink ${selectedSize === size
-                  ? "bg-custom-rose text-white border-custom-rose"
-                  : "bg-white text-gray-700 border-custom-pink hover:border-custom-rose"
+      {sizes && sizes.length > 0 && (
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <p className="text-sm font-medium text-gray-700">Choose a Size</p>
+            <a href="#" className="text-sm text-custom-rose hover:underline">
+              Size Guide
+            </a>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {sizes.map((size, index) => (
+              <button
+                key={index}
+                onClick={() => onSizeSelect(size)}
+                className={`px-4 py-1.5 rounded-full border text-sm font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-custom-pink ${
+                  selectedSize === size
+                    ? "bg-custom-rose text-white border-custom-rose"
+                    : "bg-white text-gray-700 border-custom-pink hover:border-custom-rose"
                 }`}
-            >
-              {size}
-            </button>
-          ))}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>}
+      )}
     </div>
   );
 };

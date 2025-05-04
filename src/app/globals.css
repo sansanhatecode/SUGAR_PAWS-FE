@@ -32,6 +32,27 @@ body {
   display: none; /* Chrome, Safari and Opera */
 }
 
+/* Custom scrollbar styling */
+.cart-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cart-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+  margin: 4px 0;
+}
+
+.cart-scrollbar::-webkit-scrollbar-thumb {
+  background: #ffd1dc;
+  border-radius: 10px;
+  border: 1px solid black;
+}
+
+.cart-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #fe6e94;
+}
+
 @layer utilities {
   @keyframes spin-slow {
     from {

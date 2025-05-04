@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 // components/product/ProductImageGallery.tsx
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
@@ -236,10 +237,10 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
             {/* Indicator for more images to the left */}
             {startIndex > 0 && (
               <div
-                className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white to-transparent z-10 flex items-center cursor-pointer"
+                className="absolute left-0 top-0 h-full w-8 z-10 flex items-center cursor-pointer"
                 onClick={handlePagePrev}
               >
-                <div className="bg-white/80 w-5 h-5 rounded-full flex items-center justify-center shadow-sm ml-1 hover:bg-white transition-colors">
+                <div className="bg-white/80 w-5 h-5 rounded-full hover:shadow-md hover:scale-105 flex items-center justify-center shadow-sm ml-1 hover:bg-white transition-colors">
                   <FontAwesomeIcon
                     icon={faChevronLeft}
                     className="w-3 h-3 text-gray-600"
@@ -275,10 +276,10 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
             {/* Indicator for more images to the right */}
             {startIndex + maxVisibleThumbnails < images.length && (
               <div
-                className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent z-10 flex items-center justify-end cursor-pointer"
+                className="absolute right-0 top-0 h-full w-8 z-10 flex items-center justify-end cursor-pointer"
                 onClick={handlePageNext}
               >
-                <div className="bg-white/80 w-5 h-5 rounded-full flex items-center justify-center shadow-sm mr-1 hover:bg-white transition-colors">
+                <div className="bg-white/80 w-5 h-5 rounded-full flex items-center justify-center hover:shadow-md hover:scale-105 shadow-sm mr-1 hover:bg-white transition-colors">
                   <FontAwesomeIcon
                     icon={faChevronRight}
                     className="w-3 h-3 text-gray-600"

@@ -10,6 +10,7 @@ interface CategoryPageLayoutProps {
   products: Product[];
   filters: ReactNode;
   isEmpty?: string;
+  sortFilterBar?: ReactNode;
 }
 
 const CategoryPageLayout = ({
@@ -18,12 +19,19 @@ const CategoryPageLayout = ({
   products,
   filters,
   isEmpty = "Sorry, there are no products in this collection.",
+  sortFilterBar,
 }: CategoryPageLayoutProps) => {
   return (
     <>
       <div className="px-10 flex gap-8 text-[12px]">
         {filters}
         <div className="w-full relative">
+          {sortFilterBar && (
+            <div className="sticky top-[52px] z-10 pt-4 bg-custom-yellow">
+              {sortFilterBar}
+            </div>
+          )}
+
           {isLoading ? (
             <ProductLoading />
           ) : error ? (
@@ -32,8 +40,11 @@ const CategoryPageLayout = ({
             </div>
           ) : products.length === 0 ? (
             <div className="flex-1 flex flex-col gap-4 justify-center items-center min-h-[300px]">
-                  <p>{isEmpty}</p>
-                  <CtaButton text="return to home" onClick={() => console.log('hehe')}/>
+              <p>{isEmpty}</p>
+              <CtaButton
+                text="return to home"
+                onClick={() => console.log("hehe")}
+              />
             </div>
           ) : (
             <ProductsSection products={products} />

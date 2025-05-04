@@ -12,6 +12,7 @@ import { getColorCode } from "@/helper/colorHelper";
 import CategoryPageFilters from "@/components/category/CategoryPageFilters";
 import CategoryPageLayout from "@/components/category/CategoryPageLayout";
 import { Colors } from "@/components/ColorCheckboxes";
+import SortFilterBar from "@/components/category/SortFilterBar";
 
 const CategoryPage = () => {
   const pathname = usePathname();
@@ -50,6 +51,7 @@ const CategoryPage = () => {
     []
   );
   const [selectedColors, setSelectedColors] = useState<Colors[] | []>([]);
+  const [sortOption, setSortOption] = useState<string>("");
 
   const handleSizeChange = (size: string) => {
     setSelectedSizes((prevSelectedSizes) =>
@@ -99,18 +101,24 @@ const CategoryPage = () => {
     setSelectedColors([]);
   };
 
-  const pageTitle = subCategoryName
-    ? subCategoryName.charAt(0).toUpperCase() + subCategoryName.slice(1)
-    : "Sample Category";
-
-  // Replace example products with data from API
   const products = productsData || [];
+
+  const handleSortChange = (option: string) => {
+    setSortOption(option);
+  };
 
   return (
     <CategoryPageLayout
       isLoading={isLoading}
       error={error}
       products={products}
+      sortFilterBar={
+        <SortFilterBar
+          totalProducts={products.length}
+          sortOption={sortOption}
+          handleSortChange={handleSortChange}
+        />
+      }
       isEmpty="Sorry, there are no products in this collection."
       filters={
         <CategoryPageFilters

@@ -17,14 +17,14 @@ const CategoryPageBanner = ({
   return (
     <div className="w-full">
       {isLoading ? (
-        <div className="bg-custom-pink h-[250px] flex items-center justify-center relative">
+        <div className="bg-custom-pink h-[200px] flex items-center justify-center relative">
           <div className="relative text-center">
             <div className="w-[200px] h-[32px] bg-gray-300 animate-pulse mb-2 rounded"></div>
             <div className="w-[300px] h-[16px] bg-gray-300 animate-pulse rounded"></div>
           </div>
         </div>
       ) : (
-        <div className="bg-custom-pink h-[250px] flex items-center justify-center relative">
+        <div className="bg-custom-pink h-[200px] flex items-center justify-center relative">
           {imageSrc && (
             <Image
               fill

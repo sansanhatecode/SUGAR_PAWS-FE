@@ -11,6 +11,7 @@ import {
 import { getColorCode } from "@/helper/colorHelper";
 import CategoryPageFilters from "@/components/category/CategoryPageFilters";
 import CategoryPageLayout from "@/components/category/CategoryPageLayout";
+import SortFilterBar from "@/components/category/SortFilterBar";
 import { Colors } from "@/components/ColorCheckboxes";
 
 const CategoryPage = () => {
@@ -22,13 +23,18 @@ const CategoryPage = () => {
     []
   );
   const [selectedColors, setSelectedColors] = useState<Colors[]>([]);
+  const [priceRange, setPriceRange] = useState<{ min: string; max: string }>({
+    min: "",
+    max: "",
+  });
+  const [sortOption, setSortOption] = useState<string>("");
 
-  // Pass filter parameters to the API call
   const { getProducts } = useGetProducts({
     categoryName: categoryName || "",
     sizes: selectedSizes,
     colors: selectedColors.map((color) => color.colorName),
     availability: selectedAvailability,
+    sortBy: sortOption,
   });
 
   const { getColors } = useGetColors({
@@ -40,10 +46,17 @@ const CategoryPage = () => {
 
   const { data: productsData, isLoading, error, refetch } = getProducts;
 
-  // Refetch data when filters change
   useEffect(() => {
     refetch();
-  }, [selectedSizes, selectedColors, selectedAvailability, refetch]);
+  }, [
+    selectedSizes,
+    selectedColors,
+    selectedAvailability,
+    priceRange.min,
+    priceRange.max,
+    sortOption,
+    refetch,
+  ]);
 
   const { data: sizes } = getSizes;
   const { data: colorsData } = getColors;
@@ -85,6 +98,10 @@ const CategoryPage = () => {
     });
   };
 
+  const handleSortChange = (option: string) => {
+    setSortOption(option);
+  };
+
   const handleRemoveSize = (size: string) => {
     setSelectedSizes(selectedSizes.filter((s) => s !== size));
   };
@@ -93,9 +110,9 @@ const CategoryPage = () => {
     setSelectedAvailability(selectedAvailability.filter((s) => s !== status));
   };
 
-  const handleRemoveColor = (colorCode: string) => {
+  const handleRemoveColor = (colorName: string) => {
     setSelectedColors(
-      selectedColors.filter((color) => color.colorCode !== colorCode)
+      selectedColors.filter((color) => color.colorName !== colorName)
     );
   };
 
@@ -103,11 +120,9 @@ const CategoryPage = () => {
     setSelectedSizes([]);
     setSelectedAvailability([]);
     setSelectedColors([]);
+    setPriceRange({ min: "", max: "" });
+    setSortOption("");
   };
-
-  const pageTitle = categoryName
-    ? categoryName.charAt(0).toUpperCase() + categoryName.slice(1)
-    : "Sample Category";
 
   const products = productsData || [];
 
@@ -116,6 +131,13 @@ const CategoryPage = () => {
       isLoading={isLoading}
       error={error}
       products={products}
+      sortFilterBar={
+        <SortFilterBar
+          totalProducts={products.length}
+          sortOption={sortOption}
+          handleSortChange={handleSortChange}
+        />
+      }
       isEmpty="Sorry, there are no products in this collection."
       filters={
         <CategoryPageFilters
