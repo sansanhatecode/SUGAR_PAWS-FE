@@ -11,152 +11,18 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { usePathname, useRouter } from "next/navigation";
 import Cart from "./cart/Cart";
-import { CartItem } from "@/types/cart";
 import { navbarItems } from "@/const/navbarItems";
+import { useGetCartItems } from "@/hooks/queries/useCart";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const router = useRouter();
 
-  // Sample cart data - replace with your actual cart data
-  const cartItems: CartItem[] = [
-    {
-      id: "1",
-      product: {
-        name: "Pink T-shirt",
-        productId: "prod1",
-        id: "prod1",
-        price: 250000,
-        image: {
-          id: "img1",
-          url: "/assets/images/clothing/clothing-1.png",
-        },
-        color: "Pink",
-        size: "One Size",
-        rating: 0,
-        reviewsCount: 0,
-        moreDetails: [],
-      },
-      quantity: 1,
-    },
-    {
-      id: "2",
-      product: {
-        name: "Pink T-shirt",
-        productId: "prod2",
-        id: "prod2",
-        price: 1200000,
-        image: {
-          id: "img1",
-          url: "/assets/images/clothing/clothing-1.png",
-        },
-        color: "White",
-        size: "M",
-        rating: 0,
-        reviewsCount: 0,
-        moreDetails: [],
-      },
-      quantity: 2,
-    },
-    {
-      id: "3",
-      product: {
-        name: "Pink T-shirt",
-        productId: "prod2",
-        id: "prod2",
-        price: 1200000,
-        image: {
-          id: "img1",
-          url: "/assets/images/clothing/clothing-1.png",
-        },
-        color: "White",
-        size: "M",
-        rating: 0,
-        reviewsCount: 0,
-        moreDetails: [],
-      },
-      quantity: 2,
-    },
-    {
-      id: "4",
-      product: {
-        name: "Pink T-shirt",
-        productId: "prod2",
-        id: "prod2",
-        price: 1200000,
-        image: {
-          id: "img1",
-          url: "/assets/images/clothing/clothing-1.png",
-        },
-        color: "White",
-        size: "M",
-        rating: 0,
-        reviewsCount: 0,
-        moreDetails: [],
-      },
-      quantity: 2,
-    },
-    {
-      id: "5",
-      product: {
-        name: "Pink T-shirt",
-        productId: "prod2",
-        id: "prod2",
-        price: 1200000,
-        image: {
-          id: "img1",
-          url: "/assets/images/clothing/clothing-1.png",
-        },
-        color: "White",
-        size: "M",
-        rating: 0,
-        reviewsCount: 0,
-        moreDetails: [],
-      },
-      quantity: 2,
-    },
-    {
-      id: "6",
-      product: {
-        name: "Pink T-shirt",
-        productId: "prod2",
-        id: "prod2",
-        price: 1200000,
-        image: {
-          id: "img1",
-          url: "/assets/images/clothing/clothing-1.png",
-        },
-        color: "White",
-        size: "M",
-        rating: 0,
-        reviewsCount: 0,
-        moreDetails: [],
-      },
-      quantity: 2,
-    },
-    {
-      id: "7",
-      product: {
-        name: "Pink T-shirt",
-        productId: "prod2",
-        id: "prod2",
-        price: 1200000,
-        image: {
-          id: "img1",
-          url: "/assets/images/clothing/clothing-1.png",
-        },
-        color: "White",
-        size: "M",
-        rating: 0,
-        reviewsCount: 0,
-        moreDetails: [],
-      },
-      quantity: 2,
-    },
-  ];
+  const { getCartItems } = useGetCartItems();
+  const { data: cartData } = getCartItems;
 
   const handleUpdateItem = (id: string, quantity: number) => {
     console.log(`Update item ${id} to quantity ${quantity}`);
@@ -340,7 +206,7 @@ const Header = () => {
             />
             <FontAwesomeIcon
               icon={faShoppingCart}
-              className={`text-[14px] ${pathname==='/cart' ? "text-custom-rose" : ""} hover:text-custom-rose cursor-pointer cart-icon`}
+              className={`text-[14px] ${pathname === "/cart" ? "text-custom-rose" : ""} hover:text-custom-rose cursor-pointer cart-icon`}
               onClick={() => setIsCartOpen(!isCartOpen)}
             />
           </div>
@@ -359,7 +225,7 @@ const Header = () => {
           } overflow-auto z-[101]`}
         >
           <Cart
-            cartItems={cartItems}
+            cartItems={cartData?.cartItems ?? []}
             onUpdateItem={handleUpdateItem}
             onRemoveItem={handleRemoveItem}
             onClose={() => setIsCartOpen(false)}

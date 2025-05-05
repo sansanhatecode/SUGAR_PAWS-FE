@@ -15,12 +15,18 @@ export function useGetProductservice() {
     categoryName,
     colors,
     sizes,
+    minPrice,
+    maxPrice,
+    sortBy,
   }: GetProductsRequest) => {
     try {
       const { data } = await Request.get<Product[]>(API.PRODUCTS, {
         category: categoryName,
         colors: colors,
         sizes: sizes,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        sortBy: sortBy,
       });
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

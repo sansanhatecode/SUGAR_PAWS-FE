@@ -22,9 +22,11 @@ export default function Cart({
   onClose,
 }: Props) {
   const totalPrice = cartItems.reduce(
-    (total, item) => total + item.product.price * item.quantity,
+    (total, item) => total + item.productDetail.price * item.quantity,
     0
   );
+
+  console.log("Cart items:", cartItems);
 
   return (
     <div className="w-[400px] max-w-[100vw] h-full flex flex-col bg-custom-yellow shadow-md">

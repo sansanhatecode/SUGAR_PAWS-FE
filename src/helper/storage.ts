@@ -3,9 +3,11 @@ export const setAuthToken = (authToken: string) => {
 };
 
 export const getAuthToken = () => {
-  return localStorage.getItem("authToken")
-    ? localStorage.getItem("auToken")
-    : undefined;
+  const token = localStorage.getItem("authToken");
+  if (token) {
+    return token;
+  }
+  return undefined;
 };
 
 export const clearStorage = () => {

@@ -7,6 +7,8 @@ import Modal from "../ui/Modal";
 import CtaButton from "../ui/CtaButton";
 import Link from "next/link";
 import { getColorCode } from "@/helper/colorHelper";
+import { useAddProductToCart } from "@/hooks/queries/useCart";
+import { toast } from "react-toastify";
 
 type ProductCardProps = {
   product: Product;
@@ -47,18 +49,87 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     sizes,
     reviewStars,
   } = product;
-  console.log(product);
 
   const [hovered, setHovered] = useState<boolean>(false);
   const [buttonHovered, setButtonHovered] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const { addProductToCart: addToCart } = useAddProductToCart();
 
   const handleAddToCartClick = () => {
     setIsModalOpen(true);
+    setSelectedColor(null);
+    setSelectedSize(null);
+    setValidationError(null);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const addProductToCart = () => {
+    // Validate selections
+    if (colors.length > 0 && !selectedColor) {
+      setValidationError("Please select a color");
+      return;
+    }
+
+    if (sizes && sizes.length > 0 && !selectedSize) {
+      setValidationError("Please select a size");
+      return;
+    }
+
+    setValidationError(null);
+    const quantity = 1;
+
+    try {
+      if (product.productDetails && product.productDetails.length > 0) {
+        const productDetail = product.productDetails.find(
+          (detail) =>
+            (!selectedColor || detail.color === selectedColor) &&
+            (!selectedSize || detail.size === selectedSize),
+        );
+
+        if (!productDetail) {
+          setValidationError("No product available with selected options");
+          return;
+        }
+        addToCart(productDetail.id, quantity);
+        toast.success(`${product.name} added to cart! 🛒`, {
+          position: "top-right",
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          toastId: `add-to-cart-${product.id}`,
+          className:
+            "bg-white text-custom-dark border border-green-300 shadow-md px-4 py-3 rounded-xl",
+        });
+
+        console.log("Product added to cart with options:", {
+          color: selectedColor,
+          size: selectedSize,
+          productDetail,
+        });
+        setIsModalOpen(false);
+      }
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+      setValidationError("Failed to add product to cart");
+
+      // Show error toast notification
+      toast.error("Failed to add product to cart", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        className: "rounded-md font-medium text-sm",
+        toastId: `add-to-cart-error-${product.id}`,
+      });
+    }
   };
 
   const finalMinPrice = discount ? minPrice * (1 - discount / 100) : minPrice;
@@ -128,7 +199,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {isModalOpen && (
-        <Modal onClose={handleCloseModal} size="small">
+        <Modal onClose={() => setIsModalOpen(false)} size="small">
           <h3 className="text-lg font-semibold mb-4">Select Options</h3>
           {sizes && sizes.length > 0 && (
             <div className="mb-4">
@@ -137,7 +208,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 {sizes.map((size, idx) => (
                   <button
                     key={idx}
-                    className="px-3 py-1 border rounded hover:bg-gray-200"
+                    className={`px-3 py-1 border rounded transition-colors ${
+                      selectedSize === size
+                        ? "bg-custom-rose text-white"
+                        : "hover:bg-gray-200"
+                    }`}
+                    onClick={() => setSelectedSize(size)}
                   >
                     {size}
                   </button>
@@ -150,17 +226,31 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               <h4 className="text-sm font-medium mb-2">Colors:</h4>
               <div className="gap-2 flex flex-wrap">
                 {colors.map((color, idx) => (
-                  <button key={idx} className="w-6 h-6">
+                  <button
+                    key={idx}
+                    className={`w-6 h-6 transition-all ${
+                      selectedColor === color
+                        ? "ring-2 ring-custom-rose ring-offset-2"
+                        : ""
+                    }`}
+                    onClick={() => setSelectedColor(color)}
+                    title={color}
+                  >
                     {renderColorButton(color, "w-full h-full")}
                   </button>
                 ))}
               </div>
             </div>
           )}
+
+          {validationError && (
+            <div className="mb-4 text-red-500 text-sm">{validationError}</div>
+          )}
+
           <CtaButton
             className="m-auto"
             text="Add to Cart"
-            onClick={handleCloseModal}
+            onClick={() => addProductToCart()}
           />
         </Modal>
       )}

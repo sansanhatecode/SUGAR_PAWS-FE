@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import React from "react";
 import "./globals.css";
 import "../lib/fontawesome";
-import { ReactQueryProvider } from "@/provider/ReactQueryProvider";
+import "react-toastify/dist/ReactToastify.css";
+import { ClientProvider } from "@/provider/ClientProvider";
 
 export const metadata: Metadata = {
   title: "Sugar Paws",
@@ -17,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <ClientProvider>{children}</ClientProvider>
       </body>
     </html>
   );

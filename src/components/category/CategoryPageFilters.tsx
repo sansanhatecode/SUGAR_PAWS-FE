@@ -15,12 +15,19 @@ interface CategoryPageFiltersProps {
   selectedSizes: string[];
   selectedColors: Colors[];
   selectedAvailability: string[];
+  minPrice?: number;
+  maxPrice?: number;
   handleSizeChange: (size: string) => void;
   handleColorChange: (colorName: string) => void;
   handleAvailabilityChange: (status: string) => void;
+  handlePriceRangeChange: (
+    minPrice: number | undefined,
+    maxPrice: number | undefined,
+  ) => void;
   handleRemoveSize: (size: string) => void;
   handleRemoveColor: (colorCode: string) => void;
   handleRemoveAvailability: (status: string) => void;
+  handleRemovePriceRange: () => void;
   handleClearAllFilters: () => void;
 }
 
@@ -34,14 +41,24 @@ const CategoryPageFilters = ({
   selectedSizes,
   selectedColors,
   selectedAvailability,
+  minPrice,
+  maxPrice,
   handleSizeChange,
   handleColorChange,
   handleAvailabilityChange,
+  handlePriceRangeChange,
   handleRemoveSize,
   handleRemoveColor,
   handleRemoveAvailability,
   handleClearAllFilters,
 }: CategoryPageFiltersProps) => {
+  const hasPriceFilter = minPrice !== undefined || maxPrice !== undefined;
+  const totalFilters =
+    selectedSizes.length +
+    selectedAvailability.length +
+    selectedColors.length +
+    (hasPriceFilter ? 1 : 0);
+
   return (
     <div className="flex flex-col w-[268px] sticky top-[52px] py-8 self-start max-h-[calc(100vh-52px)] overflow-y-auto scrollbar-hide">
       <div className="font-light italic">
@@ -73,18 +90,9 @@ const CategoryPageFilters = ({
         <div className="flex justify-between w-full">
           <h1 className="text-[14px] font-bold">
             Filters
-            {(selectedSizes.length > 0 ||
-              selectedAvailability.length > 0 ||
-              selectedColors.length > 0) &&
-              `  (${
-                selectedSizes.length +
-                selectedAvailability.length +
-                selectedColors.length
-              })`}
+            {totalFilters > 0 && `  (${totalFilters})`}
           </h1>
-          {(selectedSizes.length > 0 ||
-            selectedAvailability.length > 0 ||
-            selectedColors.length > 0) && (
+          {totalFilters > 0 && (
             <button
               className="underline font-light"
               onClick={handleClearAllFilters}
@@ -95,11 +103,7 @@ const CategoryPageFilters = ({
         </div>
         <div
           className={`flex flex-wrap gap-2 mb-2 pb-1 ${
-            selectedSizes.length > 0 ||
-            selectedAvailability.length > 0 ||
-            selectedColors.length > 0
-              ? "pt-4"
-              : ""
+            totalFilters > 0 ? "pt-4" : ""
           }`}
         >
           {selectedSizes.length > 0 &&
@@ -161,6 +165,9 @@ const CategoryPageFilters = ({
         colors={colors}
         selectedColors={selectedColors}
         handleColorChange={handleColorChange}
+        minPrice={minPrice}
+        maxPrice={maxPrice}
+        handlePriceRangeChange={handlePriceRangeChange}
       />
     </div>
   );

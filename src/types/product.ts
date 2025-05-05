@@ -19,7 +19,7 @@ export type Product = {
 
 // components/types.ts
 export type ProductDetail = {
-  id: string | number;
+  id: number;
   productId: string | number;
   name?: string;
   vendor?: string;
@@ -53,7 +53,7 @@ export type GetProductsRequest = {
   categoryName: string;
   colors?: string[];
   sizes?: string[];
-  availability?: string;
+  availability?: string[];
   minPrice?: number;
   maxPrice?: number;
   sortBy?: string;

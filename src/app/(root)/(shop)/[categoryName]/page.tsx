@@ -23,10 +23,8 @@ const CategoryPage = () => {
     []
   );
   const [selectedColors, setSelectedColors] = useState<Colors[]>([]);
-  const [priceRange, setPriceRange] = useState<{ min: string; max: string }>({
-    min: "",
-    max: "",
-  });
+  const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
+  const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
   const [sortOption, setSortOption] = useState<string>("");
 
   const { getProducts } = useGetProducts({
@@ -34,6 +32,8 @@ const CategoryPage = () => {
     sizes: selectedSizes,
     colors: selectedColors.map((color) => color.colorName),
     availability: selectedAvailability,
+    minPrice: minPrice,
+    maxPrice: maxPrice,
     sortBy: sortOption,
   });
 
@@ -52,8 +52,8 @@ const CategoryPage = () => {
     selectedSizes,
     selectedColors,
     selectedAvailability,
-    priceRange.min,
-    priceRange.max,
+    minPrice,
+    maxPrice,
     sortOption,
     refetch,
   ]);
@@ -98,6 +98,14 @@ const CategoryPage = () => {
     });
   };
 
+  const handlePriceRangeChange = (
+    min: number | undefined,
+    max: number | undefined
+  ) => {
+    setMinPrice(min);
+    setMaxPrice(max);
+  };
+
   const handleSortChange = (option: string) => {
     setSortOption(option);
   };
@@ -116,11 +124,17 @@ const CategoryPage = () => {
     );
   };
 
+  const handleRemovePriceRange = () => {
+    setMinPrice(undefined);
+    setMaxPrice(undefined);
+  };
+
   const handleClearAllFilters = () => {
     setSelectedSizes([]);
     setSelectedAvailability([]);
     setSelectedColors([]);
-    setPriceRange({ min: "", max: "" });
+    setMinPrice(undefined);
+    setMaxPrice(undefined);
     setSortOption("");
   };
 
@@ -152,9 +166,13 @@ const CategoryPage = () => {
           colors={colors}
           selectedColors={selectedColors}
           handleColorChange={handleColorChange}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          handlePriceRangeChange={handlePriceRangeChange}
           handleRemoveSize={handleRemoveSize}
           handleRemoveColor={handleRemoveColor}
           handleRemoveAvailability={handleRemoveAvailability}
+          handleRemovePriceRange={handleRemovePriceRange}
           handleClearAllFilters={handleClearAllFilters}
         />
       }

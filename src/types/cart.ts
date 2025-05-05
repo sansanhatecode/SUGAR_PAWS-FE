@@ -2,6 +2,13 @@ import { ProductDetail } from "./product";
 
 export type CartItem = {
   id: string;
-  product: ProductDetail;
+  productDetail: ProductDetail;
   quantity: number;
+};
+
+export type Cart = {
+  id: string;
+  cartItems: CartItem[];
+  totalPrice: number;
+  totalItems: number;
 };

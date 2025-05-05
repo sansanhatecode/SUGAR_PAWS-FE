@@ -6,6 +6,8 @@ const API = {
   COLORS: "products/colors",
   SIZES: "products/sizes",
   PRODUCT_DETAIL: "products/",
+  CART: "cart",
+  CART_ITEM: "cart-item",
 };
 
 export default API;

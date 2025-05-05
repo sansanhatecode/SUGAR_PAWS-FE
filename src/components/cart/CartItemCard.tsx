@@ -16,26 +16,34 @@ export default function CartItemCard({
   onDecrease,
   onRemove,
 }: Props) {
+  console.log("Cart item:", item);
   return (
     <div className="flex gap-6 py-4 border-b text-[12px] text-custom-dark items-stretch">
       <div className="w-[112px] min-h-[112px] relative aspect-square">
-        <Image
-          src={item.product.image.url}
-          alt={item.product.name ?? ""}
-          fill
-          className="rounded-md object-cover"
-        />
+        {item.productDetail.image?.url ? (
+          <Image
+            src={item.productDetail.image.url}
+            alt={item.productDetail.name ?? ""}
+            fill
+            className="rounded-md object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-md text-center p-1 text-[10px] text-gray-500">
+            This product doesn&apos;t have a preview
+          </div>
+        )}
       </div>
       <div className="flex-1 flex flex-col justify-between gap-1">
-        <h3 className="text-[13px]">{item.product.name ?? ""}</h3>
+        <h3 className="text-[13px]">{item.productDetail.name ?? ""}</h3>
 
         <div className="flex flex-col gap-2">
           <div className="text-gray-600">
             <p>
-              <span className="font-semi">Color:</span> {item.product.color}
+              <span className="font-semi">Color:</span>{" "}
+              {item.productDetail.color}
             </p>
             <p>
-              <span className="font-semi">Size:</span> {item.product.size}
+              <span className="font-semi">Size:</span> {item.productDetail.size}
             </p>
           </div>
         </div>
@@ -66,7 +74,7 @@ export default function CartItemCard({
         </div>
 
         <p className="text-custom-wine font-semibold">
-          {formatCurrency(item.product.price)} VND
+          {formatCurrency(item.productDetail.price)} VND
         </p>
       </div>
     </div>

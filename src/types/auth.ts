@@ -11,8 +11,9 @@ export interface SignupRequest {
 }
 
 export interface LoginResponseData {
-  // username: string;
-  // email: string;
+  id: string;
+  username: string;
+  email: string;
+  name: string;
   accessToken: string;
-  // refreshToken: string;
 }

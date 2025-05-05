@@ -14,10 +14,9 @@ const SortFilterBar = ({
 }: SortFilterBarProps) => {
   const sortOptions = [
     { value: "", label: "Featured" },
-    { value: "bestselling", label: "Best Selling" },
-    { value: "newest", label: "Newest" },
-    { value: "price-high-low", label: "Price: High to Low" },
-    { value: "price-low-high", label: "Price: Low to High" },
+    { value: "bestSelling", label: "Best Selling" },
+    { value: "priceDesc", label: "Price: High to Low" },
+    { value: "priceAsc", label: "Price: Low to High" },
   ];
 
   return (

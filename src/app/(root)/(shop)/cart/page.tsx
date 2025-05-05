@@ -204,7 +204,7 @@ const CartPage = () => {
         <div className="text-center py-12">
           <h2 className="text-2xl font-semibold mb-4">Your cart is empty</h2>
           <p className="mb-8 text-gray-600">
-            Looks like you haven't added any items to your cart yet.
+            Looks like you haven&apos;t added any items to your cart yet.
           </p>
           <Link href="/collections">
             <CtaButton

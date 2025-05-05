@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import {
   useGetColors,
@@ -20,9 +20,24 @@ const CategoryPage = () => {
   const subCategoryName = pathSegments.pop();
   const categoryName = pathSegments.pop();
 
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedAvailability, setSelectedAvailability] = useState<string[]>(
+    []
+  );
+  const [selectedColors, setSelectedColors] = useState<Colors[]>([]);
+  const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
+  const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
+  const [sortOption, setSortOption] = useState<string>("");
+
   // Fetch products, colors, and sizes based on subcategory
   const { getProducts } = useGetProducts({
     categoryName: subCategoryName || "",
+    sizes: selectedSizes,
+    colors: selectedColors.map((color) => color.colorName),
+    availability: selectedAvailability,
+    minPrice: minPrice,
+    maxPrice: maxPrice,
+    sortBy: sortOption,
   });
 
   const { getColors } = useGetColors({
@@ -32,7 +47,19 @@ const CategoryPage = () => {
     categoryName: subCategoryName || "",
   });
 
-  const { data: productsData, isLoading, error } = getProducts;
+  const { data: productsData, isLoading, error, refetch } = getProducts;
+
+  useEffect(() => {
+    refetch();
+  }, [
+    selectedSizes,
+    selectedColors,
+    selectedAvailability,
+    minPrice,
+    maxPrice,
+    sortOption,
+    refetch,
+  ]);
 
   const { data: sizes } = getSizes;
   const { data: colorsData } = getColors;
@@ -45,13 +72,6 @@ const CategoryPage = () => {
           colorCode: getColorCode(color) || "",
         }) as Colors
     ) || [];
-
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedAvailability, setSelectedAvailability] = useState<string[]>(
-    []
-  );
-  const [selectedColors, setSelectedColors] = useState<Colors[] | []>([]);
-  const [sortOption, setSortOption] = useState<string>("");
 
   const handleSizeChange = (size: string) => {
     setSelectedSizes((prevSelectedSizes) =>
@@ -81,6 +101,18 @@ const CategoryPage = () => {
     });
   };
 
+  const handlePriceRangeChange = (
+    min: number | undefined,
+    max: number | undefined
+  ) => {
+    setMinPrice(min);
+    setMaxPrice(max);
+  };
+
+  const handleSortChange = (option: string) => {
+    setSortOption(option);
+  };
+
   const handleRemoveSize = (size: string) => {
     setSelectedSizes(selectedSizes.filter((s) => s !== size));
   };
@@ -89,23 +121,27 @@ const CategoryPage = () => {
     setSelectedAvailability(selectedAvailability.filter((s) => s !== status));
   };
 
-  const handleRemoveColor = (colorCode: string) => {
+  const handleRemoveColor = (colorName: string) => {
     setSelectedColors(
-      selectedColors.filter((color) => color.colorCode !== colorCode)
+      selectedColors.filter((color) => color.colorName !== colorName)
     );
+  };
+
+  const handleRemovePriceRange = () => {
+    setMinPrice(undefined);
+    setMaxPrice(undefined);
   };
 
   const handleClearAllFilters = () => {
     setSelectedSizes([]);
     setSelectedAvailability([]);
     setSelectedColors([]);
+    setMinPrice(undefined);
+    setMaxPrice(undefined);
+    setSortOption("");
   };
 
   const products = productsData || [];
-
-  const handleSortChange = (option: string) => {
-    setSortOption(option);
-  };
 
   return (
     <CategoryPageLayout
@@ -124,7 +160,6 @@ const CategoryPage = () => {
         <CategoryPageFilters
           pathname={pathname}
           categoryName={categoryName}
-          subCategoryName={subCategoryName}
           sizes={sizes || []}
           selectedSizes={selectedSizes}
           handleSizeChange={handleSizeChange}
@@ -134,9 +169,13 @@ const CategoryPage = () => {
           colors={colors}
           selectedColors={selectedColors}
           handleColorChange={handleColorChange}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          handlePriceRangeChange={handlePriceRangeChange}
           handleRemoveSize={handleRemoveSize}
           handleRemoveColor={handleRemoveColor}
           handleRemoveAvailability={handleRemoveAvailability}
+          handleRemovePriceRange={handleRemovePriceRange}
           handleClearAllFilters={handleClearAllFilters}
         />
       }
