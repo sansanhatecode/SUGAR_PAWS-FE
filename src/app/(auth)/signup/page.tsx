@@ -2,100 +2,183 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Product } from "@/types/product";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
+import { useAuthorization } from "@/hooks/queries/useAuthorization";
+import { useRouter } from "next/navigation";
+import DefaultLoading from "@/components/loading/DefaultLoading";
+import { useAppDispatch } from "@/store/store";
+import { setUser } from "@/store/slices/userSlice";
 
-interface ProductImageGalleryProps {
-  images: Product["displayImage"];
-  selectedImage: string | null;
-  onThumbnailClick: (image: string) => void;
-  productTitle: string;
-}
+const SignUpPage = () => {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    username: "",
+    email: "",
+    password: "",
+    reenterPassword: "",
+  });
 
-const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
-  images,
-  selectedImage,
-  onThumbnailClick,
-  productTitle,
-}) => {
-  const [startIndex, setStartIndex] = useState(0);
-  const visibleCount = 4;
-  const endIndex = startIndex + visibleCount;
-  const thumbnails = images.slice(startIndex, endIndex);
+  const { signUp } = useAuthorization();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  const handlePrev = () => {
-    setStartIndex((prev) => Math.max(prev - 1, 0));
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
-  const handleNext = () => {
-    if (startIndex + visibleCount < images.length) {
-      setStartIndex((prev) => prev + 1);
+  const handleSignUp = async () => {
+    if (formData.password !== formData.reenterPassword) {
+      setErrorMessage("Passwords do not match.");
+    } else {
+      setErrorMessage("");
+      setLoading(true);
+
+      try {
+        await signUp.mutateAsync({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+        });
+        // Set user in redux after successful signup
+        dispatch(
+          setUser({
+            username: formData.username,
+            email: formData.email,
+            name: formData.name,
+          }),
+        );
+        router.push("/verify-code");
+      } catch (error) {
+        console.error("Sign Up Error:", error);
+        setErrorMessage("Invalid username or password.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   return (
-    <div className="flex flex-col gap-4">
-      {/* Main image */}
-      <div className="relative w-full aspect-[4/5] rounded-lg overflow-hidden shadow-sm border border-gray-200">
-        <Image
-          src={
-            selectedImage ||
-            (images.length > 0 ? images[0] : "/placeholder.jpg")
-          }
-          alt={`Main view of ${productTitle}`}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-          className="object-cover transition-opacity duration-300 ease-in-out"
-          priority
-        />
-      </div>
+    <main className="w-full min-h-screen flex justify-center items-center">
+      <div className="max-w-[1200px] min-w-[928px] w-[60%] flex bg-white rounded-xl overflow-hidden">
+        <div className="w-1/2 relative">
+          <Image
+            src="/assets/images/signin.png"
+            alt="Sign up image"
+            fill
+            className="object-cover"
+          />
+        </div>
+        <div className="w-1/2 py-16">
+          <div className="w-[340px] flex flex-col justify-center items-start m-auto gap-4">
+            <h1 className="text-[40px] font-semibold text-custom-rose">
+              Sign Up
+            </h1>
+            <p className="text-[14px]">Join us today! 😊</p>
 
-      {/* Thumbnail navigation */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={handlePrev}
-          disabled={startIndex === 0}
-          className="p-2 rounded-full bg-white shadow disabled:opacity-50"
-        >
-          <FontAwesomeIcon icon={faChevronLeft} />
-        </button>
-
-        <div className="flex gap-2">
-          {thumbnails.map((img, index) => (
-            <div
-              key={startIndex + index}
-              className={`relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden cursor-pointer border-2 ${
-                selectedImage === img
-                  ? "border-custom-rose ring-1 ring-custom-rose ring-offset-1"
-                  : "border-gray-200 hover:border-gray-400"
-              }`}
-              onClick={() => onThumbnailClick(img)}
-            >
-              <Image
-                src={img}
-                alt={`Thumbnail ${startIndex + index + 1} for ${productTitle}`}
-                fill
-                sizes="80px"
-                className="object-cover"
+            <div className="w-full">
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter your name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose"
               />
             </div>
-          ))}
+            <div className="w-full">
+              <input
+                type="text"
+                name="username"
+                placeholder="Enter your username"
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose"
+              />
+            </div>
+            <div className="w-full">
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose"
+              />
+            </div>
+            <div className="w-full">
+              <div className="relative w-full">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose"
+                />
+                <FontAwesomeIcon
+                  width={16}
+                  height={16}
+                  icon={showPassword ? faEye : faEyeSlash}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-custom-purple"
+                  onClick={togglePasswordVisibility}
+                />
+              </div>
+            </div>
+            <div className="w-full">
+              <div className="relative w-full">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="reenterPassword"
+                  placeholder="Re-enter Password"
+                  value={formData.reenterPassword}
+                  onChange={handleChange}
+                  className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose"
+                />
+                <FontAwesomeIcon
+                  width={16}
+                  height={16}
+                  icon={showPassword ? faEye : faEyeSlash}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-custom-purple"
+                  onClick={togglePasswordVisibility}
+                />
+              </div>
+              {errorMessage && (
+                <p className="text-red-500 text-[12px]">{errorMessage}</p>
+              )}
+            </div>
+            <button
+              className="bg-custom-pink text-custom-purple w-full h-10 rounded-[10px] text-[15px] font-medium hover:bg-custom-rose hover:text-white active:bg-custom-purple active:text-white"
+              onClick={handleSignUp}
+            >
+              Sign Up
+            </button>
+            <div>
+              <p className="text-[12px] mt-1">
+                Already have an account?
+                <Link
+                  href={"/signin"}
+                  className="text-[12px] pl-2 text-custom-purple italic hover:underline hover:text-custom-rose"
+                >
+                  Go to Sign In Page
+                </Link>
+              </p>
+            </div>
+          </div>
         </div>
-
-        <button
-          onClick={handleNext}
-          disabled={endIndex >= images.length}
-          className="p-2 rounded-full bg-white shadow disabled:opacity-50"
-        >
-          <FontAwesomeIcon icon={faChevronRight} />
-        </button>
       </div>
-    </div>
+      {loading && <DefaultLoading />}
+    </main>
   );
 };
 
-export default ProductImageGallery;
+export default SignUpPage;

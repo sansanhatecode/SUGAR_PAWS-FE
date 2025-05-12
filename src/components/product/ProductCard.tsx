@@ -2,13 +2,17 @@ import React, { useState } from "react";
 import { Product } from "@/types/product";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCartPlus, faStar } from "@fortawesome/free-solid-svg-icons";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { FiShoppingCart } from "react-icons/fi";
 import Modal from "../ui/Modal";
 import CtaButton from "../ui/CtaButton";
 import Link from "next/link";
 import { getColorCode } from "@/helper/colorHelper";
 import { useAddProductToCart } from "@/hooks/queries/useCart";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/store/slices/userSlice";
+import LoginRequiredModal from "../ui/LoginRequiredModal";
 
 type ProductCardProps = {
   product: Product;
@@ -53,12 +57,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [hovered, setHovered] = useState<boolean>(false);
   const [buttonHovered, setButtonHovered] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const { addProductToCart: addToCart } = useAddProductToCart();
+  const user = useSelector(selectUser);
 
   const handleAddToCartClick = () => {
+    if (!user || !user.username) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
     setIsModalOpen(true);
     setSelectedColor(null);
     setSelectedSize(null);
@@ -85,7 +96,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         const productDetail = product.productDetails.find(
           (detail) =>
             (!selectedColor || detail.color === selectedColor) &&
-            (!selectedSize || detail.size === selectedSize),
+            (!selectedSize || detail.size === selectedSize)
         );
 
         if (!productDetail) {
@@ -183,7 +194,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             onMouseLeave={() => setButtonHovered(false)}
             onClick={handleAddToCartClick}
           >
-            <FontAwesomeIcon icon={faCartPlus} size="lg" />
+            <FiShoppingCart size={20} />
             <span
               className={`text-[12px] whitespace-nowrap transition-all duration-300 ease-in-out
               ${
@@ -313,6 +324,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <span>{totalSales.toLocaleString()} sold</span>
         )}
       </div>
+
+      {/* Login Required Modal */}
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        message="You need to sign in to add products to your cart"
+      />
     </div>
   );
 };

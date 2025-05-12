@@ -35,9 +35,9 @@ export function useAuthService() {
     }
   };
 
-  const verify = async (code: string) => {
+  const verify = async (code: string, email: string) => {
     try {
-      const { data } = await Request.get(API.VERIFY, { code });
+      const { data } = await Request.post(API.VERIFY, { code, email });
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

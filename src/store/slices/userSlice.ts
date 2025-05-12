@@ -6,7 +6,7 @@ interface UserState {
   username: string | null;
   email: string | null;
   name: string | null;
-  rolerole: string | null;
+  role: string | null;
 }
 
 // Define the initial state
@@ -14,7 +14,7 @@ const initialState: UserState = {
   username: null,
   email: null,
   name: null,
-  rolerole: null,
+  role: null,
 };
 
 // Create the user slice
@@ -28,13 +28,13 @@ export const userSlice = createSlice({
         username?: string;
         email?: string;
         name?: string;
-        rolerole?: string;
+        role?: string;
       }>,
     ) => {
       if (action.payload.username) state.username = action.payload.username;
       if (action.payload.email) state.email = action.payload.email;
       if (action.payload.name) state.name = action.payload.name;
-      if (action.payload.rolerole) state.rolerole = action.payload.rolerole;
+      if (action.payload.role) state.role = action.payload.role;
     },
     removeUser: () => {
       return initialState;
@@ -48,6 +48,6 @@ export const selectUser = (state: RootState) => state.user;
 export const selectUsername = (state: RootState) => state.user.username;
 export const selectEmail = (state: RootState) => state.user.email;
 export const selectName = (state: RootState) => state.user.name;
-export const selectRole = (state: RootState) => state.user.rolerole;
+export const selectRole = (state: RootState) => state.user.role;
 
 export default userSlice.reducer;

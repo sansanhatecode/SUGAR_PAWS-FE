@@ -22,7 +22,8 @@ export function useAuthorization() {
   });
 
   const verifyMutation = useMutation({
-    mutationFn: (code: string) => verify(code),
+    mutationFn: ({ code, email }: { code: string; email: string }) =>
+      verify(code, email),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       console.error("Verify Mutation Error:", error.message);
@@ -32,6 +33,6 @@ export function useAuthorization() {
   return {
     signIn: signInMutation,
     signUp: signUpMutation,
-    verify: verifyMutation,
+    verifyCode: verifyMutation,
   };
 }

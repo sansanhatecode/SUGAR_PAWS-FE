@@ -14,6 +14,9 @@ import { ImageDetail, Review } from "@/types/product";
 import { useGetProductDetail } from "@/hooks/queries/useProducts";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/store/slices/userSlice";
+import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fetchReviewsData = async (productId: string): Promise<Review[]> => {
@@ -48,7 +51,7 @@ const fetchReviewsData = async (productId: string): Promise<Review[]> => {
 
 export default function ProductDetailPage() {
   const pathname = usePathname();
-  const productId = pathname.split("/").pop();
+  const productId = (pathname ?? "").split("/").pop();
 
   const { getProductDetail } = useGetProductDetail(productId ?? "");
   const { data: product, isLoading, error } = getProductDetail;
@@ -61,6 +64,8 @@ export default function ProductDetailPage() {
   const [activeTab, setActiveTab] = useState<"description" | "reviews">(
     "description"
   );
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const user = useSelector(selectUser);
 
   // Effect for loading reviews and initializing selected image
   useEffect(() => {
@@ -88,7 +93,7 @@ export default function ProductDetailPage() {
             return product.productDetails
               .map((productDetail) => productDetail.image)
               .filter((image) => {
-                if (!image.id) return false;
+                if (!image || !image.id) return false;
                 if (uniqueIds.has(String(image.id))) return false;
                 uniqueIds.add(String(image.id));
                 return true;
@@ -111,6 +116,12 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = () => {
     if (!product) return;
+
+    if (!user || !user.username) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
     console.log("Adding to cart:", {
       productId: product.id,
       color: selectedColor,
@@ -171,7 +182,7 @@ export default function ProductDetailPage() {
           .map((productDetail) => productDetail.image)
           .filter((image) => {
             // Skip images without an ID
-            if (!image.id) return false;
+            if (!image || !image.id) return false;
             // Only keep if this ID hasn't been seen yet
             if (uniqueIds.has(String(image.id))) return false;
             uniqueIds.add(String(image.id));
@@ -196,7 +207,17 @@ export default function ProductDetailPage() {
           <ProductInfo product={product} />
           <ProductOptions
             colors={product.colors}
-            sizes={product.sizes ?? []}
+            sizes={
+              product.productDetails
+                ? Array.from(
+                    new Set(
+                      product.productDetails
+                        .map((detail) => detail.size)
+                        .filter(Boolean)
+                    )
+                  )
+                : []
+            }
             selectedColor={selectedColor}
             selectedSize={selectedSize}
             onColorSelect={handleColorSelect}
@@ -249,6 +270,13 @@ export default function ProductDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Login Required Modal */}
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        message="You need to sign in to add products to your cart"
+      />
     </div>
   );
 }

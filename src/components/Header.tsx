@@ -3,26 +3,62 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faSearch,
-  faShoppingCart,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
+  FiSearch,
+  FiShoppingCart,
+  FiUser,
+  FiShoppingBag,
+  FiLogOut,
+  FiUserCheck,
+  FiLogIn,
+  FiUserPlus,
+} from "react-icons/fi";
 import { usePathname, useRouter } from "next/navigation";
 import Cart from "./cart/Cart";
 import { navbarItems } from "@/const/navbarItems";
 import { useGetCartItems } from "@/hooks/queries/useCart";
+import { useDispatch, useSelector } from "react-redux";
+import { removeUser, selectUser, setUser } from "@/store/slices/userSlice";
+import { useUserService } from "@/api/service/userService";
+import LoginRequiredModal from "./ui/LoginRequiredModal";
+import { clearStorage } from "@/helper/storage";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const pathname = usePathname() ?? "";
   const router = useRouter();
+  const dispatch = useDispatch();
+  const userInfo = useSelector(selectUser);
+  const { getMyInfo } = useUserService();
 
   const { getCartItems } = useGetCartItems();
   const { data: cartData } = getCartItems;
+
+  // Fetch user info and update Redux state
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const userData = await getMyInfo();
+        if (userData) {
+          dispatch(
+            setUser({
+              username: userData.username,
+              email: userData.email,
+              name: userData.name,
+              role: userData.role,
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, [dispatch, getMyInfo]);
 
   const handleUpdateItem = (id: string, quantity: number) => {
     console.log(`Update item ${id} to quantity ${quantity}`);
@@ -32,6 +68,23 @@ const Header = () => {
   const handleRemoveItem = (id: string) => {
     console.log(`Remove item ${id}`);
     // Implement actual remove logic
+  };
+
+  const handleCartIconClick = () => {
+    if (!userInfo || !userInfo.username) {
+      setIsLoginModalOpen(true);
+    } else {
+      setIsCartOpen(!isCartOpen);
+    }
+  };
+
+  const handleSignOut = () => {
+    // Clear user data from localStorage
+    clearStorage();
+    // Clear user data from Redux store
+    dispatch(removeUser());
+    // Navigate to signin page
+    router.push("/signin");
   };
 
   useEffect(() => {
@@ -197,18 +250,86 @@ const Header = () => {
               );
             })}
           </ul>
-          <div className="flex space-x-[40px]">
-            <FontAwesomeIcon icon={faSearch} className="text-[14px]" />
-            <FontAwesomeIcon
-              icon={faUser}
-              className="text-[14px] hover:text-custom-rose cursor-pointer"
-              onClick={() => router.push("/signin")}
-            />
-            <FontAwesomeIcon
-              icon={faShoppingCart}
-              className={`text-[14px] ${pathname === "/cart" ? "text-custom-rose" : ""} hover:text-custom-rose cursor-pointer cart-icon`}
-              onClick={() => setIsCartOpen(!isCartOpen)}
-            />
+          <div className="flex h-full items-center">
+            <div className="flex items-center mr-5">
+              <FiSearch
+                size={20}
+                className="hover:text-custom-rose cursor-pointer"
+              />
+            </div>
+            <div className="relative group h-full px-5 group">
+              <div className="flex h-full items-center cursor-pointer group-hover:text-custom-rose">
+                <FiUser
+                  size={20}
+                  className={`${pathname === "/account" ? "text-custom-rose" : ""}`}
+                />
+                {userInfo && userInfo.username && (
+                  <span
+                    className={`ml-2 text-[14px] ${pathname === "/account" ? "text-custom-rose" : ""}`}
+                  >
+                    {userInfo.name}
+                  </span>
+                )}
+              </div>
+              <div
+                className="absolute top-full right-0 bg-custom-yellow rounded-b-md shadow-xl group-hover:flex group-hover:flex-col 
+                overflow-hidden text-[12px] w-[180px] h-0 group-hover:h-auto group-hover:scale-y-100 origin-top
+                transform -translate-y-3 group-hover:translate-y-0 transition-all duration-500 ease-in-out 
+                opacity-0 group-hover:opacity-100 scale-y-95 z-50"
+              >
+                {userInfo && userInfo.username ? (
+                  // Logged in dropdown options
+                  <>
+                    <Link
+                      href="/account"
+                      className="hover:text-custom-rose hover:font-semibold hover:bg-custom-pink py-3 px-5 whitespace-nowrap text-[14px] flex items-center"
+                    >
+                      <FiUserCheck className="mr-3 text-[18px]" />
+                      My Account
+                    </Link>
+                    <Link
+                      href="/orders"
+                      className="hover:text-custom-rose hover:font-semibold hover:bg-custom-pink py-3 px-5 whitespace-nowrap text-[14px] flex items-center"
+                    >
+                      <FiShoppingBag className="mr-3 text-[18px]" />
+                      Orders
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="text-left hover:text-custom-rose hover:font-semibold hover:bg-custom-pink py-3 px-5 whitespace-nowrap text-[14px] flex items-center w-full"
+                    >
+                      <FiLogOut className="mr-3 text-[18px]" />
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  // Logged out dropdown options
+                  <>
+                    <Link
+                      href="/signin"
+                      className="hover:text-custom-rose hover:font-semibold hover:bg-custom-pink py-3 px-5 whitespace-nowrap text-[14px] flex items-center"
+                    >
+                      <FiLogIn className="mr-3 text-[18px]" />
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="hover:text-custom-rose hover:font-semibold hover:bg-custom-pink py-3 px-5 whitespace-nowrap text-[14px] flex items-center"
+                    >
+                      <FiUserPlus className="mr-3 text-[18px]" />
+                      Sign Up
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center ml-5 cart-icon">
+              <FiShoppingCart
+                size={20}
+                className={`${pathname === "/cart" ? "text-custom-rose" : ""} hover:text-custom-rose cursor-pointer`}
+                onClick={handleCartIconClick}
+              />
+            </div>
           </div>
         </nav>
       </header>
@@ -232,6 +353,13 @@ const Header = () => {
           />
         </div>
       </div>
+
+      {/* Login Required Modal */}
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        message="You need to sign in to view your cart"
+      />
     </>
   );
 };

@@ -1,5 +1,5 @@
 // components/product/ProductInfo.tsx
-import { Product, ProductDetail } from "@/types/product";
+import { Product } from "@/types/product";
 import React from "react";
 import { FiHeart, FiShare2 } from "react-icons/fi";
 import StarRating from "./rating/StarRating";
