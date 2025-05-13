@@ -1,5 +1,5 @@
 import { useCartService } from "@/api/service/cartService";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/store/slices/userSlice";
 
@@ -32,8 +32,44 @@ export function useGetCartItems() {
     queryFn: () => getCartItems(),
     staleTime: 1000 * 60 * 5,
     retry: 1,
-    enabled: isLoggedIn, // Only run the query if the user is logged in
+    enabled: isLoggedIn,
   });
 
   return { getCartItems: getCartItemsQuery };
+}
+
+export function useRemoveCartItem() {
+  const { removeFromCart } = useCartService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (cartItemId: number) => {
+      await removeFromCart(cartItemId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+    },
+  });
+}
+
+export function useUpdateCartItem() {
+  const { updateCart } = useCartService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      cartItemId,
+      quantity,
+      newProductDetailId,
+    }: {
+      cartItemId: number;
+      quantity: number;
+      newProductDetailId?: number;
+    }) => {
+      await updateCart(cartItemId, quantity, newProductDetailId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+    },
+  });
 }

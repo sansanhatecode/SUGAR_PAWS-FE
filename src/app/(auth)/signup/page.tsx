@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import DefaultLoading from "@/components/loading/DefaultLoading";
 import { useAppDispatch } from "@/store/store";
 import { setUser } from "@/store/slices/userSlice";
+import { setAuthToken } from "@/helper/storage";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -39,13 +40,17 @@ const SignUpPage = () => {
       setLoading(true);
 
       try {
-        await signUp.mutateAsync({
+        const response = await signUp.mutateAsync({
           username: formData.username,
           email: formData.email,
           password: formData.password,
           name: formData.name,
         });
-        // Set user in redux after successful signup
+        if (response && response.accessToken) {
+          setAuthToken(response.accessToken);
+        } else {
+          throw new Error("Invalid response from server.");
+        }
         dispatch(
           setUser({
             username: formData.username,

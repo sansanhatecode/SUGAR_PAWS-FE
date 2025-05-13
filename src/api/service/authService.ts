@@ -21,7 +21,7 @@ export function useAuthService() {
 
   const signUp = async ({ name, username, email, password }: SignupRequest) => {
     try {
-      const { data } = await Request.post(API.REGISTER, {
+      const { data } = await Request.post<LoginResponseData>(API.REGISTER, {
         name,
         username,
         email,

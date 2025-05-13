@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DefaultLoading from "@/components/loading/DefaultLoading";
 import { useAuthorization } from "@/hooks/queries/useAuthorization";
-import { useAppSelector } from "@/store/store";
-import { selectEmail } from "@/store/slices/userSlice";
+import { selectEmail, selectUser } from "@/store/slices/userSlice";
+import { useSelector } from "react-redux";
 
 const VerifyCodePage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
@@ -16,7 +16,9 @@ const VerifyCodePage = () => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter();
   const { verifyCode } = useAuthorization();
-  const email = useAppSelector(selectEmail);
+  const email = useSelector(selectEmail);
+  const user = useSelector(selectUser);
+  console.log("user", user);
 
   const handleChange = (index: number, value: string) => {
     if (!/^[0-9]?$/.test(value)) return;
@@ -116,7 +118,7 @@ const VerifyCodePage = () => {
           </Link>
         </div>
         <p className="text-[14px] text-center text-custom-purple italic hover:underline hover:text-custom-rose">
-          Resend password?
+          Resend code?
         </p>
       </div>
       {loading && <DefaultLoading />}

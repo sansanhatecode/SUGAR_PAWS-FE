@@ -96,7 +96,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         const productDetail = product.productDetails.find(
           (detail) =>
             (!selectedColor || detail.color === selectedColor) &&
-            (!selectedSize || detail.size === selectedSize)
+            (!selectedSize || detail.size === selectedSize),
         );
 
         if (!productDetail) {
@@ -239,15 +239,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 {colors.map((color, idx) => (
                   <button
                     key={idx}
-                    className={`w-6 h-6 transition-all ${
-                      selectedColor === color
-                        ? "ring-2 ring-custom-rose ring-offset-2"
-                        : ""
-                    }`}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 shadow-sm relative
+                      ${
+                        selectedColor === color
+                          ? "ring-2 ring-custom-rose scale-110"
+                          : "hover:ring-2 hover:ring-custom-rose/50"
+                      }
+                    `}
                     onClick={() => setSelectedColor(color)}
                     title={color}
+                    style={{
+                      outline: "none",
+                      border: "none",
+                      padding: 0,
+                      background: "transparent",
+                    }}
                   >
-                    {renderColorButton(color, "w-full h-full")}
+                    {renderColorButton(color, "w-6 h-6")}
+                    {/* Tooltip */}
+                    <span
+                      className="absolute left-1/2 -translate-x-1/2 top-10 z-10 px-2 py-1 rounded bg-black text-white text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-all"
+                      style={{ whiteSpace: "nowrap" }}
+                    >
+                      {color}
+                    </span>
                   </button>
                 ))}
               </div>

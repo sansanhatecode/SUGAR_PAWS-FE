@@ -60,12 +60,12 @@ const Header = () => {
     fetchUserInfo();
   }, [dispatch, getMyInfo]);
 
-  const handleUpdateItem = (id: string, quantity: number) => {
+  const handleUpdateItem = (id: number, quantity: number) => {
     console.log(`Update item ${id} to quantity ${quantity}`);
     // Implement actual update logic
   };
 
-  const handleRemoveItem = (id: string) => {
+  const handleRemoveItem = (id: number) => {
     console.log(`Remove item ${id}`);
     // Implement actual remove logic
   };
@@ -261,11 +261,11 @@ const Header = () => {
               <div className="flex h-full items-center cursor-pointer group-hover:text-custom-rose">
                 <FiUser
                   size={20}
-                  className={`${pathname === "/account" ? "text-custom-rose" : ""}`}
+                  className={`${pathname.includes("/user") ? "text-custom-rose" : ""}`}
                 />
                 {userInfo && userInfo.username && (
                   <span
-                    className={`ml-2 text-[14px] ${pathname === "/account" ? "text-custom-rose" : ""}`}
+                    className={`ml-2 text-[14px] ${pathname.includes("/user") ? "text-custom-rose" : ""}`}
                   >
                     {userInfo.name}
                   </span>
@@ -281,14 +281,14 @@ const Header = () => {
                   // Logged in dropdown options
                   <>
                     <Link
-                      href="/account"
+                      href="/user/account/profile"
                       className="hover:text-custom-rose hover:font-semibold hover:bg-custom-pink py-3 px-5 whitespace-nowrap text-[14px] flex items-center"
                     >
                       <FiUserCheck className="mr-3 text-[18px]" />
                       My Account
                     </Link>
                     <Link
-                      href="/orders"
+                      href="/user/orders"
                       className="hover:text-custom-rose hover:font-semibold hover:bg-custom-pink py-3 px-5 whitespace-nowrap text-[14px] flex items-center"
                     >
                       <FiShoppingBag className="mr-3 text-[18px]" />

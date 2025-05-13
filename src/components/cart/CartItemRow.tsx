@@ -20,15 +20,15 @@ type ProductDetail = {
 };
 
 type CartItemProps = {
-  id: string;
+  id: number;
   product: ProductDetail;
   quantity: number;
   isSelected: boolean;
-  onSelect: (id: string, selected: boolean) => void;
-  onUpdateQuantity: (id: string, quantity: number) => void;
-  onUpdateColor: (id: string, color: string) => void;
-  onUpdateSize: (id: string, size: string) => void;
-  onRemove: (id: string) => void;
+  onSelect: (id: number, selected: boolean) => void;
+  onUpdateQuantity: (id: number, quantity: number) => void;
+  onUpdateColor: (id: number, color: string) => void;
+  onUpdateSize: (id: number, size: string) => void;
+  onRemove: (id: number) => void;
 };
 
 const CartItemRow: React.FC<CartItemProps> = ({
@@ -70,12 +70,18 @@ const CartItemRow: React.FC<CartItemProps> = ({
       {/* Product image and info */}
       <div className="col-span-11 md:col-span-6 lg:col-span-5 flex gap-4">
         <div className="relative w-20 h-20 md:w-24 md:h-24">
-          <Image
-            src={product.image.url}
-            alt={product.name}
-            fill
-            className="object-cover rounded-md"
-          />
+          {product.image && product.image.url ? (
+            <Image
+              src={product.image.url}
+              alt={product.name}
+              fill
+              className="object-cover rounded-md"
+            />
+          ) : (
+            <div className="flex items-center justify-center aspect-square h-full bg-gray-100 rounded-md border border-gray-200 text-gray-400 text-xs">
+              No Image
+            </div>
+          )}
         </div>
         <div className="flex flex-col justify-between">
           <h3 className="font-medium text-sm md:text-base">{product.name}</h3>

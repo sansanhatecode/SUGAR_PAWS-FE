@@ -93,6 +93,22 @@ export function useRequest() {
       });
     }
 
+    static patch<T>(
+      url: string,
+      params?: Params,
+      config: AxiosRequestConfig = {}
+    ): Promise<Response<T>> {
+      return new Promise<Response<T>>((resolve, reject) => {
+        axiosInstance
+          .patch<Response<T>>(url, params, {
+            headers: { "Content-Type": "application/json" },
+            ...config,
+          })
+          .then((res: AxiosResponse) => resolve(res.data))
+          .catch((e) => reject(e.response?.data || e));
+      });
+    }
+
     static del(
       url: string,
       params?: Params,

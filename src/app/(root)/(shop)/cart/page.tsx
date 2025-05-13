@@ -7,124 +7,65 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import CtaButton from "@/components/ui/CtaButton";
 import SecondaryButton from "@/components/ui/SecondaryButton";
-import BreadCrum from "@/components/ui/BreadCrum";
 import CartItemRow from "@/components/cart/CartItemRow";
-
-// Sample data types
-type ProductImage = {
-  url: string;
-};
-
-type ProductDetail = {
-  id: string;
-  name: string;
-  price: number;
-  color: string;
-  size: string;
-  image: ProductImage;
-  availableColors?: string[];
-  availableSizes?: string[];
-};
-
-type CartItem = {
-  id: string;
-  product: ProductDetail;
-  quantity: number;
-};
-
-// Sample data with available options for color and size
-const sampleCartItems: CartItem[] = [
-  {
-    id: "1",
-    product: {
-      id: "p1",
-      name: "Cozy Knit Sweater",
-      price: 450000,
-      color: "Pink",
-      size: "M",
-      image: {
-        url: "/assets/images/clothing/clothing-1.png",
-      },
-      availableColors: ["Pink", "White", "Beige", "Black"],
-      availableSizes: ["XS", "S", "M", "L", "XL"],
-    },
-    quantity: 2,
-  },
-  {
-    id: "2",
-    product: {
-      id: "p2",
-      name: "Floral Print Sundress",
-      price: 680000,
-      color: "Blue",
-      size: "S",
-      image: {
-        url: "/assets/images/clothing/clothing-2.png",
-      },
-      availableColors: ["Blue", "Yellow", "White", "Green"],
-      availableSizes: ["XS", "S", "M", "L"],
-    },
-    quantity: 1,
-  },
-  {
-    id: "3",
-    product: {
-      id: "p3",
-      name: "Classic Denim Jacket",
-      price: 750000,
-      color: "Indigo",
-      size: "L",
-      image: {
-        url: "/assets/images/clothing/clothing-3.png",
-      },
-      availableColors: ["Indigo", "Light Blue", "Black"],
-      availableSizes: ["S", "M", "L", "XL", "XXL"],
-    },
-    quantity: 1,
-  },
-];
+import { useGetCartItems, useRemoveCartItem } from "@/hooks/queries/useCart";
+import { CartItem as ApiCartItem } from "@/types/cart";
+import { ProductDetail } from "@/types/product";
 
 const CartPage = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>(sampleCartItems);
+  const [cartItems, setCartItems] = useState<ApiCartItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [voucher, setVoucher] = useState("");
   const [isApplying, setIsApplying] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
 
+  const { getCartItems } = useGetCartItems();
+  const { data: cartData, isSuccess } = getCartItems;
+  const removeCartItemMutation = useRemoveCartItem();
+
+  // Sync cartItems with API data
+  useEffect(() => {
+    if (isSuccess && cartData?.cartItems) {
+      setCartItems(cartData.cartItems);
+    }
+  }, [isSuccess, cartData]);
+
   // Update selected items when "Select All" changes
   useEffect(() => {
     if (selectAll) {
-      setSelectedItems(new Set(cartItems.map((item) => item.id)));
+      setSelectedItems(new Set(cartItems.map((item) => String(item.id))));
     } else if (selectedItems.size === cartItems.length) {
-      // Only clear if all items were previously selected
       setSelectedItems(new Set());
     }
-  }, [selectAll]);
+  }, [selectAll, cartItems, selectedItems.size]);
 
   // Update selectAll status when individual selections change
   useEffect(() => {
     setSelectAll(
-      selectedItems.size === cartItems.length && cartItems.length > 0
+      selectedItems.size === cartItems.length && cartItems.length > 0,
     );
   }, [selectedItems, cartItems.length]);
 
   // Calculate total amount from selected cart items
   const selectedTotal = cartItems
-    .filter((item) => selectedItems.has(item.id))
-    .reduce((total, item) => total + item.product.price * item.quantity, 0);
+    .filter((item) => selectedItems.has(String(item.id)))
+    .reduce(
+      (total, item) => total + item.productDetail.price * item.quantity,
+      0,
+    );
 
   // Calculate total of all items (regardless of selection)
   const cartTotal = cartItems.reduce(
-    (total, item) => total + item.product.price * item.quantity,
-    0
+    (total, item) => total + item.productDetail.price * item.quantity,
+    0,
   );
 
-  const handleSelectItem = (id: string, selected: boolean) => {
+  const handleSelectItem = (id: number, selected: boolean) => {
     const newSelectedItems = new Set(selectedItems);
     if (selected) {
-      newSelectedItems.add(id);
+      newSelectedItems.add(id.toString());
     } else {
-      newSelectedItems.delete(id);
+      newSelectedItems.delete(id.toString());
     }
     setSelectedItems(newSelectedItems);
   };
@@ -133,40 +74,46 @@ const CartPage = () => {
     setSelectAll(!selectAll);
   };
 
-  const handleUpdateQuantity = (id: string, newQuantity: number) => {
+  const handleUpdateQuantity = (id: number, newQuantity: number) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item
-      )
+        item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item,
+      ),
     );
   };
 
-  const handleUpdateColor = (id: string, newColor: string) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id
-          ? { ...item, product: { ...item.product, color: newColor } }
-          : item
-      )
-    );
-  };
-
-  const handleUpdateSize = (id: string, newSize: string) => {
+  const handleUpdateColor = (id: number, newColor: string) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id
-          ? { ...item, product: { ...item.product, size: newSize } }
-          : item
-      )
+          ? {
+              ...item,
+              productDetail: { ...item.productDetail, color: newColor },
+            }
+          : item,
+      ),
     );
   };
 
-  const handleRemoveItem = (id: string) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    // Also remove from selected items if present
-    if (selectedItems.has(id)) {
+  const handleUpdateSize = (id: number, newSize: string) => {
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              productDetail: { ...item.productDetail, size: newSize },
+            }
+          : item,
+      ),
+    );
+  };
+
+  const handleRemoveItem = (id: number) => {
+    removeCartItemMutation.mutate(id);
+    // UI sẽ tự refetch nhờ react-query, không cần setCartItems thủ công
+    if (selectedItems.has(id.toString())) {
       const newSelectedItems = new Set(selectedItems);
-      newSelectedItems.delete(id);
+      newSelectedItems.delete(id.toString());
       setSelectedItems(newSelectedItems);
     }
   };
@@ -191,10 +138,44 @@ const CartPage = () => {
     // Navigate to checkout with selected items
     console.log(
       "Checking out with selected items:",
-      cartItems.filter((item) => selectedItems.has(item.id))
+      cartItems.filter((item) => selectedItems.has(String(item.id))),
     );
     // In a real implementation, you would pass these selected items to checkout
   };
+
+  // Define local ProductDetail type for conversion
+  type ProductImage = {
+    url: string;
+  };
+
+  type ProductDetailLocal = {
+    id: string;
+    name: string;
+    price: number;
+    color: string;
+    size: string;
+    image: ProductImage;
+    availableColors?: string[];
+    availableSizes?: string[];
+  };
+
+  function toLocalProductDetail(
+    apiDetail: ProductDetail & {
+      availableColors?: string[];
+      availableSizes?: string[];
+    },
+  ): ProductDetailLocal {
+    return {
+      id: String(apiDetail.id),
+      name: apiDetail.name || "",
+      price: apiDetail.price,
+      color: apiDetail.color,
+      size: apiDetail.size,
+      image: { url: apiDetail.image?.url || "" },
+      availableColors: apiDetail.availableColors,
+      availableSizes: apiDetail.availableSizes,
+    };
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -244,11 +225,11 @@ const CartPage = () => {
               {/* Cart Items */}
               {cartItems.map((item) => (
                 <CartItemRow
-                  key={item.id}
+                  key={String(item.id)}
                   id={item.id}
-                  product={item.product}
+                  product={toLocalProductDetail(item.productDetail)}
                   quantity={item.quantity}
-                  isSelected={selectedItems.has(item.id)}
+                  isSelected={selectedItems.has(String(item.id))}
                   onSelect={handleSelectItem}
                   onUpdateQuantity={handleUpdateQuantity}
                   onUpdateColor={handleUpdateColor}

@@ -16,7 +16,6 @@ export default function CartItemCard({
   onDecrease,
   onRemove,
 }: Props) {
-  console.log("Cart item:", item);
   return (
     <div className="flex gap-6 py-4 border-b text-[12px] text-custom-dark items-stretch">
       <div className="w-[112px] min-h-[112px] relative aspect-square">
@@ -38,13 +37,18 @@ export default function CartItemCard({
 
         <div className="flex flex-col gap-2">
           <div className="text-gray-600">
-            <p>
-              <span className="font-semi">Color:</span>{" "}
-              {item.productDetail.color}
-            </p>
-            <p>
-              <span className="font-semi">Size:</span> {item.productDetail.size}
-            </p>
+            {item.productDetail.color && (
+              <p>
+                <span className="font-semi">Color:</span>{" "}
+                {item.productDetail.color}
+              </p>
+            )}
+            {item.productDetail.size && (
+              <p>
+                <span className="font-semi">Size:</span>{" "}
+                {item.productDetail.size}
+              </p>
+            )}
           </div>
         </div>
 

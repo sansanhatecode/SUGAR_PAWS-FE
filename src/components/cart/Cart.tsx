@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-// components/Cart.tsx
+"use client";
 import { CartItem } from "@/types/cart";
 import CartItemCard from "./CartItemCard";
 import CtaButton from "../ui/CtaButton";
@@ -7,11 +6,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { formatCurrency } from "@/helper/renderNumber";
 import SecondaryButton from "../ui/SecondaryButton";
+import { useRouter } from "next/navigation";
 
 type Props = {
   cartItems: CartItem[];
-  onUpdateItem: (id: string, quantity: number) => void;
-  onRemoveItem: (id: string) => void;
+  onUpdateItem: (id: number, quantity: number) => void;
+  onRemoveItem: (id: number) => void;
   onClose: () => void;
 };
 
@@ -23,10 +23,10 @@ export default function Cart({
 }: Props) {
   const totalPrice = cartItems.reduce(
     (total, item) => total + item.productDetail.price * item.quantity,
-    0
+    0,
   );
 
-  console.log("Cart items:", cartItems);
+  const router = useRouter();
 
   return (
     <div className="w-[400px] max-w-[100vw] h-full flex flex-col bg-custom-yellow shadow-md">
@@ -74,7 +74,10 @@ export default function Cart({
         <div className="flex justify-between">
           <SecondaryButton
             text="Go To Cart"
-            onClick={() => console.log("Checkout clicked")}
+            onClick={() => {
+              router.push("/cart");
+              onClose();
+            }}
             className="px-9"
           />
           <CtaButton

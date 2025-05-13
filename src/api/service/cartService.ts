@@ -38,9 +38,9 @@ export function useCartService() {
     }
   };
 
-  const removeFromCart = async (productId: string) => {
+  const removeFromCart = async (cartItemId: number) => {
     try {
-      const { data } = await Request.del(`${API.CART}/${productId}`);
+      const { data } = await Request.del(`${API.CART_ITEM}/${cartItemId}`);
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -54,5 +54,28 @@ export function useCartService() {
     }
   };
 
-  return { addToCart, getCartItems, removeFromCart };
+  const updateCart = async (
+    cartItemId: number,
+    quantity: number,
+    newProductDetailId?: number,
+  ) => {
+    try {
+      const { data } = await Request.patch<CartItem>(
+        `${API.CART_ITEM}/${cartItemId}`,
+        {
+          quantity,
+          newProductDetailId: newProductDetailId,
+        },
+      );
+      return data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("UpdateCart Error:", error.response?.data || error.message);
+      throw new Error(
+        error.response?.data?.message || "Failed to update cart item.",
+      );
+    }
+  };
+
+  return { addToCart, getCartItems, removeFromCart, updateCart };
 }
