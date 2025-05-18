@@ -1,5 +1,5 @@
 import { useUserService } from "@/api/service/userService";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useGetMyInfo() {
   const { getMyInfo } = useUserService();
@@ -12,4 +12,19 @@ export function useGetMyInfo() {
   });
 
   return { getMyInfo: getMyInfoQuery };
+}
+
+export function useUpdateMyInfo() {
+  const { updateProfile } = useUserService();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: updateProfile,
+    onSuccess: () => {
+      // Refetch user info after update
+      queryClient.invalidateQueries({ queryKey: ["users", "me"] });
+    },
+  });
+
+  return mutation;
 }

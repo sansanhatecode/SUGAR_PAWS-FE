@@ -14,5 +14,15 @@ export function useUserService() {
     }
   };
 
-  return { getMyInfo };
+  const updateProfile = async (profileData: Partial<User>) => {
+    try {
+      const { data } = await Request.patch<User>(API.ME, profileData);
+      return data;
+    } catch (error) {
+      console.error("UpdateProfile Error:", error);
+      throw error;
+    }
+  };
+
+  return { getMyInfo, updateProfile };
 }

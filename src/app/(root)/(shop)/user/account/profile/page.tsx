@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useAppSelector } from "@/store/store";
-import { selectUser } from "@/store/slices/userSlice";
+import { useGetMyInfo, useUpdateMyInfo } from "@/hooks/queries/useUser";
+import { toast } from "react-toastify";
 
 interface ProfileFormData {
   username: string;
@@ -17,16 +17,20 @@ interface ProfileFormData {
 }
 
 const ProfilePage = () => {
-  const user = useAppSelector(selectUser);
+  // Lấy thông tin user từ API
+  const { getMyInfo } = useGetMyInfo();
+  const updateProfileMutation = useUpdateMyInfo();
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ProfileFormData>({
     defaultValues: {
-      username: user?.username || "",
-      name: user?.name || "",
-      email: user?.email || "",
+      username: "",
+      name: "",
+      email: "",
       phone: "",
       gender: "",
       day: "",
@@ -35,10 +39,52 @@ const ProfilePage = () => {
     },
   });
 
-  const onSubmit = (data: ProfileFormData) => {
-    // Handle form submission (e.g., call API)
-    console.log(data);
+  // Khi có data user, set lại giá trị form
+  useEffect(() => {
+    if (getMyInfo.data) {
+      setValue("username", getMyInfo.data.username || "");
+      setValue("name", getMyInfo.data.name || "");
+      setValue("email", getMyInfo.data.email || "");
+      setValue("phone", getMyInfo.data.phoneNumber || "");
+      setValue("gender", getMyInfo.data.gender || "");
+      setValue(
+        "day",
+        getMyInfo.data.dayOfBirth ? String(getMyInfo.data.dayOfBirth) : "",
+      );
+      setValue(
+        "month",
+        getMyInfo.data.monthOfBirth ? String(getMyInfo.data.monthOfBirth) : "",
+      );
+      setValue(
+        "year",
+        getMyInfo.data.yearOfBirth ? String(getMyInfo.data.yearOfBirth) : "",
+      );
+    }
+  }, [getMyInfo.data, setValue]);
+
+  const onSubmit = async (data: ProfileFormData) => {
+    try {
+      await updateProfileMutation.mutateAsync({
+        name: data.name,
+        phoneNumber: data.phone,
+        gender: data.gender,
+        dayOfBirth: data.day ? Number(data.day) : undefined,
+        monthOfBirth: data.month ? Number(data.month) : undefined,
+        yearOfBirth: data.year ? Number(data.year) : undefined,
+      });
+      toast.success("Profile updated successfully!");
+    } catch {
+      toast.error("Failed to update profile!");
+    }
   };
+
+  if (getMyInfo.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (getMyInfo.isError) {
+    return <div>Failed to load profile.</div>;
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-10 w-full flex flex-col items-center justify-center">
@@ -52,7 +98,6 @@ const ProfilePage = () => {
           </label>
           <input
             className="w-full border border-gray-200 rounded-lg p-3 bg-gray-100 text-gray-500 cursor-not-allowed text-base"
-            value={user?.username || ""}
             disabled
             {...register("username")}
           />
@@ -78,7 +123,6 @@ const ProfilePage = () => {
           </label>
           <input
             className="w-full border border-gray-200 rounded-lg p-3 bg-gray-100 text-gray-500 cursor-not-allowed text-base"
-            value={user?.email || ""}
             disabled
             {...register("email")}
           />
@@ -158,8 +202,9 @@ const ProfilePage = () => {
         <button
           type="submit"
           className="mt-8 bg-custom-wine text-white px-8 py-3 rounded-xl font-bold hover:bg-pink-700 transition-all shadow-lg w-full text-lg tracking-wide"
+          disabled={updateProfileMutation.isPending}
         >
-          Save
+          {updateProfileMutation.isPending ? "Saving..." : "Save"}
         </button>
       </form>
     </div>
