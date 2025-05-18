@@ -1,135 +1,62 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
+import { CartItem as ApiCartItem } from "@/types/cart";
 
-// Define a cart item interface
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  color: string;
-  size?: string;
-  image: string;
-}
-
+// selectedItems lưu cả object ApiCartItem
 interface CartState {
-  items: CartItem[];
-  totalQuantity: number;
-  totalAmount: number;
+  selectedItems: ApiCartItem[];
 }
 
 const initialState: CartState = {
-  items: [],
-  totalQuantity: 0,
-  totalAmount: 0,
+  selectedItems: [],
 };
 
-// Helper function to calculate totals
-const calculateTotals = (items: CartItem[]) => {
-  const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
-  const totalAmount = items.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
-  return { totalQuantity, totalAmount };
-};
+function isSameCartItem(a: ApiCartItem, b: ApiCartItem) {
+  return String(a.id) === String(b.id);
+}
 
-// Create the cart slice
 export const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    addToCart: (state, action: PayloadAction<CartItem>) => {
-      const newItem = action.payload;
-      const existingItemIndex = state.items.findIndex(
-        (item) =>
-          item.id === newItem.id &&
-          item.color === newItem.color &&
-          item.size === newItem.size
-      );
-
-      if (existingItemIndex >= 0) {
-        // If the item already exists, update its quantity
-        state.items[existingItemIndex].quantity += newItem.quantity;
-      } else {
-        // Otherwise, add the new item to the cart
-        state.items.push(newItem);
-      }
-
-      // Recalculate totals
-      const { totalQuantity, totalAmount } = calculateTotals(state.items);
-      state.totalQuantity = totalQuantity;
-      state.totalAmount = totalAmount;
-    },
-    updateQuantity: (
-      state,
-      action: PayloadAction<{
-        id: string;
-        color: string;
-        size?: string;
-        quantity: number;
-      }>
-    ) => {
-      const { id, color, size, quantity } = action.payload;
-      const itemIndex = state.items.findIndex(
-        (item) => item.id === id && item.color === color && item.size === size
-      );
-
-      if (itemIndex >= 0) {
-        if (quantity <= 0) {
-          // Remove the item if quantity is zero or negative
-          state.items.splice(itemIndex, 1);
-        } else {
-          // Otherwise update the quantity
-          state.items[itemIndex].quantity = quantity;
-        }
-
-        // Recalculate totals
-        const { totalQuantity, totalAmount } = calculateTotals(state.items);
-        state.totalQuantity = totalQuantity;
-        state.totalAmount = totalAmount;
+    selectItem: (state, action: PayloadAction<ApiCartItem>) => {
+      if (
+        !state.selectedItems.some((item) =>
+          isSameCartItem(item, action.payload),
+        )
+      ) {
+        state.selectedItems.push(action.payload);
       }
     },
-    removeFromCart: (
-      state,
-      action: PayloadAction<{
-        id: string;
-        color: string;
-        size?: string;
-      }>
-    ) => {
-      const { id, color, size } = action.payload;
-      const itemIndex = state.items.findIndex(
-        (item) => item.id === id && item.color === color && item.size === size
+    deselectItem: (state, action: PayloadAction<ApiCartItem>) => {
+      state.selectedItems = state.selectedItems.filter(
+        (item) => !isSameCartItem(item, action.payload),
       );
-
-      if (itemIndex >= 0) {
-        // Remove the item from the cart
-        state.items.splice(itemIndex, 1);
-
-        // Recalculate totals
-        const { totalQuantity, totalAmount } = calculateTotals(state.items);
-        state.totalQuantity = totalQuantity;
-        state.totalAmount = totalAmount;
-      }
     },
-    clearCart: (state) => {
-      return initialState;
+    selectAll: (state, action: PayloadAction<ApiCartItem[]>) => {
+      state.selectedItems = [...action.payload];
+    },
+    deselectAll: (state) => {
+      state.selectedItems = [];
+    },
+    setSelectedItems: (state, action: PayloadAction<ApiCartItem[]>) => {
+      state.selectedItems = [...action.payload];
     },
   },
 });
 
-// Export the actions
-export const { addToCart, updateQuantity, removeFromCart, clearCart } =
-  cartSlice.actions;
+// Export actions
+export const {
+  selectItem,
+  deselectItem,
+  selectAll,
+  deselectAll,
+  setSelectedItems,
+} = cartSlice.actions;
 
 // Export selectors
-export const selectCart = (state: RootState) => state.cart;
-export const selectCartItems = (state: RootState) => state.cart.items;
-export const selectCartTotalQuantity = (state: RootState) =>
-  state.cart.totalQuantity;
-export const selectCartTotalAmount = (state: RootState) =>
-  state.cart.totalAmount;
+export const selectCartSelectedItems = (state: RootState) =>
+  state.cart.selectedItems;
 
-// Export the reducer
+// Export reducer
 export default cartSlice.reducer;

@@ -19,7 +19,7 @@ export type ShippingAddress = {
   fullName: string;
   phoneNumber: string;
   homeNumber: string;
-  wardCode: number;
+  wardCode: number | "";
   isDefault: boolean;
   createdAt: Date;
   updatedAt: Date;

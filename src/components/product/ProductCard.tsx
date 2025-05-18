@@ -70,6 +70,27 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       return;
     }
 
+    // If no color and no size selection required, add to cart directly
+    if ((!colors || colors.length === 0) && (!sizes || sizes.length === 0)) {
+      if (product.productDetails && product.productDetails.length > 0) {
+        const productDetail = product.productDetails[0];
+        addToCart(productDetail.id, 1);
+        toast.success(`${product.name} added to cart! 🛒`, {
+          position: "top-right",
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          toastId: `add-to-cart-${product.id}`,
+          className:
+            "bg-white text-custom-dark border border-green-300 shadow-md px-4 py-3 rounded-xl",
+        });
+        return;
+      }
+    }
+
     setIsModalOpen(true);
     setSelectedColor(null);
     setSelectedSize(null);

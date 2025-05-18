@@ -3,6 +3,7 @@ import ProductLoading from "@/components/loading/ProductLoading";
 import ProductsSection from "@/components/product/ProductsSection";
 import { Product } from "@/types/product";
 import CtaButton from "../ui/CtaButton";
+import Link from "next/link";
 
 interface CategoryPageLayoutProps {
   isLoading: boolean;
@@ -41,10 +42,12 @@ const CategoryPageLayout = ({
           ) : products.length === 0 ? (
             <div className="flex-1 flex flex-col gap-4 justify-center items-center min-h-[300px]">
               <p>{isEmpty}</p>
-              <CtaButton
-                text="return to home"
-                onClick={() => console.log("hehe")}
-              />
+              <Link href={"/"}>
+                <CtaButton
+                  text="return to home"
+                  onClick={() => console.log("hehe")}
+                />
+              </Link>
             </div>
           ) : (
             <ProductsSection products={products} />

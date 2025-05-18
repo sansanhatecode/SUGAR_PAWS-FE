@@ -11,17 +11,33 @@ import CartItemRow from "@/components/cart/CartItemRow";
 import { useGetCartItems, useRemoveCartItem } from "@/hooks/queries/useCart";
 import { CartItem as ApiCartItem } from "@/types/cart";
 import { ProductDetail } from "@/types/product";
+import { useRouter } from "next/navigation";
+import {
+  selectItem,
+  deselectItem,
+  selectAll as selectAllAction,
+  deselectAll as deselectAllAction,
+  selectCartSelectedItems,
+} from "@/store/slices/cartSlice";
+import { useAppDispatch, useAppSelector } from "@/store/store";
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState<ApiCartItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [voucher, setVoucher] = useState("");
   const [isApplying, setIsApplying] = useState(false);
+
+  const dispatch = useAppDispatch();
+  const selectedItems = useAppSelector(selectCartSelectedItems);
+
+  console.log("selectedItems", selectedItems);
+
   const [selectAll, setSelectAll] = useState(false);
 
   const { getCartItems } = useGetCartItems();
   const { data: cartData, isSuccess } = getCartItems;
   const removeCartItemMutation = useRemoveCartItem();
+
+  const router = useRouter();
 
   // Sync cartItems with API data
   useEffect(() => {
@@ -30,29 +46,26 @@ const CartPage = () => {
     }
   }, [isSuccess, cartData]);
 
-  // Update selected items when "Select All" changes
   useEffect(() => {
     if (selectAll) {
-      setSelectedItems(new Set(cartItems.map((item) => String(item.id))));
-    } else if (selectedItems.size === cartItems.length) {
-      setSelectedItems(new Set());
+      dispatch(selectAllAction(cartItems));
+    } else {
+      dispatch(deselectAllAction());
     }
-  }, [selectAll, cartItems, selectedItems.size]);
+  }, [selectAll, cartItems, dispatch]);
 
   // Update selectAll status when individual selections change
   useEffect(() => {
     setSelectAll(
-      selectedItems.size === cartItems.length && cartItems.length > 0,
+      selectedItems.length === cartItems.length && cartItems.length > 0,
     );
   }, [selectedItems, cartItems.length]);
 
   // Calculate total amount from selected cart items
-  const selectedTotal = cartItems
-    .filter((item) => selectedItems.has(String(item.id)))
-    .reduce(
-      (total, item) => total + item.productDetail.price * item.quantity,
-      0,
-    );
+  const selectedTotal = selectedItems.reduce(
+    (total, item) => total + item.productDetail.price * item.quantity,
+    0,
+  );
 
   // Calculate total of all items (regardless of selection)
   const cartTotal = cartItems.reduce(
@@ -61,17 +74,17 @@ const CartPage = () => {
   );
 
   const handleSelectItem = (id: number, selected: boolean) => {
-    const newSelectedItems = new Set(selectedItems);
+    const item = cartItems.find((i) => i.id === id);
+    if (!item) return;
     if (selected) {
-      newSelectedItems.add(id.toString());
+      dispatch(selectItem(item));
     } else {
-      newSelectedItems.delete(id.toString());
+      dispatch(deselectItem(item));
     }
-    setSelectedItems(newSelectedItems);
   };
 
   const handleSelectAll = () => {
-    setSelectAll(!selectAll);
+    setSelectAll((prev) => !prev);
   };
 
   const handleUpdateQuantity = (id: number, newQuantity: number) => {
@@ -110,11 +123,9 @@ const CartPage = () => {
 
   const handleRemoveItem = (id: number) => {
     removeCartItemMutation.mutate(id);
-    // UI sẽ tự refetch nhờ react-query, không cần setCartItems thủ công
-    if (selectedItems.has(id.toString())) {
-      const newSelectedItems = new Set(selectedItems);
-      newSelectedItems.delete(id.toString());
-      setSelectedItems(newSelectedItems);
+    const item = cartItems.find((i) => i.id === id);
+    if (item && selectedItems.some((si) => String(si.id) === String(id))) {
+      dispatch(deselectItem(item));
     }
   };
 
@@ -130,17 +141,11 @@ const CartPage = () => {
   };
 
   const handleCheckout = () => {
-    if (selectedItems.size === 0) {
+    if (selectedItems.length === 0) {
       alert("Please select at least one item to checkout");
       return;
     }
-
-    // Navigate to checkout with selected items
-    console.log(
-      "Checking out with selected items:",
-      cartItems.filter((item) => selectedItems.has(String(item.id))),
-    );
-    // In a real implementation, you would pass these selected items to checkout
+    router.push("/checkout");
   };
 
   // Define local ProductDetail type for conversion
@@ -229,7 +234,9 @@ const CartPage = () => {
                   id={item.id}
                   product={toLocalProductDetail(item.productDetail)}
                   quantity={item.quantity}
-                  isSelected={selectedItems.has(String(item.id))}
+                  isSelected={selectedItems.some(
+                    (si) => String(si.id) === String(item.id),
+                  )}
                   onSelect={handleSelectItem}
                   onUpdateQuantity={handleUpdateQuantity}
                   onUpdateColor={handleUpdateColor}
@@ -258,7 +265,7 @@ const CartPage = () => {
                 <div className="flex justify-between py-2">
                   <span className="text-gray-600">Items Selected:</span>
                   <span className="font-semibold">
-                    {selectedItems.size} of {cartItems.length}
+                    {selectedItems.length} of {cartItems.length}
                   </span>
                 </div>
                 <div className="flex justify-between py-2">
@@ -270,7 +277,7 @@ const CartPage = () => {
                 <div className="flex justify-between py-2">
                   <span className="text-gray-600">Shipping:</span>
                   <span className="font-semibold">
-                    {selectedItems.size > 0 ? "Calculated at checkout" : "—"}
+                    {selectedItems.length > 0 ? "Calculated at checkout" : "—"}
                   </span>
                 </div>
               </div>
@@ -284,7 +291,7 @@ const CartPage = () => {
                     {formatCurrency(selectedTotal)} VND
                   </span>
                 </div>
-                {selectedItems.size < cartItems.length && (
+                {selectedItems.length < cartItems.length && (
                   <div className="text-xs text-gray-600 mt-1">
                     Cart total (all items): {formatCurrency(cartTotal)} VND
                   </div>
@@ -308,9 +315,9 @@ const CartPage = () => {
                 </div>
                 <CtaButton
                   text="Checkout Selected Items"
-                  className={`w-full py-3 ${selectedItems.size === 0 ? "opacity-70 cursor-not-allowed" : ""}`}
+                  className={`w-full py-3 ${selectedItems.length === 0 ? "opacity-70 cursor-not-allowed" : ""}`}
                   onClick={handleCheckout}
-                  disabled={selectedItems.size === 0}
+                  disabled={selectedItems.length === 0}
                 />
               </div>
 

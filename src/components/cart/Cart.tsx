@@ -82,7 +82,10 @@ export default function Cart({
           />
           <CtaButton
             text="Check out"
-            onClick={() => console.log("Checkout clicked")}
+            onClick={() => {
+              router.push("/checkout");
+              onClose();
+            }}
             className="px-9"
           />
         </div>
