@@ -1,23 +1,51 @@
 import React from "react";
+import { Spinner } from "@/components/ui/Spinner";
+import { useCalculateShippingFee } from "@/hooks/queries/useOrder";
 
-const CheckoutShipping = () => {
-  // TODO: Replace with real shipping method data
+interface CheckoutShippingProps {
+  addressId: number | null;
+}
+
+const CheckoutShipping: React.FC<CheckoutShippingProps> = ({ addressId }) => {
+  const { data: shippingFee, isLoading } = useCalculateShippingFee(
+    addressId || 0,
+  );
+
+  // Calculate estimated delivery dates (example: 2-4 days from now)
+  const today = new Date();
+  const deliveryStart = new Date(today);
+  deliveryStart.setDate(today.getDate() + 2);
+  const deliveryEnd = new Date(today);
+  deliveryEnd.setDate(today.getDate() + 4);
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "long",
+    });
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-6 flex flex-col gap-2">
       <div className="flex justify-between items-center">
-        <div className="font-semibold text-custom-purple">
-          Phương thức vận chuyển:
-        </div>
-        <button className="text-custom-rose hover:underline text-sm">
-          Thay Đổi
-        </button>
+        <div className="font-semibold text-custom-purple">Shipping Method</div>
       </div>
       <div className="flex justify-between items-center text-sm">
-        <span>Nhanh</span>
-        <span className="font-medium">₫5.000</span>
+        <span>Express Delivery</span>
+        {isLoading ? (
+          <Spinner size="sm" />
+        ) : (
+          <span className="font-medium">
+            {shippingFee?.toLocaleString("en-US", {
+              style: "currency",
+              currency: "VND",
+            })}
+          </span>
+        )}
       </div>
       <div className="text-xs text-gray-500">
-        Dự kiến nhận hàng từ 17 Tháng 5 - 19 Tháng 5
+        Estimated delivery: {formatDate(deliveryStart)} -{" "}
+        {formatDate(deliveryEnd)}
       </div>
     </div>
   );

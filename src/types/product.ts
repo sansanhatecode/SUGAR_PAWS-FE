@@ -31,6 +31,7 @@ export type ProductDetail = {
   size: string;
   image: ImageDetail;
   moreDetails: string[];
+  product?: Product;
 };
 
 export type ImageDetail = {

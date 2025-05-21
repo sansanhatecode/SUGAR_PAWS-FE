@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ToastContainer } from "react-toastify";
+import { Toaster } from "react-hot-toast";
 import { ReactQueryProvider } from "@/provider/ReactQueryProvider";
-import "react-toastify/dist/ReactToastify.css";
 import ReduxProvider from "./ReduxProvider";
 
 export function ClientProvider({ children }: { children: React.ReactNode }) {
@@ -17,19 +16,9 @@ export function ClientProvider({ children }: { children: React.ReactNode }) {
     <ReactQueryProvider>
       <ReduxProvider>{children}</ReduxProvider>
       {mounted && (
-        <ToastContainer
+        <Toaster
           position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-          className="mt-16"
-          toastClassName="rounded-md shadow-lg"
+          toastOptions={{ className: "rounded-md shadow-lg mt-16" }}
         />
       )}
     </ReactQueryProvider>

@@ -273,7 +273,7 @@ export default function ProductDetailPage() {
 
       {/* Login Required Modal */}
       <LoginRequiredModal
-        isOpen={isLoginModalOpen}
+        open={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         message="You need to sign in to add products to your cart"
       />

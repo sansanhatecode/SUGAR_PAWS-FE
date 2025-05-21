@@ -5,19 +5,19 @@ import SecondaryButton from "./SecondaryButton";
 import { useRouter } from "next/navigation";
 
 interface LoginRequiredModalProps {
-  isOpen: boolean;
+  open: boolean;
   onClose: () => void;
   message?: string;
 }
 
 const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
-  isOpen,
+  open,
   onClose,
   message = "You need to be logged in to add items to your cart",
 }) => {
   const router = useRouter();
 
-  if (!isOpen) return null;
+  if (!open) return null;
 
   const handleSignIn = () => {
     router.push("/signin");
@@ -30,7 +30,7 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
   };
 
   return (
-    <Modal onClose={onClose} size="small">
+    <Modal onClose={onClose} size="small" open={open}>
       <div className="flex flex-col items-center p-2 sm:p-4">
         {/* Lock Icon */}
         <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4 animate-fadeIn">

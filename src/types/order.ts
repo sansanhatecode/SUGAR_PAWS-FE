@@ -1,5 +1,6 @@
 import { ShippingAddress } from "./address";
-import { Product } from "./product";
+import { ProductDetail } from "./product";
+import { Payment } from "./payment";
 
 export type Order = {
   id: number;
@@ -9,26 +10,27 @@ export type Order = {
   updatedAt: Date;
   paidAt?: Date;
   deliveredAt?: Date;
-  paymentMethod?: string;
   shippingFee?: number;
   totalAmount: number;
   trackingCode?: string;
   status: OrderStatus;
+  payId?: number; // Replaced paymentMethod with payId to link with payment
 
   shippingAddress?: ShippingAddress;
   orderItems?: OrderItem[];
+  payment?: Payment;
 };
 
 export type OrderItem = {
   id: number;
   orderId: number;
-  productId: number;
+  productDetailId: number;
   quantity: number;
   price: number;
   createdAt: Date;
   updatedAt: Date;
 
-  product?: Product;
+  productDetail?: ProductDetail;
 };
 
 export type OrderStatus =

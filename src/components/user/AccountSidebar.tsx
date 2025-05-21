@@ -36,7 +36,7 @@ const sidebarItems = [
     icon: <FaLock />,
     href: "/user/account/privacy",
   },
-  { label: "Orders", icon: <FaClipboardList />, href: "/user/account/orders" },
+  { label: "Orders", icon: <FaClipboardList />, href: "/user/orders" },
   {
     label: "Voucher Wallet",
     icon: <FaTicketAlt />,

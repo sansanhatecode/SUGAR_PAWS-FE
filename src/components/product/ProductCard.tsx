@@ -4,12 +4,13 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { FiShoppingCart } from "react-icons/fi";
+import { MdErrorOutline } from "react-icons/md";
 import Modal from "../ui/Modal";
 import CtaButton from "../ui/CtaButton";
 import Link from "next/link";
 import { getColorCode } from "@/helper/colorHelper";
 import { useAddProductToCart } from "@/hooks/queries/useCart";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/store/slices/userSlice";
 import LoginRequiredModal from "../ui/LoginRequiredModal";
@@ -75,18 +76,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       if (product.productDetails && product.productDetails.length > 0) {
         const productDetail = product.productDetails[0];
         addToCart(productDetail.id, 1);
-        toast.success(`${product.name} added to cart! 🛒`, {
-          position: "top-right",
-          autoClose: 2500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          toastId: `add-to-cart-${product.id}`,
-          className:
-            "bg-white text-custom-dark border border-green-300 shadow-md px-4 py-3 rounded-xl",
-        });
+        toast.success(
+          <span className="flex items-center gap-2">
+            <FiShoppingCart className="text-xl text-green-600 animate-bounce" />
+            <span className="font-semibold">{product.name} added to cart!</span>
+          </span>,
+          {
+            id: `add-to-cart-${product.id}`,
+            position: "top-right",
+            className:
+              "bg-gradient-to-r from-green-100 to-green-50 text-green-900 border border-green-300 shadow-2xl px-6 py-4 rounded-2xl font-semibold flex items-center gap-2",
+          }
+        );
         return;
       }
     }
@@ -125,18 +126,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           return;
         }
         addToCart(productDetail.id, quantity);
-        toast.success(`${product.name} added to cart! 🛒`, {
-          position: "top-right",
-          autoClose: 2500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          toastId: `add-to-cart-${product.id}`,
-          className:
-            "bg-white text-custom-dark border border-green-300 shadow-md px-4 py-3 rounded-xl",
-        });
+        toast.success(
+          <span className="flex items-center gap-2">
+            <span className="font-semibold">{product.name} added to cart!</span>
+            <FiShoppingCart
+              size={20}
+              className="text-xl text-green-600 animate-bounce"
+            />
+          </span>,
+          {
+            id: `add-to-cart-${product.id}`,
+            position: "top-right",
+            className:
+              "bg-gradient-to-r from-green-100 to-green-50 text-green-900 border border-green-300 shadow-2xl px-6 py-4 rounded-2xl font-semibold flex items-center gap-2",
+          }
+        );
 
         console.log("Product added to cart with options:", {
           color: selectedColor,
@@ -150,17 +154,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       setValidationError("Failed to add product to cart");
 
       // Show error toast notification
-      toast.error("Failed to add product to cart", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        className: "rounded-md font-medium text-sm",
-        toastId: `add-to-cart-error-${product.id}`,
-      });
+      toast.error(
+        <span className="flex items-center gap-2">
+          <MdErrorOutline className="text-xl text-red-600 animate-shake" />
+          <span className="font-semibold">Failed to add product to cart</span>
+        </span>,
+        {
+          id: `add-to-cart-error-${product.id}`,
+          position: "top-right",
+          className:
+            "bg-gradient-to-r from-red-100 to-red-50 text-red-900 border border-red-300 shadow-2xl px-6 py-4 rounded-2xl font-semibold flex items-center gap-2",
+        }
+      );
     }
   };
 
@@ -230,77 +235,79 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
       </div>
 
-      {isModalOpen && (
-        <Modal onClose={() => setIsModalOpen(false)} size="small">
-          <h3 className="text-lg font-semibold mb-4">Select Options</h3>
-          {sizes && sizes.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-sm font-medium mb-2">Sizes:</h4>
-              <div className="flex gap-2">
-                {sizes.map((size, idx) => (
-                  <button
-                    key={idx}
-                    className={`px-3 py-1 border rounded transition-colors ${
-                      selectedSize === size
-                        ? "bg-custom-rose text-white"
-                        : "hover:bg-gray-200"
-                    }`}
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
+      <Modal
+        onClose={() => setIsModalOpen(false)}
+        size="small"
+        open={isModalOpen}
+      >
+        <h3 className="text-lg font-semibold mb-4">Select Options</h3>
+        {sizes && sizes.length > 0 && (
+          <div className="mb-4">
+            <h4 className="text-sm font-medium mb-2">Sizes:</h4>
+            <div className="flex gap-2">
+              {sizes.map((size, idx) => (
+                <button
+                  key={idx}
+                  className={`px-3 py-1 border rounded transition-colors ${
+                    selectedSize === size
+                      ? "bg-custom-rose text-white"
+                      : "hover:bg-gray-200"
+                  }`}
+                  onClick={() => setSelectedSize(size)}
+                >
+                  {size}
+                </button>
+              ))}
             </div>
-          )}
-          {colors && colors.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-sm font-medium mb-2">Colors:</h4>
-              <div className="gap-2 flex flex-wrap">
-                {colors.map((color, idx) => (
-                  <button
-                    key={idx}
-                    className={`w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 shadow-sm relative
-                      ${
-                        selectedColor === color
-                          ? "ring-2 ring-custom-rose scale-110"
-                          : "hover:ring-2 hover:ring-custom-rose/50"
-                      }
-                    `}
-                    onClick={() => setSelectedColor(color)}
-                    title={color}
-                    style={{
-                      outline: "none",
-                      border: "none",
-                      padding: 0,
-                      background: "transparent",
-                    }}
+          </div>
+        )}
+        {colors && colors.length > 0 && (
+          <div className="mb-4">
+            <h4 className="text-sm font-medium mb-2">Colors:</h4>
+            <div className="gap-2 flex flex-wrap">
+              {colors.map((color, idx) => (
+                <button
+                  key={idx}
+                  className={`w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 shadow-sm relative
+                    ${
+                      selectedColor === color
+                        ? "ring-2 ring-custom-rose scale-110"
+                        : "hover:ring-2 hover:ring-custom-rose/50"
+                    }
+                  `}
+                  onClick={() => setSelectedColor(color)}
+                  title={color}
+                  style={{
+                    outline: "none",
+                    border: "none",
+                    padding: 0,
+                    background: "transparent",
+                  }}
+                >
+                  {renderColorButton(color, "w-6 h-6")}
+                  {/* Tooltip */}
+                  <span
+                    className="absolute left-1/2 -translate-x-1/2 top-10 z-10 px-2 py-1 rounded bg-black text-white text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-all"
+                    style={{ whiteSpace: "nowrap" }}
                   >
-                    {renderColorButton(color, "w-6 h-6")}
-                    {/* Tooltip */}
-                    <span
-                      className="absolute left-1/2 -translate-x-1/2 top-10 z-10 px-2 py-1 rounded bg-black text-white text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-all"
-                      style={{ whiteSpace: "nowrap" }}
-                    >
-                      {color}
-                    </span>
-                  </button>
-                ))}
-              </div>
+                    {color}
+                  </span>
+                </button>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {validationError && (
-            <div className="mb-4 text-red-500 text-sm">{validationError}</div>
-          )}
+        {validationError && (
+          <div className="mb-4 text-red-500 text-sm">{validationError}</div>
+        )}
 
-          <CtaButton
-            className="m-auto"
-            text="Add to Cart"
-            onClick={() => addProductToCart()}
-          />
-        </Modal>
-      )}
+        <CtaButton
+          className="m-auto"
+          text="Add to Cart"
+          onClick={() => addProductToCart()}
+        />
+      </Modal>
 
       <Link
         className="font-semibold text-gray-800 line-clamp-2 mb-2 hover:text-custom-rose transition-all duration-300"
@@ -363,7 +370,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
       {/* Login Required Modal */}
       <LoginRequiredModal
-        isOpen={isLoginModalOpen}
+        open={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         message="You need to sign in to add products to your cart"
       />

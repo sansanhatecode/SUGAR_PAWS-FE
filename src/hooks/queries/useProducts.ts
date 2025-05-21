@@ -18,6 +18,18 @@ export function useGetProducts(params: GetProductsRequest) {
   };
 }
 
+export function useGetAllProducts() {
+  const { getAllProducts } = useGetProductservice();
+  const getAllProductsQuery = useQuery({
+    queryKey: ["allProducts"],
+    queryFn: () => getAllProducts(),
+  });
+
+  return {
+    getAllProducts: getAllProductsQuery,
+  };
+}
+
 export function useGetColors(params: GetColorsRequest) {
   const { getColors } = useGetProductservice();
 

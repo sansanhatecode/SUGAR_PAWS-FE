@@ -41,6 +41,23 @@ export function useGetProductservice() {
     }
   };
 
+  const getAllProducts = async () => {
+    try {
+      const { data } = await Request.get<Product[]>(API.ALL_PRODUCTS);
+      return data;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch (error: any) {
+      console.error(
+        "GetAllProducts Error:",
+        error.response?.data || error.message
+      );
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch all products."
+      );
+    }
+  };
+
   const getColors = async ({ categoryName }: GetColorsRequest) => {
     try {
       const { data } = await Request.get<string[]>(API.COLORS, {
@@ -87,5 +104,5 @@ export function useGetProductservice() {
     }
   };
 
-  return { getProducts, getColors, getSizes, getProductDetail };
+  return { getProducts, getColors, getSizes, getProductDetail, getAllProducts };
 }

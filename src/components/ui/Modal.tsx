@@ -7,30 +7,34 @@ type ModalProps = {
   onClose: () => void;
   children: React.ReactNode;
   size?: "small" | "medium" | "large";
+  open: boolean;
 };
 
 const Modal: React.FC<ModalProps> = ({
   onClose,
   children,
   size = "medium",
+  open,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Set isOpen to true after component mounts for entrance animation
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsOpen(true);
-    }, 10);
-    return () => clearTimeout(timer);
-  }, []);
+    if (open) {
+      const timer = setTimeout(() => setIsOpen(true), 10);
+      return () => clearTimeout(timer);
+    } else {
+      setIsOpen(false);
+    }
+  }, [open]);
 
   const handleClose = () => {
     setIsOpen(false);
-    // Delay actual closing to allow exit animation to play
     setTimeout(() => {
       onClose();
     }, 300);
   };
+
+  if (!open && !isOpen) return null;
 
   const sizeClasses = {
     small: "max-w-sm",

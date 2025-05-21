@@ -1,18 +1,72 @@
 import React from "react";
 import { CartItem } from "@/types/cart";
+import { useCreateOrder } from "@/hooks/queries/useOrder";
+import { CreateOrderDto, CreateOrderItemDto } from "@/api/service/orderService";
+import { PaymentMethod } from "@/types/payment";
+import { Spinner } from "@/components/ui/Spinner";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 interface CheckoutSummaryProps {
   selectedItems: CartItem[];
+  selectedAddressId: number | null;
+  shippingFee: number;
+  paymentMethod: PaymentMethod;
 }
 
-const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({ selectedItems }) => {
+const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
+  selectedItems,
+  selectedAddressId,
+  shippingFee,
+  paymentMethod,
+}) => {
+  const router = useRouter();
+  const createOrderMutation = useCreateOrder();
+
   // Calculate subtotal
   const subtotal = selectedItems.reduce(
     (sum, item) => sum + item.productDetail.price * item.quantity,
-    0,
+    0
   );
-  const shipping = selectedItems.length > 0 ? 5000 : 0;
-  const total = subtotal + shipping;
+  const total = subtotal + (shippingFee || 0);
+
+  const handleCreateOrder = async () => {
+    if (!selectedAddressId) {
+      toast.error("Please select a shipping address");
+      return;
+    }
+
+    if (selectedItems.length === 0) {
+      toast.error("No items to checkout");
+      return;
+    }
+
+    try {
+      // Prepare order items
+      const orderItems: CreateOrderItemDto[] = selectedItems.map((item) => ({
+        productDetailId: item.productDetail.id,
+        quantity: item.quantity,
+      }));
+
+      // Create order data
+      const orderData: CreateOrderDto = {
+        shippingAddressId: selectedAddressId,
+        paymentMethod: paymentMethod,
+        orderItems: orderItems,
+      };
+
+      // Create order
+      const result = await createOrderMutation.mutateAsync(orderData);
+
+      toast.success("Order created successfully!");
+
+      // Navigate to the order detail page
+      router.push(`/orders/${result.id}`);
+    } catch (error) {
+      console.error("Failed to create order:", error);
+      toast.error("Failed to create order. Please try again.");
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow p-6 flex flex-col gap-2">
@@ -28,7 +82,7 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({ selectedItems }) => {
       <div className="flex justify-between items-center text-base">
         <span>Shipping Fee</span>
         <span>
-          {shipping.toLocaleString("en-US", {
+          {shippingFee?.toLocaleString("en-US", {
             style: "currency",
             currency: "VND",
           })}
@@ -43,7 +97,14 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({ selectedItems }) => {
           })}
         </span>
       </div>
-      <button className="mt-4 bg-custom-rose text-white font-semibold py-2 rounded-lg hover:bg-pink-500 transition">
+      <button
+        className="mt-4 bg-custom-rose text-white font-semibold py-2 rounded-lg hover:bg-pink-500 transition flex items-center justify-center"
+        onClick={handleCreateOrder}
+        disabled={createOrderMutation.isPending || !selectedAddressId}
+      >
+        {createOrderMutation.isPending ? (
+          <Spinner size="sm" className="mr-2" />
+        ) : null}
         Place Order
       </button>
     </div>

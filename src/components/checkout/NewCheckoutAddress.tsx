@@ -1,28 +1,47 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useGetMyAddresses } from "@/hooks/queries/useAddress";
 import { Spinner } from "@/components/ui/Spinner";
 import { AddressModal } from "@/components/user/AddressModal";
 import { AddressSelectModal } from "./AddressSelectModal";
 
-const CheckoutAddress = () => {
+interface CheckoutAddressProps {
+  setSelectedAddressId: (id: number | null) => void;
+}
+
+const CheckoutAddress: React.FC<CheckoutAddressProps> = ({
+  setSelectedAddressId,
+}) => {
   const { data: addresses = [], isLoading } = useGetMyAddresses();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectModalOpen, setSelectModalOpen] = useState(false);
-  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
-    null,
-  );
+  const [localSelectedAddressId, setLocalSelectedAddressId] = useState<
+    number | null
+  >(null);
 
   // Find default address
   const defaultAddress =
     addresses.find((addr) => addr.isDefault) || addresses[0];
 
-  React.useEffect(() => {
-    if (defaultAddress) setSelectedAddressId(defaultAddress.id);
-  }, [addresses, defaultAddress]);
+  // Update both local and parent state when address changes
+  useEffect(() => {
+    if (defaultAddress) {
+      setLocalSelectedAddressId(defaultAddress.id);
+      setSelectedAddressId(defaultAddress.id);
+    }
+  }, [addresses, defaultAddress, setSelectedAddressId]);
 
   const selectedAddress =
-    addresses.find((addr) => addr.id === selectedAddressId) || defaultAddress;
+    addresses.find((addr) => addr.id === localSelectedAddressId) ||
+    defaultAddress;
+
+  // Handle address selection
+  const handleAddressSelected = (id: number | null) => {
+    setLocalSelectedAddressId(id);
+    setSelectedAddressId(id);
+    setSelectModalOpen(false);
+    if (id === null) setModalOpen(true); // open add new address modal
+  };
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
@@ -67,18 +86,17 @@ const CheckoutAddress = () => {
       <AddressSelectModal
         open={selectModalOpen}
         onClose={() => setSelectModalOpen(false)}
-        selectedAddressId={selectedAddressId}
-        setSelectedAddressId={(id) => {
-          setSelectedAddressId(id);
-          setSelectModalOpen(false);
-          if (id === null) setModalOpen(true); // open add new address modal
-        }}
+        selectedAddressId={localSelectedAddressId}
+        setSelectedAddressId={handleAddressSelected}
       />
       <AddressModal
         addressId={null}
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        setSelectedAddressId={setSelectedAddressId}
+        setSelectedAddressId={(id) => {
+          setLocalSelectedAddressId(id);
+          setSelectedAddressId(id);
+        }}
       />
     </div>
   );

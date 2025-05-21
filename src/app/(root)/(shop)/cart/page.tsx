@@ -8,7 +8,11 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import CtaButton from "@/components/ui/CtaButton";
 import SecondaryButton from "@/components/ui/SecondaryButton";
 import CartItemRow from "@/components/cart/CartItemRow";
-import { useGetCartItems, useRemoveCartItem } from "@/hooks/queries/useCart";
+import {
+  useGetCartItems,
+  useRemoveCartItem,
+  useUpdateCartItem,
+} from "@/hooks/queries/useCart";
 import { CartItem as ApiCartItem } from "@/types/cart";
 import { ProductDetail } from "@/types/product";
 import { useRouter } from "next/navigation";
@@ -36,6 +40,7 @@ const CartPage = () => {
   const { getCartItems } = useGetCartItems();
   const { data: cartData, isSuccess } = getCartItems;
   const removeCartItemMutation = useRemoveCartItem();
+  const updateCartItemMutation = useUpdateCartItem();
 
   const router = useRouter();
 
@@ -88,6 +93,13 @@ const CartPage = () => {
   };
 
   const handleUpdateQuantity = (id: number, newQuantity: number) => {
+    const item = cartItems.find((i) => i.id === id);
+    if (!item) return;
+    // Call API to update cart item quantity
+    updateCartItemMutation.mutate({
+      cartItemId: id,
+      quantity: Math.max(1, newQuantity),
+    });
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item,
@@ -96,6 +108,11 @@ const CartPage = () => {
   };
 
   const handleUpdateColor = (id: number, newColor: string) => {
+    const item = cartItems.find((i) => i.id === id);
+    if (!item) return;
+    // Call API to update cart item color (change productDetailId)
+    // You may need to get the new productDetailId for the selected color/size
+    // For now, just update local state
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id
@@ -109,6 +126,11 @@ const CartPage = () => {
   };
 
   const handleUpdateSize = (id: number, newSize: string) => {
+    const item = cartItems.find((i) => i.id === id);
+    if (!item) return;
+    // Call API to update cart item size (change productDetailId)
+    // You may need to get the new productDetailId for the selected color/size
+    // For now, just update local state
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id

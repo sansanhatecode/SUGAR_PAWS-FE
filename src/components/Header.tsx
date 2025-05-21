@@ -22,6 +22,7 @@ import { removeUser, selectUser, setUser } from "@/store/slices/userSlice";
 import { useUserService } from "@/api/service/userService";
 import LoginRequiredModal from "./ui/LoginRequiredModal";
 import { clearStorage } from "@/helper/storage";
+import { deselectAll } from "@/store/slices/cartSlice";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -79,11 +80,10 @@ const Header = () => {
   };
 
   const handleSignOut = () => {
-    // Clear user data from localStorage
     clearStorage();
-    // Clear user data from Redux store
     dispatch(removeUser());
-    // Navigate to signin page
+    // Clear cart data when signing out
+    dispatch(deselectAll());
     router.push("/signin");
   };
 
@@ -100,7 +100,6 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close cart when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -117,7 +116,6 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isCartOpen]);
 
-  // Lock body scroll when cart is open
   useEffect(() => {
     if (isCartOpen) {
       document.body.style.overflow = "hidden";
@@ -356,7 +354,7 @@ const Header = () => {
 
       {/* Login Required Modal */}
       <LoginRequiredModal
-        isOpen={isLoginModalOpen}
+        open={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         message="You need to sign in to view your cart"
       />

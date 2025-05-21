@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useGetMyInfo, useUpdateMyInfo } from "@/hooks/queries/useUser";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 interface ProfileFormData {
   username: string;
@@ -49,15 +49,15 @@ const ProfilePage = () => {
       setValue("gender", getMyInfo.data.gender || "");
       setValue(
         "day",
-        getMyInfo.data.dayOfBirth ? String(getMyInfo.data.dayOfBirth) : "",
+        getMyInfo.data.dayOfBirth ? String(getMyInfo.data.dayOfBirth) : ""
       );
       setValue(
         "month",
-        getMyInfo.data.monthOfBirth ? String(getMyInfo.data.monthOfBirth) : "",
+        getMyInfo.data.monthOfBirth ? String(getMyInfo.data.monthOfBirth) : ""
       );
       setValue(
         "year",
-        getMyInfo.data.yearOfBirth ? String(getMyInfo.data.yearOfBirth) : "",
+        getMyInfo.data.yearOfBirth ? String(getMyInfo.data.yearOfBirth) : ""
       );
     }
   }, [getMyInfo.data, setValue]);

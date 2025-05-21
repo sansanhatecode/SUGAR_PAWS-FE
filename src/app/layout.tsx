@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import React from "react";
 import "./globals.css";
 import "../lib/fontawesome";
-import "react-toastify/dist/ReactToastify.css";
 import { ClientProvider } from "@/provider/ClientProvider";
 
 export const metadata: Metadata = {
