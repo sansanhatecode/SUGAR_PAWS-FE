@@ -4,16 +4,16 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { FiShoppingCart } from "react-icons/fi";
-import { MdErrorOutline } from "react-icons/md";
 import Modal from "../ui/Modal";
 import CtaButton from "../ui/CtaButton";
 import Link from "next/link";
 import { getColorCode } from "@/helper/colorHelper";
 import { useAddProductToCart } from "@/hooks/queries/useCart";
-import { toast } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/store/slices/userSlice";
 import LoginRequiredModal from "../ui/LoginRequiredModal";
+import { showSuccessToast } from "../ui/SuccessToast";
+import { showErrorToast } from "../ui/ErrorToast";
 
 type ProductCardProps = {
   product: Product;
@@ -76,18 +76,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       if (product.productDetails && product.productDetails.length > 0) {
         const productDetail = product.productDetails[0];
         addToCart(productDetail.id, 1);
-        toast.success(
-          <span className="flex items-center gap-2">
-            <FiShoppingCart className="text-xl text-green-600 animate-bounce" />
-            <span className="font-semibold">{product.name} added to cart!</span>
-          </span>,
-          {
-            id: `add-to-cart-${product.id}`,
-            position: "top-right",
-            className:
-              "bg-gradient-to-r from-green-100 to-green-50 text-green-900 border border-green-300 shadow-2xl px-6 py-4 rounded-2xl font-semibold flex items-center gap-2",
-          }
-        );
+        showSuccessToast(`${product.name} added to cart!`);
         return;
       }
     }
@@ -126,21 +115,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           return;
         }
         addToCart(productDetail.id, quantity);
-        toast.success(
-          <span className="flex items-center gap-2">
-            <span className="font-semibold">{product.name} added to cart!</span>
-            <FiShoppingCart
-              size={20}
-              className="text-xl text-green-600 animate-bounce"
-            />
-          </span>,
-          {
-            id: `add-to-cart-${product.id}`,
-            position: "top-right",
-            className:
-              "bg-gradient-to-r from-green-100 to-green-50 text-green-900 border border-green-300 shadow-2xl px-6 py-4 rounded-2xl font-semibold flex items-center gap-2",
-          }
-        );
+        showSuccessToast(`${product.name} added to cart!`);
 
         console.log("Product added to cart with options:", {
           color: selectedColor,
@@ -152,20 +127,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     } catch (error) {
       console.error("Failed to add product to cart:", error);
       setValidationError("Failed to add product to cart");
-
-      // Show error toast notification
-      toast.error(
-        <span className="flex items-center gap-2">
-          <MdErrorOutline className="text-xl text-red-600 animate-shake" />
-          <span className="font-semibold">Failed to add product to cart</span>
-        </span>,
-        {
-          id: `add-to-cart-error-${product.id}`,
-          position: "top-right",
-          className:
-            "bg-gradient-to-r from-red-100 to-red-50 text-red-900 border border-red-300 shadow-2xl px-6 py-4 rounded-2xl font-semibold flex items-center gap-2",
-        }
-      );
+      showErrorToast("Failed to add product to cart");
     }
   };
 

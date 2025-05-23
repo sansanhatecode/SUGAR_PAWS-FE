@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { CartItem } from "@/types/cart";
+import { ensureAbsoluteUrl } from "@/helper/renderNumber";
 
 interface CheckoutProductListProps {
   selectedItems: CartItem[];
@@ -11,6 +12,7 @@ interface CheckoutProductListProps {
 const CheckoutProductList: React.FC<CheckoutProductListProps> = ({
   selectedItems,
 }) => {
+  console.log("selectedItems", selectedItems);
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="font-semibold text-lg text-custom-purple mb-4">
@@ -24,10 +26,13 @@ const CheckoutProductList: React.FC<CheckoutProductListProps> = ({
             {/* Sử dụng Image của Next.js */}
             <div className="w-16 h-16 relative">
               <Image
-                src={
-                  item.productDetail.image?.url ||
-                  "/assets/images/plus-size/plus-size1.png"
-                }
+                src={ensureAbsoluteUrl(
+                  item.productDetail.image?.url ??
+                    (item.productDetail.displayImage &&
+                    item.productDetail.displayImage.length > 0
+                      ? item.productDetail.displayImage[0]
+                      : ""),
+                )}
                 alt={item.productDetail.name || "product"}
                 fill
                 className="rounded object-cover border"

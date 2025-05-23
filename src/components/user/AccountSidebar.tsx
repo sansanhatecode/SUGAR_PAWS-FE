@@ -12,7 +12,7 @@ import {
   FaKey,
   FaClipboardList,
   FaTicketAlt,
-  // FaCoins,
+  FaEdit,
 } from "react-icons/fa";
 import { useAppSelector } from "@/store/store";
 import { selectName } from "@/store/slices/userSlice";
@@ -42,41 +42,46 @@ const sidebarItems = [
     icon: <FaTicketAlt />,
     href: "/user/account/voucher",
   },
-  // { label: "Shopee Coins", icon: <FaCoins />, href: "/user/account/coins" },
 ];
 
 const AccountSidebar = () => {
   const pathname = usePathname();
   const name = useAppSelector(selectName);
   return (
-    <aside className="w-full max-w-xs md:w-64 bg-white rounded-xl shadow p-4 md:p-6 flex flex-col gap-2 mx-auto md:mx-0">
-      <div className="flex flex-col items-center mb-6">
-        <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-3xl text-gray-400 mb-2">
+    <aside className="w-full max-w-xs md:w-64 bg-white rounded-2xl shadow-lg p-4 md:p-6 flex flex-col gap-2 mx-auto md:mx-0 md:sticky md:top-24 z-20 border border-pink-100">
+      <div className="flex flex-col items-center mb-4">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-pink-100 to-pink-200 border-4 border-custom-wine flex items-center justify-center text-4xl text-custom-wine shadow mb-2">
           <FaUser />
         </div>
-        <span className="font-semibold text-base md:text-lg text-center break-all w-full flex justify-center">
+        <span className="font-bold text-lg md:text-xl text-center w-full flex justify-center text-custom-wine">
           {name}
         </span>
         <Link
           href="#"
-          className="text-xs text-custom-wine hover:underline mt-1 text-center w-full flex justify-center"
+          className="flex items-center gap-1 text-xs text-custom-wine hover:text-white hover:bg-custom-wine transition px-2 py-1 rounded mt-2 font-medium border border-custom-wine shadow-sm"
         >
+          <FaEdit className="text-sm" />
           Edit Profile
         </Link>
       </div>
+      <div className="border-t border-pink-100 mb-2" />
       <nav className="flex flex-col gap-1 w-full">
         {sidebarItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className={`flex items-center gap-3 px-2 md:px-3 py-2 rounded-lg transition font-medium text-sm hover:bg-pink-50 w-full ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-xl transition font-semibold text-sm w-full border border-transparent hover:border-pink-200 hover:bg-pink-50 hover:shadow-sm group ${
               pathname === item.href
-                ? "bg-pink-100 text-custom-wine"
+                ? "bg-pink-100 text-custom-wine border-custom-wine shadow"
                 : "text-gray-700"
             }`}
           >
-            <span className="text-lg shrink-0">{item.icon}</span>
-            <span className="truncate">{item.label}</span>
+            <span className="text-lg shrink-0 group-hover:scale-110 transition-transform duration-150 text-custom-wine">
+              {item.icon}
+            </span>
+            <span className="truncate group-hover:text-custom-wine">
+              {item.label}
+            </span>
           </Link>
         ))}
       </nav>

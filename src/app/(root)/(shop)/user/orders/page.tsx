@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useGetOrders } from "@/hooks/queries/useOrder";
 import OrderCard from "@/components/user/OrderCard";
 import type { Order, OrderStatus, OrderItem } from "@/types/order";
+import CtaButton from "@/components/ui/CtaButton";
 
 const OrdersPage = () => {
   const { getOrders } = useGetOrders();
@@ -35,13 +36,12 @@ const OrdersPage = () => {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Tabs */}
-      <div className="flex space-x-6 border-b mb-4 overflow-x-auto">
+    <div className="container mx-auto px-4 max-w-4xl">
+      <div className="flex justify-between border-b mb-4 overflow-x-auto">
         {orderTabs.map((tab) => (
           <button
             key={tab.key}
-            className={`py-2 px-4 text-base font-medium border-b-2 transition-colors duration-150 ${
+            className={`py-2 px-4 text-sm font-medium border-b-2 transition-colors duration-150 ${
               activeTab === tab.key
                 ? "border-custom-wine text-custom-wine"
                 : "border-transparent text-gray-700 hover:text-custom-wine"
@@ -102,9 +102,7 @@ const OrdersPage = () => {
             Try adjusting your filters or start shopping!
           </p>
           <Link href="/collections">
-            <button className="bg-custom-wine text-white px-6 py-2 rounded-full font-semibold">
-              Shop Now
-            </button>
+            <CtaButton text="shop now" onClick={() => {}} />
           </Link>
         </div>
       ) : (

@@ -70,7 +70,7 @@ export function useOrderService() {
       const { data } = await Request.get<{ shippingFee: number }>(
         `${API.SHIPPING_FEE}/${addressId}`,
       );
-      return data?.shippingFee || 0;
+      return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error(

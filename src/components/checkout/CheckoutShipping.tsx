@@ -7,9 +7,11 @@ interface CheckoutShippingProps {
 }
 
 const CheckoutShipping: React.FC<CheckoutShippingProps> = ({ addressId }) => {
-  const { data: shippingFee, isLoading } = useCalculateShippingFee(
+  const { data: shippingFeeData, isLoading } = useCalculateShippingFee(
     addressId || 0,
   );
+
+  console.log("Shipping Fee:", shippingFeeData?.shippingFee);
 
   // Calculate estimated delivery dates (example: 2-4 days from now)
   const today = new Date();
@@ -36,7 +38,7 @@ const CheckoutShipping: React.FC<CheckoutShippingProps> = ({ addressId }) => {
           <Spinner size="sm" />
         ) : (
           <span className="font-medium">
-            {shippingFee?.toLocaleString("en-US", {
+            {shippingFeeData?.shippingFee?.toLocaleString("en-US", {
               style: "currency",
               currency: "VND",
             })}

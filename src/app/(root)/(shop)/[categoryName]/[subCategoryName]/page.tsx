@@ -9,14 +9,16 @@ import {
   useGetSizes,
 } from "@/hooks/queries/useProducts";
 import { getColorCode } from "@/helper/colorHelper";
+import { scrollToTop } from "@/helper/scrollToTop";
 import CategoryPageFilters from "@/components/category/CategoryPageFilters";
 import CategoryPageLayout from "@/components/category/CategoryPageLayout";
 import { Colors } from "@/components/ColorCheckboxes";
 import SortFilterBar from "@/components/category/SortFilterBar";
+import Pagination from "@/components/ui/Pagination";
 
 const CategoryPage = () => {
   const pathname = usePathname();
-  const pathSegments = pathname.split("/");
+  const pathSegments = (pathname ?? "").split("/");
   const subCategoryName = pathSegments.pop();
   const categoryName = pathSegments.pop();
 
@@ -28,6 +30,9 @@ const CategoryPage = () => {
   const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
   const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
   const [sortOption, setSortOption] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemPerPage = 40;
 
   // Fetch products, colors, and sizes based on subcategory
   const { getProducts } = useGetProducts({
@@ -38,6 +43,8 @@ const CategoryPage = () => {
     minPrice: minPrice,
     maxPrice: maxPrice,
     sortBy: sortOption,
+    page: currentPage,
+    itemPerPage,
   });
 
   const { getColors } = useGetColors({
@@ -48,6 +55,7 @@ const CategoryPage = () => {
   });
 
   const { data: productsData, isLoading, error, refetch } = getProducts;
+  console.log("productsData", productsData);
 
   useEffect(() => {
     refetch();
@@ -60,6 +68,27 @@ const CategoryPage = () => {
     sortOption,
     refetch,
   ]);
+
+  useEffect(() => {
+    if (productsData?.totalProducts) {
+      setTotalPages(Math.ceil(productsData.totalProducts / itemPerPage));
+    }
+  }, [productsData, itemPerPage]);
+
+  useEffect(() => {
+    setCurrentPage(1); // Reset page when filters change
+  }, [
+    selectedSizes,
+    selectedColors,
+    selectedAvailability,
+    minPrice,
+    maxPrice,
+    sortOption,
+  ]);
+
+  useEffect(() => {
+    refetch();
+  }, [currentPage, refetch]);
 
   const { data: sizes } = getSizes;
   const { data: colorsData } = getColors;
@@ -141,16 +170,17 @@ const CategoryPage = () => {
     setSortOption("");
   };
 
-  const products = productsData || [];
+  const products = productsData?.products || [];
 
   return (
     <CategoryPageLayout
+      totalProducts={productsData?.totalProducts || 0}
       isLoading={isLoading}
       error={error}
       products={products}
       sortFilterBar={
         <SortFilterBar
-          totalProducts={products.length}
+          totalProducts={productsData?.totalProducts || 0}
           sortOption={sortOption}
           handleSortChange={handleSortChange}
         />
@@ -158,7 +188,7 @@ const CategoryPage = () => {
       isEmpty="Sorry, there are no products in this collection."
       filters={
         <CategoryPageFilters
-          pathname={pathname}
+          pathname={pathname ?? ""}
           categoryName={categoryName}
           sizes={sizes || []}
           selectedSizes={selectedSizes}
@@ -177,6 +207,16 @@ const CategoryPage = () => {
           handleRemoveAvailability={handleRemoveAvailability}
           handleRemovePriceRange={handleRemovePriceRange}
           handleClearAllFilters={handleClearAllFilters}
+        />
+      }
+      pagination={
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            scrollToTop();
+          }}
         />
       }
     />

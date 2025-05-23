@@ -20,12 +20,14 @@ export default function CheckoutPage() {
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
     null,
   );
+
+  console.log("selectedAddressId", selectedAddressId);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
     PaymentMethod.CASH,
   );
 
   // Get shipping fee based on selected address
-  const { data: shippingFee = 0 } = useCalculateShippingFee(
+  const { data: shippingFeeData } = useCalculateShippingFee(
     selectedAddressId || 0,
   );
 
@@ -49,7 +51,7 @@ export default function CheckoutPage() {
         <CheckoutSummary
           selectedItems={selectedItems}
           selectedAddressId={selectedAddressId}
-          shippingFee={shippingFee}
+          shippingFee={shippingFeeData?.shippingFee ?? 0}
           paymentMethod={paymentMethod}
         />
       </div>

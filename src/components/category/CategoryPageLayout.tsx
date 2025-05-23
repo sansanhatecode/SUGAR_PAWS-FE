@@ -12,6 +12,8 @@ interface CategoryPageLayoutProps {
   filters: ReactNode;
   isEmpty?: string;
   sortFilterBar?: ReactNode;
+  totalProducts?: number;
+  pagination?: ReactNode;
 }
 
 const CategoryPageLayout = ({
@@ -21,6 +23,8 @@ const CategoryPageLayout = ({
   filters,
   isEmpty = "Sorry, there are no products in this collection.",
   sortFilterBar,
+  pagination,
+  totalProducts,
 }: CategoryPageLayoutProps) => {
   return (
     <>
@@ -39,7 +43,7 @@ const CategoryPageLayout = ({
             <div className="flex-1 flex justify-center items-center min-h-[300px]">
               <p>Error loading products. Please try again later.</p>
             </div>
-          ) : products.length === 0 ? (
+          ) : totalProducts === 0 ? (
             <div className="flex-1 flex flex-col gap-4 justify-center items-center min-h-[300px]">
               <p>{isEmpty}</p>
               <Link href={"/"}>
@@ -50,7 +54,10 @@ const CategoryPageLayout = ({
               </Link>
             </div>
           ) : (
-            <ProductsSection products={products} />
+            <>
+              <ProductsSection products={products} />
+              {pagination}
+            </>
           )}
         </div>
       </div>

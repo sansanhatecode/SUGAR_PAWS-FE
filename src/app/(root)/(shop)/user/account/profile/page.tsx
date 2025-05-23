@@ -3,7 +3,9 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useGetMyInfo, useUpdateMyInfo } from "@/hooks/queries/useUser";
-import { toast } from "react-hot-toast";
+import { showSuccessToast } from "@/components/ui/SuccessToast";
+import { showErrorToast } from "@/components/ui/ErrorToast";
+import { FaUser, FaEnvelope, FaPhone, FaVenusMars, FaBirthdayCake } from "react-icons/fa";
 
 interface ProfileFormData {
   username: string;
@@ -49,15 +51,15 @@ const ProfilePage = () => {
       setValue("gender", getMyInfo.data.gender || "");
       setValue(
         "day",
-        getMyInfo.data.dayOfBirth ? String(getMyInfo.data.dayOfBirth) : ""
+        getMyInfo.data.dayOfBirth ? String(getMyInfo.data.dayOfBirth) : "",
       );
       setValue(
         "month",
-        getMyInfo.data.monthOfBirth ? String(getMyInfo.data.monthOfBirth) : ""
+        getMyInfo.data.monthOfBirth ? String(getMyInfo.data.monthOfBirth) : "",
       );
       setValue(
         "year",
-        getMyInfo.data.yearOfBirth ? String(getMyInfo.data.yearOfBirth) : ""
+        getMyInfo.data.yearOfBirth ? String(getMyInfo.data.yearOfBirth) : "",
       );
     }
   }, [getMyInfo.data, setValue]);
@@ -72,9 +74,9 @@ const ProfilePage = () => {
         monthOfBirth: data.month ? Number(data.month) : undefined,
         yearOfBirth: data.year ? Number(data.year) : undefined,
       });
-      toast.success("Profile updated successfully!");
+      showSuccessToast("Profile updated successfully!");
     } catch {
-      toast.error("Failed to update profile!");
+      showErrorToast("Failed to update profile!");
     }
   };
 
@@ -87,58 +89,69 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-10 w-full flex flex-col items-center justify-center">
-      <h2 className="text-3xl font-bold mb-10 text-custom-wine text-center tracking-tight drop-shadow-sm">
-        My Profile
-      </h2>
-      <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <label className="block text-base font-semibold mb-2 text-gray-800">
-            Username
+    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-10 w-full flex flex-col items-center justify-center border border-pink-100 mx-auto">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="bg-pink-100 text-custom-wine rounded-full p-3 shadow text-3xl">
+          <FaUser />
+        </div>
+        <h2 className="text-3xl font-bold text-custom-wine text-center tracking-tight drop-shadow-sm">
+          My Profile
+        </h2>
+      </div>
+      <form className="flex flex-col gap-5 w-full" onSubmit={handleSubmit(onSubmit)}>
+        <div className="relative">
+          <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
+            <FaUser className="text-custom-wine" /> Username
           </label>
           <input
-            className="w-full border border-gray-200 rounded-lg p-3 bg-gray-100 text-gray-500 cursor-not-allowed text-base"
+            className="w-full border border-gray-200 rounded-lg px-10 py-2 bg-gray-100 text-gray-500 cursor-not-allowed text-base shadow-sm"
             disabled
             {...register("username")}
           />
+          <FaUser className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
         </div>
-        <div>
-          <label className="block text-base font-semibold mb-2 text-gray-800">
-            Name
+        <div className="relative">
+          <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
+            <FaUser className="text-custom-wine" /> Name
           </label>
           <input
-            className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base"
+            className="w-full border border-gray-200 rounded-lg px-10 py-2 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base shadow-sm"
             placeholder="Enter your name"
             {...register("name", { required: "Name is required" })}
           />
+          <FaUser className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
           {errors.name && (
-            <span className="text-red-500 text-sm">
+            <span className="text-red-500 text-sm mt-1 block">
               {errors.name.message as string}
             </span>
           )}
         </div>
-        <div>
-          <label className="block text-base font-semibold mb-2 text-gray-800">
-            Email
+        <div className="relative">
+          <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
+            <FaEnvelope className="text-custom-wine" /> Email
           </label>
           <input
-            className="w-full border border-gray-200 rounded-lg p-3 bg-gray-100 text-gray-500 cursor-not-allowed text-base"
+            className="w-full border border-gray-200 rounded-lg px-10 py-2 bg-gray-100 text-gray-500 cursor-not-allowed text-base shadow-sm"
             disabled
             {...register("email")}
           />
+          <FaEnvelope className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
         </div>
-        <div>
-          <label className="block text-base font-semibold mb-2 text-gray-800">
-            Phone Number
+        <div className="relative">
+          <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
+            <FaPhone className="text-custom-wine" /> Phone Number
           </label>
           <input
-            className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base"
+            className="w-full border border-gray-200 rounded-lg px-10 py-2 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base shadow-sm"
             placeholder="Add your phone number"
             {...register("phone")}
           />
+          <FaPhone className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
         </div>
         <div className="flex flex-wrap gap-6 items-center">
-          <span className="text-base font-semibold text-gray-800">Gender:</span>
+          <span className="text-base font-semibold text-gray-800 flex items-center gap-2">
+            <FaVenusMars className="text-custom-wine" /> Gender:
+          </span>
           <label className="flex items-center gap-2 text-gray-700">
             <input
               type="radio"
@@ -168,43 +181,50 @@ const ProfilePage = () => {
           </label>
         </div>
         <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="block text-base font-semibold mb-2 text-gray-800">
-              Day
+          <div className="flex-1 relative">
+            <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
+              <FaBirthdayCake className="text-custom-wine" /> Day
             </label>
             <input
-              className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base"
+              className="w-full border border-gray-200 rounded-lg px-10 py-2 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base shadow-sm"
               placeholder="Day"
               {...register("day")}
             />
+            <FaBirthdayCake className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
           </div>
-          <div className="flex-1">
-            <label className="block text-base font-semibold mb-2 text-gray-800">
-              Month
+          <div className="flex-1 relative">
+            <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
+              <FaBirthdayCake className="text-custom-wine" /> Month
             </label>
             <input
-              className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base"
+              className="w-full border border-gray-200 rounded-lg px-10 py-2 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base shadow-sm"
               placeholder="Month"
               {...register("month")}
             />
+            <FaBirthdayCake className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
           </div>
-          <div className="flex-1">
-            <label className="block text-base font-semibold mb-2 text-gray-800">
-              Year
+          <div className="flex-1 relative">
+            <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
+              <FaBirthdayCake className="text-custom-wine" /> Year
             </label>
             <input
-              className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base"
+              className="w-full border border-gray-200 rounded-lg px-10 py-2 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base shadow-sm"
               placeholder="Year"
               {...register("year")}
             />
+            <FaBirthdayCake className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
           </div>
         </div>
         <button
           type="submit"
-          className="mt-8 bg-custom-wine text-white px-8 py-3 rounded-xl font-bold hover:bg-pink-700 transition-all shadow-lg w-full text-lg tracking-wide"
+          className="mt-8 bg-custom-wine text-white py-3 rounded-xl font-bold hover:bg-custom-rose transition-all shadow-lg w-full text-lg tracking-wide flex items-center justify-center gap-2 uppercase"
           disabled={updateProfileMutation.isPending}
         >
-          {updateProfileMutation.isPending ? "Saving..." : "Save"}
+          {updateProfileMutation.isPending ? (
+            <span className="flex items-center gap-2"><span className="animate-spin-slow"><FaUser /></span> Saving...</span>
+          ) : (
+            <><FaUser /> Save</>
+          )}
         </button>
       </form>
     </div>

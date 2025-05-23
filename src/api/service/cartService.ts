@@ -24,7 +24,6 @@ export function useCartService() {
   const getCartItems = async () => {
     try {
       const { data } = await Request.get<Cart>(API.CART);
-      console.log("Cart items:", data);
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

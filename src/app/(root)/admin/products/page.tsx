@@ -21,7 +21,7 @@ const AdminProductsPage = () => {
           An error occurred while loading products
         </div>
       )}
-      {products && products.length > 0 ? (
+      {products && products.totalAmount > 0 ? (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow">
             <thead>

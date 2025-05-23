@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { PaymentMethod } from "@/types/payment";
 import PaymentMethodModal from "./PaymentMethodModal";
+import { FaMoneyBillWave, FaCreditCard, FaUniversity } from "react-icons/fa";
 
 interface CheckoutPaymentProps {
   selectedMethod: PaymentMethod;
@@ -26,8 +27,21 @@ const CheckoutPayment: React.FC<CheckoutPaymentProps> = ({
     }
   };
 
+  const getPaymentMethodIcon = (method: PaymentMethod) => {
+    switch (method) {
+      case PaymentMethod.CASH:
+        return <FaMoneyBillWave className="text-green-500 text-lg" />;
+      case PaymentMethod.CREDIT_CARD:
+        return <FaCreditCard className="text-blue-500 text-lg" />;
+      case PaymentMethod.BANK_TRANSFER:
+        return <FaUniversity className="text-purple-500 text-lg" />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow p-6 flex flex-col gap-2">
+    <div className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 justify-center">
       <div className="flex justify-between items-center">
         <div className="font-semibold text-custom-purple">Payment Method</div>
         <button
@@ -37,7 +51,8 @@ const CheckoutPayment: React.FC<CheckoutPaymentProps> = ({
           Change
         </button>
       </div>
-      <div className="flex justify-between items-center text-base">
+      <div className="flex items-center gap-2 text-[14px]">
+        <span>{getPaymentMethodIcon(selectedMethod)}</span>
         <span>{getPaymentMethodText(selectedMethod)}</span>
       </div>
 

@@ -16,7 +16,11 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import Cart from "./cart/Cart";
 import { navbarItems } from "@/const/navbarItems";
-import { useGetCartItems } from "@/hooks/queries/useCart";
+import {
+  useGetCartItems,
+  useRemoveCartItem,
+  useUpdateCartItem,
+} from "@/hooks/queries/useCart";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUser, selectUser, setUser } from "@/store/slices/userSlice";
 import { useUserService } from "@/api/service/userService";
@@ -37,6 +41,8 @@ const Header = () => {
 
   const { getCartItems } = useGetCartItems();
   const { data: cartData } = getCartItems;
+  const { mutate: updateCart } = useUpdateCartItem();
+  const { mutate: removeCart } = useRemoveCartItem();
 
   // Fetch user info and update Redux state
   useEffect(() => {
@@ -62,13 +68,11 @@ const Header = () => {
   }, [dispatch, getMyInfo]);
 
   const handleUpdateItem = (id: number, quantity: number) => {
-    console.log(`Update item ${id} to quantity ${quantity}`);
-    // Implement actual update logic
+    updateCart({ cartItemId: id, quantity: Math.max(1, quantity) });
   };
 
   const handleRemoveItem = (id: number) => {
-    console.log(`Remove item ${id}`);
-    // Implement actual remove logic
+    removeCart(id);
   };
 
   const handleCartIconClick = () => {

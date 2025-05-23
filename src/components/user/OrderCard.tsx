@@ -72,7 +72,8 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
               )}
             </div>
             <div className="font-semibold text-sm whitespace-nowrap text-right">
-              {formatCurrency(item.price * item.quantity)} VND
+              {formatCurrency(item?.productDetail?.price ?? 0 * item.quantity)}{" "}
+              VND
             </div>
           </div>
         ))}
@@ -83,11 +84,11 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
         )}
       </div>
       <div className="flex justify-between items-center mt-2">
-        <span className="font-bold text-base md:text-lg">
+        <span className="font-semibold text-base">
           Total: {formatCurrency(order.totalAmount)} VND
         </span>
         <Link
-          href={`/orders/${order.id}`}
+          href={`/user/orders/${order.id}`}
           className="text-custom-wine text-sm font-medium hover:underline"
         >
           View Details

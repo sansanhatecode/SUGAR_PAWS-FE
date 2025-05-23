@@ -1,23 +1,9 @@
 import React from "react";
 import Image from "next/image";
-import { formatCurrency } from "@/helper/renderNumber";
+import { formatCurrency, ensureAbsoluteUrl } from "@/helper/renderNumber";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-
-type ProductImage = {
-  url: string;
-};
-
-type ProductDetail = {
-  id: string;
-  name: string;
-  price: number;
-  color: string;
-  size: string;
-  image: ProductImage;
-  availableColors?: string[];
-  availableSizes?: string[];
-};
+import { ProductDetail } from "@/types/product";
 
 type CartItemProps = {
   id: number;
@@ -46,15 +32,8 @@ const CartItemRow: React.FC<CartItemProps> = ({
   const [showVariants, setShowVariants] = React.useState(false);
 
   // Generate colors and sizes from available options
-  const colors = product.availableColors || [
-    "White",
-    "Black",
-    "Red",
-    "Blue",
-    "Pink",
-  ];
-  const sizes = product.availableSizes || ["XS", "S", "M", "L", "XL"];
-
+  const colors = ["White", "Black", "Red", "Blue", "Pink"];
+  const sizes = ["XS", "S", "M", "L", "XL"];
   return (
     <div className="grid grid-cols-12 gap-4 items-center py-6 border-b border-gray-200">
       {/* Checkbox for selection */}
@@ -70,16 +49,24 @@ const CartItemRow: React.FC<CartItemProps> = ({
       {/* Product image and info */}
       <div className="col-span-11 md:col-span-6 lg:col-span-5 flex gap-4">
         <div className="relative w-20 h-20 md:w-24 md:h-24">
-          {product.image && product.image.url ? (
+          {product.image?.url ||
+          (product.displayImage && product.displayImage.length > 0) ? (
             <Image
-              src={product.image.url}
-              alt={product.name}
+              src={ensureAbsoluteUrl(
+                product.image?.url ??
+                  (product.displayImage && product.displayImage.length > 0
+                    ? product.displayImage[0]
+                    : ""),
+              )}
+              alt={product.name ?? ""}
               fill
-              className="object-cover rounded-md"
+              sizes="100vw"
+              className="object-cover w-full h-full rounded-md"
+              // style={{ objectFit: "cover" }}
             />
           ) : (
-            <div className="flex items-center justify-center aspect-square h-full bg-gray-100 rounded-md border border-gray-200 text-gray-400 text-xs">
-              No Image
+            <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-md text-center p-1 text-[10px] text-gray-500">
+              This product doesn&apos;t have a preview
             </div>
           )}
         </div>

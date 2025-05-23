@@ -14,7 +14,6 @@ import {
   useUpdateCartItem,
 } from "@/hooks/queries/useCart";
 import { CartItem as ApiCartItem } from "@/types/cart";
-import { ProductDetail } from "@/types/product";
 import { useRouter } from "next/navigation";
 import {
   selectItem,
@@ -170,40 +169,6 @@ const CartPage = () => {
     router.push("/checkout");
   };
 
-  // Define local ProductDetail type for conversion
-  type ProductImage = {
-    url: string;
-  };
-
-  type ProductDetailLocal = {
-    id: string;
-    name: string;
-    price: number;
-    color: string;
-    size: string;
-    image: ProductImage;
-    availableColors?: string[];
-    availableSizes?: string[];
-  };
-
-  function toLocalProductDetail(
-    apiDetail: ProductDetail & {
-      availableColors?: string[];
-      availableSizes?: string[];
-    },
-  ): ProductDetailLocal {
-    return {
-      id: String(apiDetail.id),
-      name: apiDetail.name || "",
-      price: apiDetail.price,
-      color: apiDetail.color,
-      size: apiDetail.size,
-      image: { url: apiDetail.image?.url || "" },
-      availableColors: apiDetail.availableColors,
-      availableSizes: apiDetail.availableSizes,
-    };
-  }
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <h1 className="text-3xl font-bold text-center mb-4">Shopping Cart</h1>
@@ -254,7 +219,7 @@ const CartPage = () => {
                 <CartItemRow
                   key={String(item.id)}
                   id={item.id}
-                  product={toLocalProductDetail(item.productDetail)}
+                  product={item.productDetail}
                   quantity={item.quantity}
                   isSelected={selectedItems.some(
                     (si) => String(si.id) === String(item.id),

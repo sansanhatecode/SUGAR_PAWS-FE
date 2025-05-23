@@ -10,7 +10,6 @@ export type Payment = {
   updatedAt: Date;
 };
 
-// Payment method constants
 export enum PaymentMethod {
   CASH = "CASH",
   CREDIT_CARD = "CREDIT_CARD",

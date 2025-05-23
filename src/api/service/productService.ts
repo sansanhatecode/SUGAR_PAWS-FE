@@ -18,15 +18,22 @@ export function useGetProductservice() {
     minPrice,
     maxPrice,
     sortBy,
+    page,
+    itemPerPage,
   }: GetProductsRequest) => {
     try {
-      const { data } = await Request.get<Product[]>(API.PRODUCTS, {
+      const { data } = await Request.get<{
+        products: Product[];
+        totalProducts: number;
+      }>(API.PRODUCTS, {
         category: categoryName,
         colors: colors,
         sizes: sizes,
         minPrice: minPrice,
         maxPrice: maxPrice,
         sortBy: sortBy,
+        page: page,
+        itemPerPage: itemPerPage,
       });
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,11 +50,13 @@ export function useGetProductservice() {
 
   const getAllProducts = async () => {
     try {
-      const { data } = await Request.get<Product[]>(API.ALL_PRODUCTS);
+      const { data } = await Request.get<{
+        products: Product[];
+        totalAmount: number;
+      }>(API.ALL_PRODUCTS);
       return data;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    catch (error: any) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error(
         "GetAllProducts Error:",
         error.response?.data || error.message

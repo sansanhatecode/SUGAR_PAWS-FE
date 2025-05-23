@@ -1,5 +1,5 @@
 // components/CartItemCard.tsx
-import { formatCurrency } from "@/helper/renderNumber";
+import { ensureAbsoluteUrl, formatCurrency } from "@/helper/renderNumber";
 import { CartItem } from "@/types/cart";
 import Image from "next/image";
 
@@ -19,10 +19,16 @@ export default function CartItemCard({
   return (
     <div className="flex gap-6 py-4 border-b text-[12px] text-custom-dark items-stretch">
       <div className="w-[112px] min-h-[112px] relative aspect-square">
-        {item.productDetail.image?.url ? (
+        {item.productDetail?.image?.url || item.productDetail?.displayImage ? (
           <Image
-            src={item.productDetail.image.url}
-            alt={item.productDetail.name ?? ""}
+            src={ensureAbsoluteUrl(
+              item.productDetail?.image?.url ??
+                (item.productDetail?.displayImage &&
+                item.productDetail?.displayImage?.length > 0
+                  ? item.productDetail?.displayImage[0]
+                  : ""),
+            )}
+            alt={item.productDetail?.name ?? ""}
             fill
             className="rounded-md object-cover"
           />

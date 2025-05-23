@@ -32,6 +32,7 @@ export type ProductDetail = {
   image: ImageDetail;
   moreDetails: string[];
   product?: Product;
+  displayImage?: string[];
 };
 
 export type ImageDetail = {
@@ -58,6 +59,8 @@ export type GetProductsRequest = {
   minPrice?: number;
   maxPrice?: number;
   sortBy?: string;
+  page?: number;
+  itemPerPage?: number;
 };
 
 export type GetColorsRequest = {

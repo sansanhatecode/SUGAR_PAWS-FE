@@ -26,7 +26,7 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
   // Calculate subtotal
   const subtotal = selectedItems.reduce(
     (sum, item) => sum + item.productDetail.price * item.quantity,
-    0
+    0,
   );
   const total = subtotal + (shippingFee || 0);
 
@@ -60,8 +60,11 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
 
       toast.success("Order created successfully!");
 
-      // Navigate to the order detail page
-      router.push(`/orders/${result.id}`);
+      if (result) {
+        router.push(`/orders/${result.id}`);
+      } else {
+        toast.error("Error retrieving order details");
+      }
     } catch (error) {
       console.error("Failed to create order:", error);
       toast.error("Failed to create order. Please try again.");
@@ -98,13 +101,11 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
         </span>
       </div>
       <button
-        className="mt-4 bg-custom-rose text-white font-semibold py-2 rounded-lg hover:bg-pink-500 transition flex items-center justify-center"
+        className="mt-4 bg-custom-wine text-white font-semibold py-2 rounded-lg hover:bg-custom-rose transition flex items-center justify-center"
         onClick={handleCreateOrder}
         disabled={createOrderMutation.isPending || !selectedAddressId}
       >
-        {createOrderMutation.isPending ? (
-          <Spinner size="sm" className="mr-2" />
-        ) : null}
+        {createOrderMutation.isPending ? <Spinner size="sm" /> : null}
         Place Order
       </button>
     </div>
