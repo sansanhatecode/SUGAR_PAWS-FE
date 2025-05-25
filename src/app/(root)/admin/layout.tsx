@@ -16,23 +16,78 @@ export default function AuthLayout({
   return (
     <html lang="en">
       <body>
-        <Link
-          href="/"
-          className="flex items-center gap-2 absolute top-1 left-5"
-        >
-          <span
-            className={`font-jua text-[40px] font-medium text-transparent bg-gradient-to-b from-custom-rose to-pink-500 hover:text-custom-rose bg-clip-text`}
+        <header className="fixed top-0 left-0 w-full z-40 transition-all duration-300 shadow-md bg-custom-yellow h-[72px] flex items-center justify-between px-8">
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:text-custom-rose"
           >
-            Sugar Paws
-          </span>
-          <Image
-            src="/assets/favicon/sugar-paws-logo.png"
-            alt="Sugar Paws logo"
-            height={50}
-            width={40}
-            className="w-auto"
-          />
-        </Link>
+            <span className="font-jua text-[32px] font-bold text-custom-rose tracking-wide">
+              SUGAR PAWS
+            </span>
+            <Image
+              src="/assets/favicon/sugar-paws-logo.png"
+              alt="Sugar Paws logo"
+              height={40}
+              width={32}
+              className="w-auto"
+            />
+          </Link>
+          <nav className="flex gap-8 text-base font-semibold h-full items-center">
+            <Link
+              href="/admin/products"
+              className="hover:text-custom-rose transition-colors duration-200"
+            >
+              Product
+            </Link>
+            <Link
+              href="/admin/users"
+              className="hover:text-custom-rose transition-colors duration-200"
+            >
+              User
+            </Link>
+            <Link
+              href="/admin/orders"
+              className="hover:text-custom-rose transition-colors duration-200"
+            >
+              Order
+            </Link>
+            <Link
+              href="/admin/revenue"
+              className="hover:text-custom-rose transition-colors duration-200"
+            >
+              Revenue
+            </Link>
+            <Link
+              href="/admin/financial-report"
+              className="hover:text-custom-rose transition-colors duration-200"
+            >
+              Financial Report
+            </Link>
+          </nav>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin/profile"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-custom-rose font-bold shadow hover:bg-custom-rose hover:text-white transition-colors duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25v-1.5A2.25 2.25 0 016.75 16.5h10.5a2.25 2.25 0 012.25 2.25v1.5"
+                />
+              </svg>
+              <span>My Info</span>
+            </Link>
+          </div>
+        </header>
+        <div className="h-[72px] w-full"></div>
         {children}
       </body>
     </html>

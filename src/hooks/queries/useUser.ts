@@ -28,3 +28,30 @@ export function useUpdateMyInfo() {
 
   return mutation;
 }
+
+export function useGetAllUsers() {
+  const { getAllUsers } = useUserService();
+
+  const getAllUsersQuery = useQuery({
+    queryKey: ["users", "all"],
+    queryFn: () => getAllUsers(),
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  });
+
+  return { getAllUsers: getAllUsersQuery };
+}
+
+export function useCreateUser() {
+  const { createUser } = useUserService();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: createUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users", "all"] });
+    },
+  });
+
+  return mutation;
+}

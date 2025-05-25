@@ -5,6 +5,7 @@ import {
   GetProductsRequest,
   GetSizesRequest,
 } from "@/types/product";
+import { Product } from "@/types/product";
 
 export function useGetProducts(params: GetProductsRequest) {
   const { getProducts } = useGetProductservice();
@@ -18,11 +19,20 @@ export function useGetProducts(params: GetProductsRequest) {
   };
 }
 
-export function useGetAllProducts() {
+export function useGetAllProducts({
+  page = 1,
+  itemPerPage = 10,
+}: {
+  page?: number;
+  itemPerPage?: number;
+}) {
   const { getAllProducts } = useGetProductservice();
-  const getAllProductsQuery = useQuery({
-    queryKey: ["allProducts"],
-    queryFn: () => getAllProducts(),
+  const getAllProductsQuery = useQuery<
+    { products: Product[]; totalProducts: number } | undefined,
+    Error
+  >({
+    queryKey: ["allProducts", page, itemPerPage],
+    queryFn: () => getAllProducts({ page, itemPerPage }),
   });
 
   return {

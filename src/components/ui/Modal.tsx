@@ -8,6 +8,7 @@ type ModalProps = {
   children: React.ReactNode;
   size?: "small" | "medium" | "large";
   open: boolean;
+  width?: string; // thêm prop width
 };
 
 const Modal: React.FC<ModalProps> = ({
@@ -15,6 +16,7 @@ const Modal: React.FC<ModalProps> = ({
   children,
   size = "medium",
   open,
+  width, // nhận width
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -50,11 +52,16 @@ const Modal: React.FC<ModalProps> = ({
       onClick={handleClose}
     >
       <div
-        className={`bg-white rounded-lg shadow-lg p-6 w-full ${sizeClasses[size]} relative transition-all duration-300 ease-in-out transform ${
+        className={`bg-white rounded-lg shadow-lg p-6 w-full relative transition-all duration-300 ease-in-out transform ${
           isOpen
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-4"
-        }`}
+        } ${!width ? sizeClasses[size] : ""}`}
+        style={{
+          ...(width ? { maxWidth: width } : {}),
+          maxHeight: "calc(100vh - 100px)",
+          overflowY: "auto",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <button

@@ -1,4 +1,5 @@
 const API = {
+  USERS: "users",
   LOGIN: "auth/signin",
   REGISTER: "auth/signup",
   VERIFY: "auth/verify-code",

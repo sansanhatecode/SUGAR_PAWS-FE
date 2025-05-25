@@ -61,7 +61,7 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
       toast.success("Order created successfully!");
 
       if (result) {
-        router.push(`/orders/${result.id}`);
+        router.push(`/user/orders/${result.id}`);
       } else {
         toast.error("Error retrieving order details");
       }

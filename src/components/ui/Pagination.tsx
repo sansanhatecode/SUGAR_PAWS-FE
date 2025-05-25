@@ -33,31 +33,57 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-6">
-      <button
-        className="px-3 py-1 rounded border bg-white disabled:opacity-50"
-        onClick={handlePrev}
-        disabled={currentPage === 1}
-      >
-        Prev
-      </button>
-      {getPageNumbers().map((page) => (
+    <div className="flex flex-col items-center justify-center gap-2 mt-6">
+      <div className="flex items-center justify-center gap-2">
         <button
-          key={page}
-          className={`px-3 py-1 rounded border ${page === currentPage ? "bg-black text-white" : "bg-white"}`}
-          onClick={() => onPageChange(page)}
+          className="px-3 py-1 rounded border bg-white disabled:opacity-50"
+          onClick={handlePrev}
+          disabled={currentPage === 1}
         >
-          {page}
+          Prev
         </button>
-      ))}
-      {getPageNumbers().at(-1)! < totalPages && <span>...</span>}
-      <button
-        className="px-3 py-1 rounded border bg-white disabled:opacity-50"
-        onClick={handleNext}
-        disabled={currentPage === totalPages}
-      >
-        Next
-      </button>
+        {getPageNumbers()[0] > 1 && (
+          <>
+            <button
+              className="px-3 py-1 rounded border bg-white"
+              onClick={() => onPageChange(1)}
+            >
+              1
+            </button>
+            <span>...</span>
+          </>
+        )}
+        {getPageNumbers().map((page) => (
+          <button
+            key={page}
+            className={`px-3 py-1 rounded border ${page === currentPage ? "bg-black text-white" : "bg-white"}`}
+            onClick={() => onPageChange(page)}
+          >
+            {page}
+          </button>
+        ))}
+        {getPageNumbers().at(-1)! < totalPages && (
+          <>
+            <span>...</span>
+            <button
+              className="px-3 py-1 rounded border bg-white"
+              onClick={() => onPageChange(totalPages)}
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+        <button
+          className="px-3 py-1 rounded border bg-white disabled:opacity-50"
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
+      <div className="text-sm text-gray-500 mt-2">
+        Trang {currentPage} / {totalPages}
+      </div>
     </div>
   );
 };

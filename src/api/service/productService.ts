@@ -37,33 +37,54 @@ export function useGetProductservice() {
       });
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error(
-        "GetProducts Error:",
-        error.response?.data || error.message
-      );
-      throw new Error(
-        error.response?.data?.message || "Failed to fetch products."
-      );
+    } catch (error: unknown) {
+      let message = "Failed to fetch products.";
+      if (typeof error === "object" && error !== null) {
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        message = err.response?.data?.message || err.message || message;
+        console.error("GetProducts Error:", err.response?.data || err.message);
+      } else {
+        console.error("GetProducts Error:", error);
+      }
+      throw new Error(message);
     }
   };
 
-  const getAllProducts = async () => {
+  const getAllProducts = async ({
+    page = 1,
+    itemPerPage = 10,
+  }: {
+    page?: number;
+    itemPerPage?: number;
+  }) => {
     try {
       const { data } = await Request.get<{
         products: Product[];
-        totalAmount: number;
-      }>(API.ALL_PRODUCTS);
+        totalProducts: number;
+      }>(API.ALL_PRODUCTS, {
+        page,
+        itemPerPage,
+      });
       return data;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error(
-        "GetAllProducts Error:",
-        error.response?.data || error.message
-      );
-      throw new Error(
-        error.response?.data?.message || "Failed to fetch all products."
-      );
+    } catch (error: unknown) {
+      let message = "Failed to fetch all products.";
+      if (typeof error === "object" && error !== null) {
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        message = err.response?.data?.message || err.message || message;
+        console.error(
+          "GetAllProducts Error:",
+          err.response?.data || err.message
+        );
+      } else {
+        console.error("GetAllProducts Error:", error);
+      }
+      throw new Error(message);
     }
   };
 
@@ -113,5 +134,38 @@ export function useGetProductservice() {
     }
   };
 
-  return { getProducts, getColors, getSizes, getProductDetail, getAllProducts };
+  const updateProduct = async (id: string, updateData: Partial<Product>) => {
+    try {
+      const { data } = await Request.patch<Product>(
+        API.PRODUCT_DETAIL + id,
+        updateData
+      );
+      return data;
+    } catch (error: unknown) {
+      let message = "Failed to update product.";
+      if (typeof error === "object" && error !== null) {
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        message = err.response?.data?.message || err.message || message;
+        console.error(
+          "UpdateProduct Error:",
+          err.response?.data || err.message
+        );
+      } else {
+        console.error("UpdateProduct Error:", error);
+      }
+      throw new Error(message);
+    }
+  };
+
+  return {
+    getProducts,
+    getColors,
+    getSizes,
+    getProductDetail,
+    getAllProducts,
+    updateProduct,
+  };
 }

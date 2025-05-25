@@ -1,3 +1,5 @@
+import { Category } from "./category";
+
 export type Product = {
   id: string;
   name: string;
@@ -15,6 +17,7 @@ export type Product = {
   rating?: number;
   description?: string;
   productDetails?: ProductDetail[];
+  categories?: Category[];
 };
 
 // components/types.ts
@@ -33,6 +36,8 @@ export type ProductDetail = {
   moreDetails: string[];
   product?: Product;
   displayImage?: string[];
+  sale: number;
+  stock: number;
 };
 
 export type ImageDetail = {

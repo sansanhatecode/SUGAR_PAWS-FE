@@ -24,5 +24,25 @@ export function useUserService() {
     }
   };
 
-  return { getMyInfo, updateProfile };
+  const getAllUsers = async () => {
+    try {
+      const { data } = await Request.get<User[]>(API.USERS);
+      return data;
+    } catch (error) {
+      console.error("GetAllUsers Error:", error);
+      throw error;
+    }
+  };
+
+  const createUser = async (userData: Partial<User>) => {
+    try {
+      const { data } = await Request.post<User>(API.USERS, userData);
+      return data;
+    } catch (error) {
+      console.error("CreateUser Error:", error);
+      throw error;
+    }
+  };
+
+  return { getMyInfo, updateProfile, getAllUsers, createUser };
 }

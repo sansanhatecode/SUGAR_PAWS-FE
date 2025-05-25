@@ -7,6 +7,8 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { formatCurrency } from "@/helper/renderNumber";
 import SecondaryButton from "../ui/SecondaryButton";
 import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/store/store";
+import { selectAll } from "@/store/slices/cartSlice";
 
 type Props = {
   cartItems: CartItem[];
@@ -27,6 +29,7 @@ export default function Cart({
   );
 
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   return (
     <div className="w-[400px] max-w-[100vw] h-full flex flex-col bg-custom-yellow shadow-md">
@@ -83,6 +86,7 @@ export default function Cart({
           <CtaButton
             text="Check out"
             onClick={() => {
+              dispatch(selectAll(cartItems));
               router.push("/checkout");
               onClose();
             }}

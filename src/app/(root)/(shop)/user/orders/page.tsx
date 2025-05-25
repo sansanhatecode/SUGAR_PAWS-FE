@@ -16,7 +16,7 @@ const OrdersPage = () => {
   const [search, setSearch] = React.useState("");
   const orderTabs: { key: "all" | OrderStatus; label: string }[] = [
     { key: "all", label: "All" },
-    { key: "pending", label: "Pending Payment" },
+    { key: "pending", label: "Pending" },
     { key: "confirmed", label: "Confirmed" },
     { key: "delivered", label: "Delivered" },
     { key: "cancelled", label: "Cancelled" },

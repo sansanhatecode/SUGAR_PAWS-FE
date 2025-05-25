@@ -17,6 +17,6 @@ export function showSuccessToast(message: string) {
       },
       icon: null,
       position: "top-center",
-    }
+    },
   );
 }
