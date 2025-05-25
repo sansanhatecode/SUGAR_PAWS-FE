@@ -21,7 +21,6 @@ export default function CheckoutPage() {
     null,
   );
 
-  console.log("selectedAddressId", selectedAddressId);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
     PaymentMethod.CASH,
   );

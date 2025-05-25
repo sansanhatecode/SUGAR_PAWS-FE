@@ -14,6 +14,7 @@ const API = {
   ME: "users/me",
   ORDERS: "orders",
   SHIPPING_FEE: "orders/shipping-fee",
+  CATEGORIES: "categories",
 };
 
 export default API;

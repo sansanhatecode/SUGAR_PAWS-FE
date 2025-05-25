@@ -1,20 +1,22 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useGetProductservice } from "@/api/service/productService";
+import { useProductservice } from "@/api/service/productService";
 import { Product } from "@/types/product";
 
 export function useUpdateProduct() {
-  const { updateProduct } = useGetProductservice();
+  const { updateProduct } = useProductservice();
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async ({
       id,
       data,
+      images,
     }: {
       id: string;
       data: Partial<Product>;
+      images?: File[];
     }) => {
-      return await updateProduct(id, data);
+      return await updateProduct(id, data, images);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["allProducts"] });

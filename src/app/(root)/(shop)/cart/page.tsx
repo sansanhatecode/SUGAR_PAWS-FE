@@ -32,8 +32,6 @@ const CartPage = () => {
   const dispatch = useAppDispatch();
   const selectedItems = useAppSelector(selectCartSelectedItems);
 
-  console.log("selectedItems", selectedItems);
-
   const [selectAll, setSelectAll] = useState(false);
 
   const { getCartItems } = useGetCartItems();

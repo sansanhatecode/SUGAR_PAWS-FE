@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       "store.lolitacollective.com",
       "example.com",
       "via.placeholder.com",
+      "res.cloudinary.com",
     ],
   },
 };

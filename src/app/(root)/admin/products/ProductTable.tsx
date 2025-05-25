@@ -1,14 +1,17 @@
-import { useGetAllProducts } from "@/hooks/queries/useProducts";
-import { useUpdateProduct } from "@/hooks/queries/useUpdateProduct";
+import {
+  useGetAllProducts,
+  useUpdateProduct,
+  useCreateProduct,
+} from "@/hooks/queries/useProducts";
 import { Button } from "@mantine/core";
 import Image from "next/image";
 import React, { useState } from "react";
 import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
-import { FiEye, FiEdit } from "react-icons/fi";
+import { FiEye, FiEdit, FiPlus } from "react-icons/fi";
 
-import EditProductModal from "./EditProductModal";
 import PreviewProduct from "./ProductDetailModal";
 import ProductDetailTableModal from "./ProductDetailTableModal";
+import ProductModal from "./ProductModal";
 import { Product } from "@/types/product";
 import { Category } from "@/types/category";
 import { showSuccessToast } from "@/components/ui/SuccessToast";
@@ -32,37 +35,65 @@ const ProductTable: React.FC = () => {
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
-  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [productModalOpen, setProductModalOpen] = useState(false);
   const [detailProductId, setDetailProductId] = useState<string | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const { updateProductMutation } = useUpdateProduct();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const { mutateAsync: updateProduct } = useUpdateProduct();
+  const { mutateAsync: createProduct } = useCreateProduct();
 
   const handleEditClick = (product: Product) => {
     setEditProduct(product);
-    setEditModalOpen(true);
+    setIsEditMode(true);
+    setProductModalOpen(true);
   };
 
-  const handleEditSubmit = async (data: {
+  const handleCreateClick = () => {
+    setEditProduct(null);
+    setIsEditMode(false);
+    setProductModalOpen(true);
+  };
+
+  const handleProductSubmit = async (data: {
     name: string;
     description: string;
     vendor?: string;
-    categories?: Category[];
+    categories?: number[];
     tags?: string[];
+    images?: File[];
+    displayImage?: string[];
   }) => {
-    if (!editProduct) return;
-    await updateProductMutation.mutateAsync({
-      id: editProduct.id,
-      data: {
-        name: data.name,
-        description: data.description,
-        vendor: data.vendor,
-        categories: data.categories,
-        tags: data.tags,
-      },
-    });
-    showSuccessToast(`Product "${data.name}" updated successfully!`);
-    setEditModalOpen(false);
-    setEditProduct(null);
+    if (isEditMode && editProduct) {
+      // Edit mode
+      await updateProduct({
+        id: editProduct.id,
+        updateData: {
+          name: data.name,
+          description: data.description,
+          vendor: data.vendor,
+          categories: data.categories,
+          tags: data.tags,
+          displayImage: data.displayImage,
+        },
+        images: data.images,
+      });
+      showSuccessToast(`Product "${data.name}" updated successfully!`);
+    } else {
+      // Create mode
+      await createProduct({
+        productData: {
+          name: data.name,
+          description: data.description,
+          categories: data.categories,
+          vendor: data.vendor,
+          tags: data.tags,
+          displayImage: data.displayImage || [],
+        },
+        images: data.images,
+      });
+      showSuccessToast(`Product "${data.name}" created successfully!`);
+    }
+    setProductModalOpen(false);
   };
 
   const columns: MRT_ColumnDef<Product>[] = [
@@ -279,6 +310,16 @@ const ProductTable: React.FC = () => {
 
   return (
     <>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Products</h1>
+        <Button
+          leftIcon={<FiPlus size={16} />}
+          onClick={handleCreateClick}
+          color="green"
+        >
+          Create New Product
+        </Button>
+      </div>
       {isLoading && <div>Loading products...</div>}
       {error && (
         <div className="text-red-500 text-center my-4">
@@ -322,11 +363,12 @@ const ProductTable: React.FC = () => {
         open={!!selectedProduct}
         onClose={() => setSelectedProduct(null)}
       />
-      <EditProductModal
-        opened={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        product={editProduct}
-        onSubmit={handleEditSubmit}
+      <ProductModal
+        opened={productModalOpen}
+        onClose={() => setProductModalOpen(false)}
+        product={isEditMode ? editProduct : null}
+        onSubmit={handleProductSubmit}
+        isEditMode={isEditMode}
       />
 
       {/* Product Detail Table Modal */}

@@ -20,7 +20,18 @@ export type Product = {
   categories?: Category[];
 };
 
-// components/types.ts
+export type UploadProductDto = {
+  id: string;
+  name: string;
+  displayImage: string[];
+  vendor?: string;
+  discount?: number;
+  sizes?: string[];
+  tags?: string[];
+  description?: string;
+  categories?: number[];
+};
+
 export type ProductDetail = {
   id: number;
   productId: string | number;

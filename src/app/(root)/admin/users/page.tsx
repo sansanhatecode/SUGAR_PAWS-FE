@@ -112,7 +112,7 @@ export default function UserAdminPage() {
         ),
       },
     ],
-    []
+    [],
   );
 
   const table = useMantineReactTable({

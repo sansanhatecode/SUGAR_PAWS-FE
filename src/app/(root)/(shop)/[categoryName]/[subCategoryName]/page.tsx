@@ -55,7 +55,6 @@ const CategoryPage = () => {
   });
 
   const { data: productsData, isLoading, error, refetch } = getProducts;
-  console.log("productsData", productsData);
 
   useEffect(() => {
     refetch();

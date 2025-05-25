@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DefaultLoading from "@/components/loading/DefaultLoading";
 import { useAuthorization } from "@/hooks/queries/useAuthorization";
-import { selectEmail, selectUser } from "@/store/slices/userSlice";
+import { selectEmail } from "@/store/slices/userSlice";
 import { useSelector } from "react-redux";
 
 const VerifyCodePage = () => {
@@ -17,8 +17,6 @@ const VerifyCodePage = () => {
   const router = useRouter();
   const { verifyCode } = useAuthorization();
   const email = useSelector(selectEmail);
-  const user = useSelector(selectUser);
-  console.log("user", user);
 
   const handleChange = (index: number, value: string) => {
     if (!/^[0-9]?$/.test(value)) return;
