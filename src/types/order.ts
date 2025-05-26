@@ -13,8 +13,15 @@ export type Order = {
   shippingFee?: number;
   totalAmount: number;
   trackingCode?: string;
+  confirmedAt?: Date;
+  completedAt?: Date;
+  cancelledAt?: Date;
+  refundedAt?: Date;
+  requestCancelAt?: Date;
   status: OrderStatus;
-  payId?: number; // Replaced paymentMethod with payId to link with payment
+  payId?: number;
+  userName?: string;
+  phoneNumber?: string;
 
   shippingAddress?: ShippingAddress;
   orderItems?: OrderItem[];
@@ -34,8 +41,10 @@ export type OrderItem = {
 };
 
 export type OrderStatus =
-  | "pending"
-  | "confirmed"
-  | "delivered"
-  | "cancelled"
-  | "returned";
+  | "PENDING"
+  | "CONFIRMED"
+  | "DELIVERED"
+  | "COMPLETED"
+  | "REQUESTCANCEL"
+  | "CANCELLED"
+  | "REFUNDED";

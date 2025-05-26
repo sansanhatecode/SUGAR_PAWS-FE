@@ -9,33 +9,37 @@ import CtaButton from "@/components/ui/CtaButton";
 import SecondaryButton from "@/components/ui/SecondaryButton";
 import Image from "next/image";
 import { formatCurrency, ensureAbsoluteUrl } from "@/helper/renderNumber";
-import { FiCheckCircle, FiTruck, FiBox, FiCreditCard } from "react-icons/fi";
+import {
+  FiCheckCircle,
+  FiTruck,
+  FiBox,
+  FiCreditCard,
+  FiSmartphone,
+} from "react-icons/fi";
 import type { OrderItem } from "@/types/order";
 
 const ORDER_STATUS_STEPS = [
-  { key: "pending", label: "Order Placed", icon: <FiBox /> },
-  { key: "confirmed", label: "Confirmed", icon: <FiCreditCard /> },
-  { key: "delivered", label: "Delivered", icon: <FiTruck /> },
-  { key: "completed", label: "Completed", icon: <FiCheckCircle /> },
+  { key: "PENDING", label: "Order Placed", icon: <FiBox /> },
+  { key: "CONFIRMED", label: "Confirmed", icon: <FiCreditCard /> },
+  { key: "DELIVERED", label: "Delivered", icon: <FiTruck /> },
+  { key: "COMPLETED", label: "Completed", icon: <FiCheckCircle /> },
 ];
 
 const statusToStepIndex = (status: string) => {
-  // Convert status to lowercase for case-insensitive comparison
-  const statusLower = status?.toLowerCase() || "";
-
-  switch (statusLower) {
-    case "pending":
+  switch (status) {
+    case "PENDING":
       return 0;
-    case "confirmed":
+    case "CONFIRMED":
       return 1;
-    case "delivered":
+    case "DELIVERED":
       return 2;
-    case "cancelled":
-      return 2; // treat as stopped
-    case "returned":
-      return 2;
-    case "completed":
+    case "COMPLETED":
       return 3;
+    case "CANCELLED":
+    case "REFUNDED":
+      return 2; // treat as stopped at delivered step
+    case "REQUESTCANCEL":
+      return 1; // treat as stopped at confirmed step
     default:
       return 0; // default to first step if unknown
   }
@@ -65,19 +69,13 @@ export default function OrderDetailPage() {
     );
   }
 
-  // Breadcrumbs
   const breadcrumbItems = [
     { name: "Home", href: "/" },
     { name: "My Orders", href: "/user/orders" },
     { name: `Order #${order.id}` },
   ];
 
-  // Status step - handle uppercase status from API
-  console.log("Order status from API:", order.status);
   const currentStep = statusToStepIndex(order.status);
-  console.log("Mapped to step index:", currentStep);
-
-  // Address
   const address = order.shippingAddress;
   const addressString = address
     ? [
@@ -93,11 +91,24 @@ export default function OrderDetailPage() {
         .join(", ")
     : "-";
 
-  // Timeline (mocked for now)
   const trackingHistory = [
     { time: order.createdAt, label: "Order placed" },
-    order.paidAt && { time: order.paidAt, label: "Payment confirmed" },
-    order.deliveredAt && { time: order.deliveredAt, label: "Delivered" },
+    order.status === "PENDING" && {
+      time: order.createdAt,
+      label: "Order placed",
+    },
+    order.status === "CONFIRMED" && {
+      time: order.confirmedAt,
+      label: "Order confirmed",
+    },
+    order.status === "DELIVERED" && {
+      time: order.deliveredAt,
+      label: "Order delivered",
+    },
+    order.status === "COMPLETED" && {
+      time: order.completedAt,
+      label: "Order completed",
+    },
   ].filter(Boolean);
 
   return (
@@ -108,7 +119,7 @@ export default function OrderDetailPage() {
         <div className="flex items-center justify-between mb-8 w-[80%] m-auto relative">
           <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200 z-0"></div>
           <div
-            className="absolute top-5 left-0 h-1 bg-custom-wine z-0"
+            className="absolute top-5 left-0 h-1 bg-custom-wine z-0 w-[95%]"
             style={{
               width:
                 currentStep >= 0
@@ -279,12 +290,39 @@ export default function OrderDetailPage() {
           </div>
           <div className="flex justify-between text-base">
             <span>Payment Status</span>
-            <span className="capitalize">{order.payment?.status || "-"}</span>
+            <span
+              className={`capitalize font-semibold ${
+                order.payment?.status === "UNPAID"
+                  ? "text-red-600"
+                  : order.payment?.status === "PAID"
+                    ? "text-green-600"
+                    : "text-gray-600"
+              }`}
+            >
+              {order.payment?.status || "-"}
+              {order.payment?.method === "BANK_TRANSFER" &&
+                order.payment?.status === "UNPAID" && (
+                  <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                    Payment Required
+                  </span>
+                )}
+            </span>
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex gap-3 justify-end">
+          {/* Bank Transfer Payment Button - Show if payment method is BANK_TRANSFER and status is UNPAID */}
+          {order.payment?.method === "BANK_TRANSFER" &&
+            order.payment?.status === "UNPAID" && (
+              <button
+                className="bg-green-600 text-[13px] uppercase hover:bg-green-700 text-white py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2 shadow-lg"
+                onClick={() => router.push(`/user/orders/${order.id}/qr-code`)}
+              >
+                <FiSmartphone className="text-lg" />
+                Pay Now - QR Code
+              </button>
+            )}
           <CtaButton
             text="Buy Again"
             onClick={() => router.push("/collections")}

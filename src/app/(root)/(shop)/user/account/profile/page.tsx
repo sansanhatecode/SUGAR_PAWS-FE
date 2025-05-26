@@ -5,7 +5,14 @@ import { useForm } from "react-hook-form";
 import { useGetMyInfo, useUpdateMyInfo } from "@/hooks/queries/useUser";
 import { showSuccessToast } from "@/components/ui/SuccessToast";
 import { showErrorToast } from "@/components/ui/ErrorToast";
-import { FaUser, FaEnvelope, FaPhone, FaVenusMars, FaBirthdayCake } from "react-icons/fa";
+import CtaButton from "@/components/ui/CtaButton";
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaVenusMars,
+  FaBirthdayCake,
+} from "react-icons/fa";
 
 interface ProfileFormData {
   username: string;
@@ -98,7 +105,10 @@ const ProfilePage = () => {
           My Profile
         </h2>
       </div>
-      <form className="flex flex-col gap-5 w-full" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="flex flex-col gap-5 w-full"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <div className="relative">
           <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
             <FaUser className="text-custom-wine" /> Username
@@ -215,17 +225,17 @@ const ProfilePage = () => {
             <FaBirthdayCake className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
           </div>
         </div>
-        <button
+        <CtaButton
           type="submit"
-          className="mt-8 bg-custom-wine text-white py-3 rounded-xl font-bold hover:bg-custom-rose transition-all shadow-lg w-full text-lg tracking-wide flex items-center justify-center gap-2 uppercase"
+          text="Save"
+          onClick={() => {}} // The actual submission is handled by the form onSubmit
+          variant="profile"
+          isLoading={updateProfileMutation.isPending}
+          loadingText="Saving..."
+          icon={<FaUser />}
+          loadingIcon={<FaUser />}
           disabled={updateProfileMutation.isPending}
-        >
-          {updateProfileMutation.isPending ? (
-            <span className="flex items-center gap-2"><span className="animate-spin-slow"><FaUser /></span> Saving...</span>
-          ) : (
-            <><FaUser /> Save</>
-          )}
-        </button>
+        />
       </form>
     </div>
   );

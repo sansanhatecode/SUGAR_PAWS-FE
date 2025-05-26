@@ -34,6 +34,17 @@ export function useGetOrders() {
   return { getOrders: getOrdersQuery };
 }
 
+export function useGetAllOrders() {
+  const { getAllOrders } = useOrderService();
+
+  const getAllOrdersQuery = useQuery({
+    queryKey: ["all-orders"],
+    queryFn: () => getAllOrders(),
+  });
+
+  return { getAllOrders: getAllOrdersQuery };
+}
+
 export function useGetOrderById(orderId: number) {
   const { getOrderById } = useOrderService();
 
@@ -92,6 +103,43 @@ export function useCancelOrder() {
     onSuccess: (_data, orderId) => {
       queryClient.invalidateQueries({ queryKey: ["order", orderId] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+}
+
+export function useUpdateOrderStatus() {
+  const { updateOrderStatus } = useOrderService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: { orderId: number; status: string }) => {
+      const { orderId, status } = params;
+      return await updateOrderStatus(orderId, status);
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["order", variables.orderId] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["all-orders"] });
+    },
+  });
+}
+
+export function useUpdatePaymentStatus() {
+  const { updatePaymentStatus } = useOrderService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      paymentId: number;
+      status: string;
+      paidAt?: Date;
+    }) => {
+      const { paymentId, status, paidAt } = params;
+      return await updatePaymentStatus(paymentId, status, paidAt);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["all-orders"] });
     },
   });
 }

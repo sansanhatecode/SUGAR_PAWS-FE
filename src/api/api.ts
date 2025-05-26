@@ -13,8 +13,10 @@ const API = {
   CART_ITEM: "cart-item",
   ME: "users/me",
   ORDERS: "orders",
+  ALL_ORDERS: "orders/all",
   SHIPPING_FEE: "orders/shipping-fee",
   CATEGORIES: "categories",
+  PAYMENTS: "payments",
 };
 
 export default API;

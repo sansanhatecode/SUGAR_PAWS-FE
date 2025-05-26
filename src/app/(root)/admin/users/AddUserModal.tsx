@@ -1,5 +1,12 @@
 import React from "react";
-import { Modal, TextInput, PasswordInput, Button, Group } from "@mantine/core";
+import {
+  Modal,
+  TextInput,
+  PasswordInput,
+  Button,
+  Group,
+  Select,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useCreateUser } from "@/hooks/queries/useUser";
 
@@ -11,15 +18,19 @@ interface AddUserModalProps {
 const AddUserModal: React.FC<AddUserModalProps> = ({ open, onClose }) => {
   const form = useForm({
     initialValues: {
-      name: "",
       email: "",
+      name: "",
+      username: "",
       password: "",
+      role: "USER" as "USER" | "ADMIN",
     },
     validate: {
-      name: (value: string) => (value ? null : "Vui lòng nhập tên người dùng"),
       email: (value: string) =>
-        /^\S+@\S+$/.test(value) ? null : "Vui lòng nhập email hợp lệ",
-      password: (value: string) => (value ? null : "Vui lòng nhập mật khẩu"),
+        /^\S+@\S+$/.test(value) ? null : "Please enter a valid email",
+      name: (value: string) => (value ? null : "Please enter name"),
+      username: (value: string) => (value ? null : "Please enter username"),
+      password: (value: string) => (value ? null : "Please enter password"),
+      role: (value: string) => (value ? null : "Please select a role"),
     },
   });
 
@@ -31,40 +42,58 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, onClose }) => {
       form.reset();
       onClose();
     } catch {
-      // Có thể show thông báo lỗi ở đây nếu muốn
+      // Could show error notification here if needed
     }
   };
 
   return (
-    <Modal opened={open} onClose={onClose} title="Tạo người dùng mới" centered>
+    <Modal opened={open} onClose={onClose} title="Create New User" centered>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <TextInput
-          label="Tên người dùng"
-          placeholder="Nhập tên người dùng"
+          label="Email"
+          placeholder="Enter email"
+          type="email"
+          {...form.getInputProps("email")}
+          required
+        />
+        <TextInput
+          label="Name"
+          placeholder="Enter name"
+          mt="md"
           {...form.getInputProps("name")}
           required
         />
         <TextInput
-          label="Email"
-          placeholder="Nhập email"
-          type="email"
+          label="Username"
+          placeholder="Enter username"
           mt="md"
-          {...form.getInputProps("email")}
+          {...form.getInputProps("username")}
           required
         />
         <PasswordInput
-          label="Mật khẩu"
-          placeholder="Nhập mật khẩu"
+          label="Password"
+          placeholder="Enter password"
           mt="md"
           {...form.getInputProps("password")}
           required
         />
+        <Select
+          label="Role"
+          placeholder="Select role"
+          data={[
+            { value: "USER", label: "User" },
+            { value: "ADMIN", label: "Admin" },
+          ]}
+          mt="md"
+          {...form.getInputProps("role")}
+          required
+        />
         <Group position="right" mt="xl">
           <Button variant="default" onClick={onClose} type="button">
-            Hủy
+            Cancel
           </Button>
           <Button type="submit" loading={createUser.status === "pending"}>
-            Tạo mới
+            Create
           </Button>
         </Group>
       </form>

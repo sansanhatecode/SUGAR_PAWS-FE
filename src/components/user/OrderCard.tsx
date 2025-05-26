@@ -2,19 +2,12 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { formatCurrency } from "@/helper/renderNumber";
+import { formatOrderStatus, getOrderStatusColor } from "@/helper/orderHelper";
 import type { Order } from "@/types/order";
 
 interface OrderCardProps {
   order: Order;
 }
-
-const statusColor: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-800",
-  confirmed: "bg-blue-100 text-blue-800",
-  delivered: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
-  returned: "bg-gray-200 text-gray-700",
-};
 
 const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   return (
@@ -27,9 +20,9 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
         </div>
         <div>
           <span
-            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusColor[order.status] || "bg-gray-100 text-gray-700"}`}
+            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getOrderStatusColor(order.status)}`}
           >
-            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+            {formatOrderStatus(order.status)}
           </span>
         </div>
       </div>

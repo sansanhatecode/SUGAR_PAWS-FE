@@ -46,6 +46,7 @@ export type ProductDetail = {
   image: ImageDetail;
   moreDetails: string[];
   product?: Product;
+  productName?: string;
   displayImage?: string[];
   sale: number;
   stock: number;

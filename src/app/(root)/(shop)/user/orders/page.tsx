@@ -16,11 +16,13 @@ const OrdersPage = () => {
   const [search, setSearch] = React.useState("");
   const orderTabs: { key: "all" | OrderStatus; label: string }[] = [
     { key: "all", label: "All" },
-    { key: "pending", label: "Pending" },
-    { key: "confirmed", label: "Confirmed" },
-    { key: "delivered", label: "Delivered" },
-    { key: "cancelled", label: "Cancelled" },
-    { key: "returned", label: "Returned" },
+    { key: "PENDING", label: "Pending" },
+    { key: "CONFIRMED", label: "Confirmed" },
+    { key: "DELIVERED", label: "Delivered" },
+    { key: "COMPLETED", label: "Completed" },
+    { key: "REQUESTCANCEL", label: "Request Cancel" },
+    { key: "CANCELLED", label: "Cancelled" },
+    { key: "REFUNDED", label: "Refunded" },
   ];
 
   // Filter orders by status and search
@@ -46,7 +48,9 @@ const OrdersPage = () => {
                 ? "border-custom-wine text-custom-wine"
                 : "border-transparent text-gray-700 hover:text-custom-wine"
             }`}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() =>
+              setActiveTab(activeTab === tab.key ? "all" : tab.key)
+            }
           >
             {tab.label}
           </button>

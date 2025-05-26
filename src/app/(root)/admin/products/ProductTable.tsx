@@ -3,7 +3,7 @@ import {
   useUpdateProduct,
   useCreateProduct,
 } from "@/hooks/queries/useProducts";
-import { Button } from "@mantine/core";
+import { Button, Box, LoadingOverlay, Paper, Title } from "@mantine/core";
 import Image from "next/image";
 import React, { useState } from "react";
 import { MantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
@@ -17,13 +17,11 @@ import { Category } from "@/types/category";
 import { showSuccessToast } from "@/components/ui/SuccessToast";
 
 const ProductTable: React.FC = () => {
-  // Pagination state using Mantine React Table's pagination format
   const [pagination, setPagination] = useState({
     pageIndex: 0, // 0-based index
     pageSize: 10, // Default page size
   });
 
-  // Fetch products with server-side pagination
   const { getAllProducts } = useGetAllProducts({
     page: pagination.pageIndex + 1, // Convert to 1-based index for API
     itemPerPage: pagination.pageSize,
@@ -275,32 +273,28 @@ const ProductTable: React.FC = () => {
       header: "Actions",
       accessorKey: "actions",
       Cell: ({ row }) => (
-        <div style={{ display: "flex", gap: 0, justifyContent: "center" }}>
+        <div style={{ display: "flex", gap: 16, justifyContent: "center" }}>
           <Button
-            size="md"
-            bg={"transparent"}
-            variant="light"
+            size="xs"
+            variant="outline"
             color="blue"
-            radius="xl"
             onClick={(e) => {
               e.stopPropagation();
               setSelectedProduct(row.original);
             }}
           >
-            <FiEye size={16} />
+            <FiEye />
           </Button>
           <Button
-            size="md"
-            variant="light"
-            bg={"transparent"}
+            size="xs"
+            variant="outline"
             color="orange"
-            radius="xl"
             onClick={(e) => {
               e.stopPropagation();
               handleEditClick(row.original);
             }}
           >
-            <FiEdit size={16} />
+            <FiEdit />
           </Button>
         </div>
       ),
@@ -308,55 +302,83 @@ const ProductTable: React.FC = () => {
     },
   ];
 
+  if (error) {
+    return (
+      <div className="p-8">
+        <Paper p="xl" shadow="md" className="bg-red-50">
+          <Title order={3} className="text-red-600">
+            Error loading products data
+          </Title>
+          <p className="mt-2">Please try again later or contact support.</p>
+        </Paper>
+      </div>
+    );
+  }
+
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Products</h1>
-        <Button
-          leftIcon={<FiPlus size={16} />}
-          onClick={handleCreateClick}
-          color="green"
-        >
-          Create New Product
-        </Button>
-      </div>
-      {isLoading && <div>Loading products...</div>}
-      {error && (
-        <div className="text-red-500 text-center my-4">
-          An error occurred while loading products
-        </div>
-      )}
-      {products ? (
-        <>
-          <MantineReactTable
-            columns={columns}
-            data={products || []}
-            enableRowSelection={false}
-            enableColumnActions={false}
-            enableColumnFilters={false}
-            enableSorting={true}
-            enablePagination={true}
-            manualPagination={true}
-            onPaginationChange={setPagination}
-            rowCount={rowCount}
-            state={{ pagination }}
-            initialState={{ pagination: { pageIndex: 0, pageSize: 10 } }}
-            mantinePaginationProps={{
-              rowsPerPageOptions: ["10", "20", "30", "50"],
-              withEdges: true,
-            }}
-            mantineTableBodyRowProps={({ row }) => ({
-              style: { cursor: "pointer" },
-              onClick: () => {
-                setDetailProductId(row.original.id);
-                setDetailModalOpen(true);
-              },
-            })}
+      <div className="p-6">
+        <Box pos="relative">
+          <LoadingOverlay
+            visible={isLoading}
+            loaderProps={{ size: "lg", color: "blue" }}
           />
-        </>
-      ) : (
-        !isLoading && <div className="text-center">No products found.</div>
-      )}
+          {products && products.length > 0 ? (
+            <MantineReactTable
+              columns={columns}
+              data={products}
+              enableRowSelection={true}
+              enableColumnActions={false}
+              enableColumnFilters={true}
+              enableSorting={true}
+              enablePagination={true}
+              enableColumnFilterModes={true}
+              enableColumnOrdering={true}
+              enableColumnDragging={true}
+              enableGlobalFilter={true}
+              manualPagination={true}
+              onPaginationChange={setPagination}
+              rowCount={rowCount}
+              state={{ pagination }}
+              initialState={{
+                pagination: { pageIndex: 0, pageSize: 10 },
+                showGlobalFilter: true,
+              }}
+              mantineTableProps={{
+                withBorder: true,
+                striped: true,
+                highlightOnHover: true,
+              }}
+              mantineSearchTextInputProps={{
+                placeholder: "Search all products...",
+              }}
+              mantinePaginationProps={{
+                rowsPerPageOptions: ["10", "20", "30", "50"],
+                withEdges: true,
+              }}
+              mantineTableBodyRowProps={({ row }) => ({
+                style: { cursor: "pointer" },
+                onClick: () => {
+                  setDetailProductId(row.original.id);
+                  setDetailModalOpen(true);
+                },
+              })}
+              renderTopToolbarCustomActions={() => (
+                <Button
+                  color="green"
+                  onClick={handleCreateClick}
+                  leftIcon={<FiPlus size={16} />}
+                  className="ml-2"
+                >
+                  Create New Product
+                </Button>
+              )}
+            />
+          ) : (
+            !isLoading && <div className="text-center">No products found.</div>
+          )}
+        </Box>
+      </div>
       {/* Product Detail Modal */}
       <PreviewProduct
         product={selectedProduct}

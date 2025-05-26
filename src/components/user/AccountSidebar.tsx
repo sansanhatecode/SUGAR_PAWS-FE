@@ -71,7 +71,7 @@ const AccountSidebar = () => {
             key={item.href}
             href={item.href}
             className={`flex items-center gap-3 px-3 py-2 rounded-xl transition font-semibold text-sm w-full border border-transparent hover:border-pink-200 hover:bg-pink-50 hover:shadow-sm group ${
-              pathname === item.href
+              pathname?.includes(item.href)
                 ? "bg-pink-100 text-custom-wine border-custom-wine shadow"
                 : "text-gray-700"
             }`}

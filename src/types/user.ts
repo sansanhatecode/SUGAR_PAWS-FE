@@ -9,4 +9,5 @@ export type User = {
   dayOfBirth?: number | null;
   monthOfBirth?: number | null;
   yearOfBirth?: number | null;
+  isVerified?: boolean;
 };

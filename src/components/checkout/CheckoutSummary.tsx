@@ -26,7 +26,7 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
   // Calculate subtotal
   const subtotal = selectedItems.reduce(
     (sum, item) => sum + item.productDetail.price * item.quantity,
-    0,
+    0
   );
   const total = subtotal + (shippingFee || 0);
 
@@ -61,7 +61,12 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
       toast.success("Order created successfully!");
 
       if (result) {
-        router.push(`/user/orders/${result.id}`);
+        // Check if payment method is bank transfer
+        if (paymentMethod === PaymentMethod.BANK_TRANSFER) {
+          router.push(`/user/orders/${result.id}/qr-code`);
+        } else {
+          router.push(`/user/orders/${result.id}`);
+        }
       } else {
         toast.error("Error retrieving order details");
       }

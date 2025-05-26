@@ -1,4 +1,5 @@
 import { useUserService } from "@/api/service/userService";
+import { User } from "@/types/user";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useGetMyInfo() {
@@ -48,6 +49,21 @@ export function useCreateUser() {
 
   const mutation = useMutation({
     mutationFn: createUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users", "all"] });
+    },
+  });
+
+  return mutation;
+}
+
+export function useUpdateUser() {
+  const { updateUser } = useUserService();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<User> }) =>
+      updateUser(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users", "all"] });
     },

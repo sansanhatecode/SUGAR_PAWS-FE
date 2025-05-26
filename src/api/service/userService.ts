@@ -44,5 +44,18 @@ export function useUserService() {
     }
   };
 
-  return { getMyInfo, updateProfile, getAllUsers, createUser };
+  const updateUser = async (id: number, userData: Partial<User>) => {
+    try {
+      const { data } = await Request.patch<User>(
+        `${API.USERS}/${id}`,
+        userData,
+      );
+      return data;
+    } catch (error) {
+      console.error("UpdateUser Error:", error);
+      throw error;
+    }
+  };
+
+  return { getMyInfo, updateProfile, getAllUsers, createUser, updateUser };
 }

@@ -111,10 +111,9 @@ export function useOrderService() {
 
   const cancelOrder = async (orderId: number) => {
     try {
-      const { data } = await Request.patch<Order>(
-        `${API.ORDERS}/${orderId}/cancel`,
-        { status: "cancelled" as OrderStatus },
-      );
+      const { data } = await Request.patch<Order>(`${API.ORDERS}/${orderId}`, {
+        status: "CANCELLED" as OrderStatus,
+      });
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -128,6 +127,64 @@ export function useOrderService() {
     }
   };
 
+  const updateOrderStatus = async (orderId: number, status: string) => {
+    try {
+      const { data } = await Request.patch<Order>(
+        `${API.ORDERS}/${orderId}/status`,
+        { status },
+      );
+      return data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error(
+        "UpdateOrderStatus Error:",
+        error.response?.data || error.message,
+      );
+      throw new Error(
+        error.response?.data?.message || "Failed to update order status.",
+      );
+    }
+  };
+
+  const getAllOrders = async () => {
+    try {
+      const { data } = await Request.get<Order[]>(API.ALL_ORDERS);
+      return data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error(
+        "GetAllOrders Error:",
+        error.response?.data || error.message,
+      );
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch all orders.",
+      );
+    }
+  };
+
+  const updatePaymentStatus = async (
+    paymentId: number,
+    status: string,
+    paidAt?: Date,
+  ) => {
+    try {
+      const { data } = await Request.patch<Payment>(
+        `${API.PAYMENTS}/${paymentId}`,
+        { status, paidAt: paidAt || new Date() },
+      );
+      return data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error(
+        "UpdatePaymentStatus Error:",
+        error.response?.data || error.message,
+      );
+      throw new Error(
+        error.response?.data?.message || "Failed to update payment status.",
+      );
+    }
+  };
+
   return {
     createOrder,
     getOrders,
@@ -135,5 +192,8 @@ export function useOrderService() {
     calculateShippingFee,
     processPayment,
     cancelOrder,
+    updateOrderStatus,
+    getAllOrders,
+    updatePaymentStatus,
   };
 }

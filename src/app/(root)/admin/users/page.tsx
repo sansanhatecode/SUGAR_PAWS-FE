@@ -18,11 +18,14 @@ import {
   Paper,
 } from "@mantine/core";
 import AddUserModal from "./AddUserModal";
+import EditUserModal from "./EditUserModal";
 
 export default function UserAdminPage() {
   const { getAllUsers } = useGetAllUsers();
   const { data: users, isLoading, isError } = getAllUsers;
   const [addUserOpen, setAddUserOpen] = useState(false);
+  const [editUserOpen, setEditUserOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const columns = useMemo<MRT_ColumnDef<User>[]>(
     () => [
@@ -75,6 +78,22 @@ export default function UserAdminPage() {
         Cell: ({ cell }) => cell.getValue<string | null>() || "Not specified",
       },
       {
+        accessorKey: "isVerified",
+        header: "Verified",
+        size: 100,
+        Cell: ({ cell }) => (
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-bold ${
+              cell.getValue<boolean>()
+                ? "bg-green-200 text-green-800"
+                : "bg-red-200 text-red-800"
+            }`}
+          >
+            {cell.getValue<boolean>() ? "Yes" : "No"}
+          </span>
+        ),
+      },
+      {
         id: "birthdate",
         header: "Date of Birth",
         size: 150,
@@ -96,7 +115,10 @@ export default function UserAdminPage() {
               size="xs"
               variant="outline"
               color="blue"
-              onClick={() => console.log("Edit user", row.original.id)}
+              onClick={() => {
+                setSelectedUser(row.original);
+                setEditUserOpen(true);
+              }}
             >
               <FaEdit />
             </Button>
@@ -174,6 +196,14 @@ export default function UserAdminPage() {
         <AddUserModal
           open={addUserOpen}
           onClose={() => setAddUserOpen(false)}
+        />
+        <EditUserModal
+          open={editUserOpen}
+          onClose={() => {
+            setEditUserOpen(false);
+            setSelectedUser(null);
+          }}
+          user={selectedUser}
         />
       </Box>
     </div>
