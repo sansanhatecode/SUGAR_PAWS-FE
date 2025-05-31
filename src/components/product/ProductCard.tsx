@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { FiShoppingCart } from "react-icons/fi";
 import Modal from "../ui/Modal";
-import CtaButton from "../ui/CtaButton";
 import Link from "next/link";
 import { getColorCode } from "@/helper/colorHelper";
 import { useAddProductToCart } from "@/hooks/queries/useCart";
@@ -14,6 +13,7 @@ import { selectUser } from "@/store/slices/userSlice";
 import LoginRequiredModal from "../ui/LoginRequiredModal";
 import { showSuccessToast } from "../ui/SuccessToast";
 import { showErrorToast } from "../ui/ErrorToast";
+import ProductOptionsSelector from "./ProductOptionsSelector";
 
 type ProductCardProps = {
   product: Product;
@@ -64,6 +64,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const { addProductToCart: addToCart } = useAddProductToCart();
   const user = useSelector(selectUser);
 
@@ -92,6 +93,86 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     setSelectedSize(null);
     setSelectedType(null);
     setValidationError(null);
+    // Set initial preview image with proper protocol
+    const initialImage = displayImage[0].startsWith("//")
+      ? `https:${displayImage[0]}`
+      : displayImage[0];
+    setPreviewImage(initialImage);
+  };
+
+  const updatePreviewImage = (
+    color?: string | null,
+    size?: string | null,
+    type?: string | null,
+  ) => {
+    if (product.productDetails && product.productDetails.length > 0) {
+      // Get available options from productDetails
+      const availableColors = Array.from(
+        new Set(
+          product.productDetails.map((detail) => detail.color).filter(Boolean),
+        ),
+      );
+      const availableSizes = Array.from(
+        new Set(
+          product.productDetails.map((detail) => detail.size).filter(Boolean),
+        ),
+      );
+      const availableTypes = Array.from(
+        new Set(
+          product.productDetails.map((detail) => detail.type).filter(Boolean),
+        ),
+      );
+
+      // Find best matching detail even with partial selections
+      let bestMatch = null;
+
+      // If we have any selections, try to find the best match
+      if (color || size || type) {
+        const candidates = product.productDetails.filter((detail) => {
+          const colorMatch =
+            !color || !availableColors.length || detail.color === color;
+          const sizeMatch =
+            !size || !availableSizes.length || detail.size === size;
+          const typeMatch =
+            !type || !availableTypes.length || detail.type === type;
+
+          return colorMatch && sizeMatch && typeMatch;
+        });
+
+        if (candidates.length > 0) {
+          // If multiple candidates, prefer the one that matches more attributes
+          bestMatch = candidates.reduce((best, current) => {
+            const currentScore =
+              (color && current.color === color ? 1 : 0) +
+              (size && current.size === size ? 1 : 0) +
+              (type && current.type === type ? 1 : 0);
+
+            const bestScore =
+              (color && best.color === color ? 1 : 0) +
+              (size && best.size === size ? 1 : 0) +
+              (type && best.type === type ? 1 : 0);
+
+            return currentScore > bestScore ? current : best;
+          });
+        }
+      } else {
+        // If no selections, use the first product detail
+        bestMatch = product.productDetails[0];
+      }
+
+      if (bestMatch && bestMatch.image) {
+        const imageUrl = bestMatch.image.url.startsWith("//")
+          ? `https:${bestMatch.image.url}`
+          : bestMatch.image.url;
+        setPreviewImage(imageUrl);
+      } else {
+        // Fallback to display image with proper protocol
+        const fallbackImage = displayImage[0].startsWith("//")
+          ? `https:${displayImage[0]}`
+          : displayImage[0];
+        setPreviewImage(fallbackImage);
+      }
+    }
   };
 
   const addProductToCart = () => {
@@ -213,95 +294,32 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
       <Modal
         onClose={() => setIsModalOpen(false)}
-        size="small"
+        size="large"
         open={isModalOpen}
       >
-        <h3 className="text-lg font-semibold mb-4">Select Options</h3>
-        {sizes && sizes.length > 0 && (
-          <div className="mb-4">
-            <h4 className="text-sm font-medium mb-2">Sizes:</h4>
-            <div className="flex gap-2">
-              {sizes.map((size, idx) => (
-                <button
-                  key={idx}
-                  className={`px-3 py-1 border rounded transition-colors ${
-                    selectedSize === size
-                      ? "bg-custom-rose text-white"
-                      : "hover:bg-gray-200"
-                  }`}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {colors && colors.length > 0 && (
-          <div className="mb-4">
-            <h4 className="text-sm font-medium mb-2">Colors:</h4>
-            <div className="gap-2 flex flex-wrap">
-              {colors.map((color, idx) => (
-                <button
-                  key={idx}
-                  className={`w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 shadow-sm relative
-                    ${
-                      selectedColor === color
-                        ? "ring-2 ring-custom-rose scale-110"
-                        : "hover:ring-2 hover:ring-custom-rose/50"
-                    }
-                  `}
-                  onClick={() => setSelectedColor(color)}
-                  title={color}
-                  style={{
-                    outline: "none",
-                    border: "none",
-                    padding: 0,
-                    background: "transparent",
-                  }}
-                >
-                  {renderColorButton(color, "w-6 h-6")}
-                  {/* Tooltip */}
-                  <span
-                    className="absolute left-1/2 -translate-x-1/2 top-10 z-10 px-2 py-1 rounded bg-black text-white text-xs opacity-0 pointer-events-none group-hover:opacity-100 transition-all"
-                    style={{ whiteSpace: "nowrap" }}
-                  >
-                    {color}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {types && types.length > 0 && (
-          <div className="mb-4">
-            <h4 className="text-sm font-medium mb-2">Types:</h4>
-            <div className="flex gap-2">
-              {types.map((type, idx) => (
-                <button
-                  key={idx}
-                  className={`px-3 py-1 border rounded transition-colors ${
-                    selectedType === type
-                      ? "bg-custom-rose text-white"
-                      : "hover:bg-gray-200"
-                  }`}
-                  onClick={() => setSelectedType(type)}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {validationError && (
-          <div className="mb-4 text-red-500 text-sm">{validationError}</div>
-        )}
-
-        <CtaButton
-          className="m-auto"
-          text="Add to Cart"
-          onClick={() => addProductToCart()}
+        <ProductOptionsSelector
+          name={name}
+          sizes={sizes}
+          colors={colors}
+          types={types}
+          selectedSize={selectedSize}
+          selectedColor={selectedColor}
+          selectedType={selectedType}
+          validationError={validationError}
+          previewImage={previewImage}
+          onSizeSelect={(size) => {
+            setSelectedSize(size);
+            updatePreviewImage(selectedColor, size, selectedType);
+          }}
+          onColorSelect={(color) => {
+            setSelectedColor(color);
+            updatePreviewImage(color, selectedSize, selectedType);
+          }}
+          onTypeSelect={(type) => {
+            setSelectedType(type);
+            updatePreviewImage(selectedColor, selectedSize, type);
+          }}
+          onAddToCart={addProductToCart}
         />
       </Modal>
 

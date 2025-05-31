@@ -136,7 +136,7 @@ export default function ProductDetailPage() {
       const hasRequiredSize = availableSizes.length === 0 || selectedSize;
       const hasRequiredType = availableTypes.length === 0 || selectedType;
 
-      // Only find matching detail if all required selections are made
+      // Only find matching detail if all required selections are made for setSelectedProductDetail
       if (hasRequiredColor && hasRequiredSize && hasRequiredType) {
         const matchingDetail = product.productDetails.find(
           (detail) =>
@@ -146,14 +146,46 @@ export default function ProductDetailPage() {
         );
 
         setSelectedProductDetail(matchingDetail || null);
-
-        // Update selected image if a matching product detail is found and has an image
-        if (matchingDetail && matchingDetail.image) {
-          setSelectedImage(matchingDetail.image);
-        }
       } else {
         // Clear selection if not all required options are selected
         setSelectedProductDetail(null);
+      }
+
+      // For image preview, find best matching detail even with partial selections
+      // Priority: try to match as many selected attributes as possible
+      let bestMatch = null;
+
+      // If we have any selections, try to find the best match
+      if (selectedColor || selectedSize || selectedType) {
+        const candidates = product.productDetails.filter((detail) => {
+          const colorMatch = !selectedColor || !availableColors.length || detail.color === selectedColor;
+          const sizeMatch = !selectedSize || !availableSizes.length || detail.size === selectedSize;
+          const typeMatch = !selectedType || !availableTypes.length || detail.type === selectedType;
+          
+          return colorMatch && sizeMatch && typeMatch;
+        });
+
+        if (candidates.length > 0) {
+          // If multiple candidates, prefer the one that matches more attributes
+          bestMatch = candidates.reduce((best, current) => {
+            const currentScore = 
+              (selectedColor && current.color === selectedColor ? 1 : 0) +
+              (selectedSize && current.size === selectedSize ? 1 : 0) +
+              (selectedType && current.type === selectedType ? 1 : 0);
+            
+            const bestScore = 
+              (selectedColor && best.color === selectedColor ? 1 : 0) +
+              (selectedSize && best.size === selectedSize ? 1 : 0) +
+              (selectedType && best.type === selectedType ? 1 : 0);
+
+            return currentScore > bestScore ? current : best;
+          });
+        }
+      }
+
+      // Update selected image if a matching product detail is found and has an image
+      if (bestMatch && bestMatch.image) {
+        setSelectedImage(bestMatch.image);
       }
     }
   }, [product, selectedColor, selectedSize, selectedType]);
