@@ -119,7 +119,7 @@ const Slider = () => {
   }, [startAutoSlide]);
 
   return (
-    <div className="relative w-full h-[620px] overflow-hidden group">
+    <div className="relative w-full h-[520px] overflow-hidden group">
       <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button
           onClick={goToPrevious}
@@ -160,7 +160,7 @@ const Slider = () => {
                 ctaButtons,
                 textColor,
               },
-              index
+              index,
             ) => (
               <div key={index} className="relative w-full h-full flex-shrink-0">
                 <Image
@@ -212,7 +212,7 @@ const Slider = () => {
                   </div>
                 )}
               </div>
-            )
+            ),
           )}
         </div>
       </div>

@@ -10,6 +10,7 @@ import { REGEX } from "@/const/common";
 import { useRouter } from "next/navigation";
 import { setAuthToken } from "@/helper/storage";
 import DefaultLoading from "@/components/loading/DefaultLoading";
+import { motion } from "framer-motion";
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -40,11 +41,15 @@ const SignInPage = () => {
 
     try {
       setLoading(true);
-      const { accessToken } = await signIn.mutateAsync({
+      const response = await signIn.mutateAsync({
         identifier: username,
         password,
       });
-      setAuthToken(accessToken);
+      if (response && response.accessToken) {
+        setAuthToken(response.accessToken);
+      } else {
+        throw new Error("Invalid response from server.");
+      }
       setLoading(false);
       router.push("/");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -65,77 +70,174 @@ const SignInPage = () => {
   };
 
   return (
-    <main className="w-full min-h-screen flex justify-center items-center relative">
-      <div className="max-w-[1200px] min-w-[928px] w-[60%] flex bg-white rounded-xl overflow-hidden">
-        <div className="w-1/2 relative">
+    <motion.main
+      className="w-full min-h-screen flex justify-center items-center relative"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div
+        className="max-w-[1200px] min-w-[928px] w-[60%] flex bg-white rounded-xl overflow-hidden shadow-2xl"
+        initial={{ scale: 0.95, y: 50, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        transition={{
+          duration: 0.6,
+          delay: 0.1,
+          type: "spring",
+          stiffness: 60,
+          damping: 20,
+        }}
+      >
+        <motion.div
+          className="w-1/2 relative"
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{
+            duration: 0.6,
+            delay: 0.3,
+            type: "spring",
+            stiffness: 50,
+          }}
+        >
           <Image
             src="/assets/images/signin.png"
             alt="Sign in image"
             fill
             className="object-cover"
           />
-        </div>
-        <div className="w-1/2 py-16">
+        </motion.div>
+        <motion.div
+          className="w-1/2 py-16"
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{
+            duration: 0.6,
+            delay: 0.3,
+            type: "spring",
+            stiffness: 50,
+          }}
+        >
           <div className="w-[340px] flex flex-col justify-center items-start m-auto gap-4">
-            <h1 className="text-[40px] font-semibold text-custom-rose">
+            <motion.h1
+              className="text-[40px] font-semibold text-custom-rose"
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
               Sign In
-            </h1>
-            <p className="text-[14px]">Great to see you again! 😊</p>
+            </motion.h1>
+            <motion.p
+              className="text-[14px]"
+              initial={{ y: -15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              Great to see you again! 😊
+            </motion.p>
 
-            <div className="w-full">
+            <motion.div
+              className="w-full"
+              initial={{ y: 15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
               <input
                 type="text"
                 placeholder="Enter your username/email"
                 value={username}
                 onChange={handleUsernameChange}
-                className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose"
+                className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose transition-all duration-300 focus:scale-[1.02]"
               />
               {usernameErrorMessage && (
-                <p className="text-red-500 text-[12px]">
+                <motion.p
+                  className="text-red-500 text-[12px]"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
                   {usernameErrorMessage}
-                </p>
+                </motion.p>
               )}
-            </div>
-            <div className="w-full">
+            </motion.div>
+            <motion.div
+              className="w-full"
+              initial={{ y: 15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+            >
               <div className="relative w-full">
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose"
+                  className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose transition-all duration-300 focus:scale-[1.02]"
                 />
                 <FontAwesomeIcon
                   width={16}
                   height={16}
                   icon={showPassword ? faEye : faEyeSlash}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-custom-purple"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-custom-purple hover:text-custom-rose transition-colors duration-300"
                   onClick={togglePasswordVisibility}
                 />
               </div>
               {errorMessage && (
-                <p className="text-red-500 text-[12px]">{errorMessage}</p>
+                <motion.p
+                  className="text-red-500 text-[12px]"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {errorMessage}
+                </motion.p>
               )}
-              <div className="flex items-center mt-3">
+              <motion.div
+                className="flex items-center mt-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.8 }}
+              >
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={() => setRememberMe(!rememberMe)}
-                  className="mr-2 w-5 h-5 appearance-none border-2 border-gray-300 rounded-md checked:bg-custom-rose checked:border-custom-pink checked:before:content-['✔'] checked:before:text-white checked:before:flex checked:before:items-center checked:before:justify-center checked:before:h-full checked:before:w-full checked:before:text-[12px] font-bold"
+                  className="mr-2 w-5 h-5 appearance-none border-2 border-gray-300 rounded-md checked:bg-custom-rose checked:border-custom-pink checked:before:content-['✔'] checked:before:text-white checked:before:flex checked:before:items-center checked:before:justify-center checked:before:h-full checked:before:w-full checked:before:text-[12px] font-bold transition-all duration-300"
                 />
                 <label className="text-[12px]">Remember Me</label>
-              </div>
-            </div>
-            <button
-              className="bg-custom-pink text-custom-purple w-full h-10 rounded-[10px] text-[15px] font-medium hover:bg-custom-rose hover:text-white active:bg-custom-purple active:text-white"
+              </motion.div>
+            </motion.div>
+            <motion.button
+              className="bg-custom-pink text-custom-purple w-full h-10 rounded-[10px] text-[15px] font-medium hover:bg-custom-rose hover:text-white active:bg-custom-purple active:text-white transition-all duration-300"
               onClick={handleSignIn}
+              initial={{ y: 20, opacity: 0, scale: 0.95 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              transition={{
+                duration: 0.5,
+                delay: 0.8,
+                type: "spring",
+                stiffness: 80,
+                damping: 20,
+              }}
+              whileHover={{
+                scale: 1.02,
+                boxShadow: "0 5px 15px rgba(0,0,0,0.08)",
+                transition: { duration: 0.2 },
+              }}
+              whileTap={{
+                scale: 0.98,
+                transition: { duration: 0.1 },
+              }}
             >
               Sign In
-            </button>
-            <div>
+            </motion.button>
+            <motion.div
+              initial={{ y: 15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.9 }}
+            >
               <Link
                 href={"/forget-password"}
-                className="text-[12px] text-custom-purple italic hover:underline hover:text-custom-rose"
+                className="text-[12px] text-custom-purple italic hover:underline hover:text-custom-rose transition-colors duration-300"
               >
                 Forget your password?
               </Link>
@@ -144,18 +246,18 @@ const SignInPage = () => {
                   Don&apos;t have an account?
                   <Link
                     href={"/signup"}
-                    className="text-[12px] pl-2 text-custom-purple italic hover:underline hover:text-custom-rose"
+                    className="text-[12px] pl-2 text-custom-purple italic hover:underline hover:text-custom-rose transition-colors duration-300"
                   >
                     Go to Sign Up Page
                   </Link>
                 </p>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
       {loading && <DefaultLoading />}
-    </main>
+    </motion.main>
   );
 };
 

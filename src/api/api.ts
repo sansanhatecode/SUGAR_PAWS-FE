@@ -1,7 +1,23 @@
 const API = {
+  USERS: "users",
   LOGIN: "auth/signin",
   REGISTER: "auth/signup",
   VERIFY: "auth/verify-code",
+  SEND_CODE: "auth/send-code",
+  FORGOT_PASSWORD: "auth/forgot-password",
+  PRODUCTS: "products/category",
+  ALL_PRODUCTS: "products",
+  COLORS: "products/colors",
+  SIZES: "products/sizes",
+  PRODUCT_DETAIL: "products/",
+  CART: "cart",
+  CART_ITEM: "cart-item",
+  ME: "users/me",
+  ORDERS: "orders",
+  ALL_ORDERS: "orders/all",
+  SHIPPING_FEE: "orders/shipping-fee",
+  CATEGORIES: "categories",
+  PAYMENTS: "payments",
 };
 
 export default API;

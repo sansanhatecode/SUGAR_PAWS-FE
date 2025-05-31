@@ -2,6 +2,7 @@
 
 import CtaButton from "@/components/ui/CtaButton";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 type PlusSizeItem = { imgSrc: string; name: string; price: string };
@@ -30,6 +31,7 @@ const products: PlusSizeItem[] = [
 ];
 
 const PlusSize = () => {
+  const router = useRouter();
   return (
     <div className="max-w-[1200px] min-w-[928px] w-[60%] flex justify-between items-center gap-10">
       <div className="w-[40%]">
@@ -46,7 +48,7 @@ const PlusSize = () => {
         </p>
         <CtaButton
           text="BROWSE ALL PLUS PRICE"
-          onClick={() => console.log("click")}
+          onClick={() => router.push("/categories/plus-size")}
         />
       </div>
       <div className="w-[50%]">

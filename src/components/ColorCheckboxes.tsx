@@ -3,15 +3,15 @@ import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 
-type Colors = {
+export type Colors = {
   colorName: string;
-  colorCode: string;
+  colorCode: string | string[];
 };
 
 interface ColorCheckboxesProps {
   colors: Colors[];
   selectedColors: Colors[];
-  handleColorChange: (color: string) => void;
+  handleColorChange: (colorName: string) => void;
 }
 
 const ColorCheckboxes = ({
@@ -23,10 +23,39 @@ const ColorCheckboxes = ({
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
+  const isColorSelected = (colorName: string) => {
+    return selectedColors.some((color) => color.colorName === colorName);
+  };
+
+  const renderColorDiv = (colorCode: string | string[], colorName: string) => {
+    let backgroundStyle: string;
+
+    if (Array.isArray(colorCode) && colorCode.length === 2) {
+      backgroundStyle = `linear-gradient(to bottom right, ${colorCode[0]} 50%, ${colorCode[1]} 50%)`;
+    } else {
+      backgroundStyle =
+        typeof colorCode === "string"
+          ? colorCode
+          : colorCode[0] || "transparent";
+    }
+
+    return (
+      <div
+        className="w-6 h-6 rounded-full relative border border-gray-300"
+        style={{
+          background: backgroundStyle,
+          boxShadow: isColorSelected(colorName)
+            ? "0 0 0 2px #ff7eb9, 0 0 0 4px white"
+            : "none",
+        }}
+      />
+    );
+  };
+
   return (
     <div>
       <div
-        className="flex items-center justify-between mt-4 mb-3 cursor-pointer"
+        className="flex items-center justify-between mt-4 mb-2 cursor-pointer"
         onClick={toggleOpen}
       >
         <h2 className="text-[12px] font-[600]">Color</h2>
@@ -49,27 +78,20 @@ const ColorCheckboxes = ({
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="overflow-hidden"
       >
-        <div className="grid grid-cols-3 gap-4">
-          {colors.map(({ colorCode, colorName }) => (
-            <div key={colorCode} className="flex flex-col items-center">
-              <input
-                type="checkbox"
-                id={colorCode}
-                name={colorCode}
-                value={colorCode}
-                checked={selectedColors.some(
-                  (color) => color.colorCode === colorCode,
-                )}
-                onChange={() => handleColorChange(colorCode)}
-                className="w-6 h-6 appearance-none rounded-full checked:border-[1px] checked:border-black"
-                style={{ backgroundColor: colorCode }}
-              />
-              <label
-                htmlFor={colorCode}
-                className="text-[12px] font-light mt-1"
-              >
+        <div className="pt-1 grid grid-cols-3 gap-4">
+          {colors.map(({ colorCode, colorName }, index) => (
+            // Thẻ div cha xử lý onClick và hover
+            <div
+              key={index}
+              className="flex flex-col items-center cursor-pointer transition-all hover:scale-105 duration-150 ease-in-out"
+              onClick={() => handleColorChange(colorName)}
+            >
+              {/* Div chỉ để hiển thị màu, không cần onClick */}
+              <div>{renderColorDiv(colorCode, colorName)}</div>
+              {/* Dùng span hoặc div thay cho label */}
+              <span className="text-[12px] font-light mt-1 text-center">
                 {colorName}
-              </label>
+              </span>
             </div>
           ))}
         </div>

@@ -1,33 +1,64 @@
+import { Category } from "./category";
+
 export type Product = {
   id: string;
   name: string;
   minPrice: number;
   maxPrice: number;
-  imageUrl: string[];
-  colors: { colorName: string; colorCode: string }[];
-  availability: string[];
+  displayImage: string[];
+  vendor?: string;
+  colors: string[];
+  totalStock: number;
   discount?: number;
-  sales?: number;
+  totalSales?: number;
   sizes?: string[];
+  types?: string[];
   reviewStars?: number;
+  tags?: string[];
+  rating?: number;
+  description?: string;
+  productDetails?: ProductDetail[];
+  categories?: Category[];
 };
 
-// components/types.ts
+export type UploadProductDto = {
+  id: string;
+  name: string;
+  displayImage: string[];
+  vendor?: string;
+  discount?: number;
+  sizes?: string[];
+  tags?: string[];
+  description?: string;
+  categories?: number[];
+};
+
 export type ProductDetail = {
-  id: string | number; // Thêm ID cho sản phẩm
-  title: string;
-  brand: string;
+  id: number;
+  productId: string | number;
+  name?: string;
+  vendor?: string;
   price: number;
   oldPrice?: number;
   rating: number;
-  reviewsCount: number; // Đổi tên từ reviews
-  colors: string[];
-  sizes: string[];
-  images: string[];
-  description: string;
-  benefits: string[];
-  productDetails: string[];
+  reviewsCount: number;
+  color: string;
+  size: string;
+  type: string;
+  image: ImageDetail;
   moreDetails: string[];
+  product?: Product;
+  productName?: string;
+  displayImage?: string[];
+  sale: number;
+  stock: number;
+};
+
+export type ImageDetail = {
+  id: number | string;
+  url: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type Review = {
@@ -37,4 +68,24 @@ export type Review = {
   time: string;
   title: string;
   comment: string;
+};
+
+export type GetProductsRequest = {
+  categoryName: string;
+  colors?: string[];
+  sizes?: string[];
+  availability?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy?: string;
+  page?: number;
+  itemPerPage?: number;
+};
+
+export type GetColorsRequest = {
+  categoryName: string;
+};
+
+export type GetSizesRequest = {
+  categoryName: string;
 };

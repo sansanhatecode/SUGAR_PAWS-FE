@@ -1,6 +1,11 @@
 import API from "@/api/api";
 import { useRequest } from "@/api/Request";
-import { SigninRequest, LoginResponseData, SignupRequest } from "@/types/auth";
+import {
+  SigninRequest,
+  LoginResponseData,
+  SignupRequest,
+  ForgotPasswordRequest,
+} from "@/types/auth";
 
 export function useAuthService() {
   const { Request } = useRequest();
@@ -21,7 +26,7 @@ export function useAuthService() {
 
   const signUp = async ({ name, username, email, password }: SignupRequest) => {
     try {
-      const { data } = await Request.post(API.REGISTER, {
+      const { data } = await Request.post<LoginResponseData>(API.REGISTER, {
         name,
         username,
         email,
@@ -35,9 +40,9 @@ export function useAuthService() {
     }
   };
 
-  const verify = async (code: string) => {
+  const verify = async (code: string, email: string) => {
     try {
-      const { data } = await Request.get(API.VERIFY, { code });
+      const { data } = await Request.post(API.VERIFY, { code, email });
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -46,5 +51,21 @@ export function useAuthService() {
     }
   };
 
-  return { signIn, signUp, verify };
+  const forgotPassword = async ({ email }: ForgotPasswordRequest) => {
+    try {
+      const { data } = await Request.post(API.FORGOT_PASSWORD, { email });
+      return data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error(
+        "Forgot Password Error:",
+        error.response?.data || error.message,
+      );
+      throw new Error(
+        error.response?.data?.message || "Failed to send reset email.",
+      );
+    }
+  };
+
+  return { signIn, signUp, verify, forgotPassword };
 }

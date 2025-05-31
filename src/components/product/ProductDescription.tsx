@@ -1,60 +1,40 @@
-import { ProductDetail } from "@/types/product";
+"use client";
+
 import React from "react";
 
 interface ProductDescriptionProps {
-  product: Pick<
-    ProductDetail,
-    "description" | "benefits" | "productDetails" | "moreDetails"
-  >;
+  description?: string;
 }
 
-const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
-  return (
-    <div className="text-gray-700 space-y-6 text-sm leading-relaxed">
-      <div>
-        <h3 className="font-semibold text-base text-gray-800 mb-2">
-          Product Description
-        </h3>
-        <p>{product.description}</p>
+export default function ProductDescription({
+  description,
+}: ProductDescriptionProps) {
+  // Nếu không có mô tả, hiển thị mặc định
+  if (!description || description.trim() === "") {
+    return (
+      <div className="text-gray-500 text-center py-8">
+        No description available.
       </div>
-      {product.benefits?.length > 0 && (
-        <div>
-          <h3 className="font-semibold text-base text-gray-800 mb-2">
-            Benefits
-          </h3>
-          <ul className="list-disc list-outside pl-5 space-y-1">
-            {product.benefits.map((benefit, index) => (
-              <li key={index}>{benefit}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {product.productDetails?.length > 0 && (
-        <div>
-          <h3 className="font-semibold text-base text-gray-800 mb-2">
-            Product Details
-          </h3>
-          <ul className="list-disc list-outside pl-5 space-y-1">
-            {product.productDetails.map((detail, index) => (
-              <li key={index}>{detail}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {product.moreDetails?.length > 0 && (
-        <div>
-          <h3 className="font-semibold text-base text-gray-800 mb-2">
-            More Details
-          </h3>
-          <ul className="list-disc list-outside pl-5 space-y-1">
-            {product.moreDetails.map((detail, index) => (
-              <li key={index}>{detail}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+    );
+  }
+
+  // Làm sạch HTML cơ bản (bỏ thẻ meta)
+  const cleanDescription = description.replace(/<meta[^>]*>/g, "");
+
+  return (
+    <div>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+        Product Description
+      </h2>
+      <div
+        className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl 
+                     prose-p:text-gray-800 prose-p:leading-relaxed 
+                     prose-li:marker:text-custom-rose prose-li:mb-1 
+                     prose-a:text-blue-600 hover:prose-a:underline 
+                     prose-strong:text-gray-900 prose-img:rounded-xl 
+                     prose-img:shadow-md dark:prose-invert max-w-none"
+        dangerouslySetInnerHTML={{ __html: cleanDescription }}
+      />
     </div>
   );
-};
-
-export default ProductDescription;
+}

@@ -13,8 +13,9 @@ import InfiniteCarousel from "@/components/InfiniteCarousel";
 import FooterButtonList from "@/components/FooterButtonList";
 import InstantShipping from "./InstantShipping";
 import PlusSize from "./PlusSize";
+import Link from "next/link";
 
-type PopularItem = { imgSrc: string; name: string };
+type PopularItem = { imgSrc: string; name: string; linkTo?: string };
 
 const cards = [
   {
@@ -41,19 +42,56 @@ const cards = [
 
 export default function HomePage() {
   const popularItems: PopularItem[] = [
-    { imgSrc: "/assets/images/popular-img/blouse.png", name: "Blouses" },
-    { imgSrc: "/assets/images/popular-img/skirt.png", name: "Jumperskirts" },
-    { imgSrc: "/assets/images/popular-img/shoes.png", name: "Shoes" },
-    { imgSrc: "/assets/images/popular-img/sock.png", name: "Socks" },
-    { imgSrc: "/assets/images/popular-img/hair.png", name: "Hair Accessories" },
+    {
+      imgSrc: "/assets/images/popular-img/blouse.png",
+      name: "Blouses",
+      linkTo: "/clothing/blouses",
+    },
+    {
+      imgSrc: "/assets/images/popular-img/skirt.png",
+      name: "Jumperskirts",
+      linkTo: "/clothing/jumperskirts",
+    },
+    {
+      imgSrc: "/assets/images/popular-img/shoes.png",
+      name: "Shoes",
+      linkTo: "/accesories/shoes",
+    },
+    {
+      imgSrc: "/assets/images/popular-img/sock.png",
+      name: "Socks",
+      linkTo: "/clothing/socks",
+    },
+    {
+      imgSrc: "/assets/images/popular-img/hair.png",
+      name: "Hair Accessories",
+      linkTo: "/hair/hair-accessories",
+    },
     {
       imgSrc: "/assets/images/popular-img/enamel-pins.png",
       name: "Enamel Pins",
+      linkTo: "/accesories/enamel-pins",
     },
-    { imgSrc: "/assets/images/popular-img/ring.png", name: "Rings" },
-    { imgSrc: "/assets/images/popular-img/necklaces.png", name: "Necklaces" },
-    { imgSrc: "/assets/images/popular-img/hair-clip.png", name: "Hair Clips" },
-    { imgSrc: "/assets/images/popular-img/earing.png", name: "Earings" },
+    {
+      imgSrc: "/assets/images/popular-img/ring.png",
+      name: "Rings",
+      linkTo: "/jewelry/rings",
+    },
+    {
+      imgSrc: "/assets/images/popular-img/necklaces.png",
+      name: "Necklaces",
+      linkTo: "/jewelry/necklaces",
+    },
+    {
+      imgSrc: "/assets/images/popular-img/hair-clip.png",
+      name: "Hair Clips",
+      linkTo: "/hair/hair-clips",
+    },
+    {
+      imgSrc: "/assets/images/popular-img/earing.png",
+      name: "Earings",
+      linkTo: "/jewelry/earings",
+    },
   ];
 
   return (
@@ -71,25 +109,34 @@ export default function HomePage() {
                 <div key={rowIndex} className="flex justify-between">
                   {popularItems
                     .slice(rowIndex * 5, (rowIndex + 1) * 5)
-                    .map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex flex-col items-center gap-6 cursor-pointer group"
-                      >
-                        <div className="w-[160px] h-[160px] rounded-full overflow-hidden transition-transform duration-700 group-hover:scale-110">
-                          <Image
-                            width={160}
-                            height={160}
-                            src={item.imgSrc}
-                            alt={item.name}
-                            className="object-cover"
-                          />
+                    .map((item, index) => {
+                      const content = (
+                        <div
+                          key={index}
+                          className="flex flex-col items-center gap-6 cursor-pointer group"
+                        >
+                          <div className="w-[160px] h-[160px] rounded-full overflow-hidden transition-transform duration-700 group-hover:scale-110">
+                            <Image
+                              width={160}
+                              height={160}
+                              src={item.imgSrc}
+                              alt={item.name}
+                              className="object-cover"
+                            />
+                          </div>
+                          <span className="text-[16px] font-bold transition-all duration-500 group-hover:tracking-wider">
+                            {item.name}
+                          </span>
                         </div>
-                        <span className="text-[16px] font-bold transition-all duration-500 group-hover:tracking-wider">
-                          {item.name}
-                        </span>
-                      </div>
-                    ))}
+                      );
+                      return item.linkTo ? (
+                        <Link href={item.linkTo} key={index} legacyBehavior>
+                          {content}
+                        </Link>
+                      ) : (
+                        content
+                      );
+                    })}
                 </div>
               ),
             )}
