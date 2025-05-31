@@ -109,11 +109,10 @@ export const navbarItems: NavBarItem[] = [
           link: "/hair",
         },
         itemlist: [
-          { name: "bows", link: "/hair/bows" },
           { name: "hair claws", link: "/hair/claws" },
           { name: "hair cups", link: "/hair/cups" },
           { name: "scrunchies", link: "/hair/scrunchies" },
-          { name: "star clips", link: "/hair/star-clips" },
+          { name: "hair clips", link: "/hair/hair-clips" },
           { name: "⭐ ALL hair ACCESSORIES ⭐", link: "/hair" },
         ],
       },
@@ -140,7 +139,7 @@ export const navbarItems: NavBarItem[] = [
           { name: "halos", link: "/hair/halos" },
           { name: "headbands", link: "/accesories/headbands" },
           { name: "hairbows", link: "/hair/hairbows" },
-          { name: "headdresses", link: "/hair/headdresses" },
+          { name: "headdresses", link: "/hair/headdress" },
           {
             name: "⭐ ALL headbands & hairbows ⭐",
             link: "/hair/headbands-hairbows",
@@ -161,7 +160,7 @@ export const navbarItems: NavBarItem[] = [
         },
         itemlist: [
           { name: "blouses", link: "/clothing/blouses" },
-          { name: "button up shirts", link: "/clothing/button-up" },
+          { name: "button up shirts", link: "/clothing/button-up-shirts" },
           { name: "cardigans", link: "/clothing/cardigans" },
           { name: "cutsews", link: "/clothing/cutsews" },
           { name: "sweaters", link: "/clothing/sweaters" },
@@ -295,12 +294,13 @@ export const navbarItems: NavBarItem[] = [
     nestedItems: [
       {
         itemlist: [
-          { name: "plus size dresses", link: "/plus-size/dresses" },
-          { name: "plus size skirts", link: "/plus-size/skirts" },
-          { name: "plus size blouses", link: "/plus-size/blouses" },
+          { name: "plus size dresses", link: "/plus-size/plus-size-dresses" },
+          { name: "plus size skirts", link: "/plus-size/plus-size-skirts" },
+          { name: "plus size blouses", link: "/plus-size/plus-size-blouses" },
+          { name: "plus size casual", link: "/plus-size/plus-size-casual" },
           {
             name: "plus size petticoat & bloomers",
-            link: "/plus-size/petticoat-bloomer",
+            link: "/plus-size/plus-size-petticoat-bloomers",
           },
           { name: "⭐ all plus size clothing ⭐", link: "/plus-size" },
         ],

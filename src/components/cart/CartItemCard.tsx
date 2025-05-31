@@ -55,6 +55,12 @@ export default function CartItemCard({
                 {item.productDetail.size}
               </p>
             )}
+            {item.productDetail.type && (
+              <p>
+                <span className="font-semi">Type:</span>{" "}
+                {item.productDetail.type}
+              </p>
+            )}
           </div>
         </div>
 

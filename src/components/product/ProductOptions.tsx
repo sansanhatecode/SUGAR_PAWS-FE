@@ -5,19 +5,25 @@ import { getColorCode } from "@/helper/colorHelper";
 interface ProductOptionsProps {
   colors: Product["colors"];
   sizes: Product["sizes"];
+  types?: Product["types"];
   selectedColor: string;
   selectedSize: string;
+  selectedType: string;
   onColorSelect: (color: string) => void;
   onSizeSelect: (size: string) => void;
+  onTypeSelect: (type: string) => void;
 }
 
 const ProductOptions: React.FC<ProductOptionsProps> = ({
   colors,
   sizes,
+  types,
   selectedColor,
   selectedSize,
+  selectedType,
   onColorSelect,
   onSizeSelect,
+  onTypeSelect,
 }) => {
   const renderColorButton = (color: string, isSelected: boolean) => {
     const colorCode = getColorCode(color);
@@ -85,6 +91,29 @@ const ProductOptions: React.FC<ProductOptionsProps> = ({
                 }`}
               >
                 {size}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {types && types.length > 0 && (
+        <div>
+          <p className="mb-2 text-sm font-medium text-gray-700">
+            Choose a Type
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {types.map((type, index) => (
+              <button
+                key={index}
+                onClick={() => onTypeSelect(type)}
+                className={`px-4 py-1.5 rounded-full border text-sm font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-custom-pink ${
+                  selectedType === type
+                    ? "bg-custom-rose text-white border-custom-rose"
+                    : "bg-white text-gray-700 border-custom-pink hover:border-custom-rose"
+                }`}
+              >
+                {type}
               </button>
             ))}
           </div>

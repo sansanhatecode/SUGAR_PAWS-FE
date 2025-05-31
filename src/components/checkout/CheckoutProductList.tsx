@@ -47,7 +47,7 @@ const CheckoutProductList: React.FC<CheckoutProductListProps> = ({
                   : ""}
                 {item.productDetail.name || "Product name"}
               </div>
-              {/* Hiển thị màu và size rõ ràng */}
+              {/* Hiển thị màu, size và type rõ ràng */}
               <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
                 <span>
                   Color:{" "}
@@ -62,6 +62,17 @@ const CheckoutProductList: React.FC<CheckoutProductListProps> = ({
                       Size:{" "}
                       <span className="font-semibold text-gray-700">
                         {item.productDetail.size}
+                      </span>
+                    </span>
+                  </>
+                )}
+                {item.productDetail.type && (
+                  <>
+                    <span className="mx-1">|</span>
+                    <span>
+                      Type:{" "}
+                      <span className="font-semibold text-gray-700">
+                        {item.productDetail.type}
                       </span>
                     </span>
                   </>

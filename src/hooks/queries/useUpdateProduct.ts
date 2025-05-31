@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useProductservice } from "@/api/service/productService";
-import { Product } from "@/types/product";
+import { UploadProductDto } from "@/types/product";
 
 export function useUpdateProduct() {
   const { updateProduct } = useProductservice();
@@ -13,7 +13,7 @@ export function useUpdateProduct() {
       images,
     }: {
       id: string;
-      data: Partial<Product>;
+      data: Partial<UploadProductDto>;
       images?: File[];
     }) => {
       return await updateProduct(id, data, images);

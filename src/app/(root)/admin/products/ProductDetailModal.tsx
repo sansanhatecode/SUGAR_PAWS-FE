@@ -139,6 +139,34 @@ const PreviewProduct: React.FC<PreviewProductProps> = ({
                 </>
               )}
             </div>
+            <div className="flex flex-wrap gap-2 items-center">
+              {product.productDetails &&
+                Array.from(
+                  new Set(
+                    product.productDetails.map((d) => d.type).filter(Boolean),
+                  ),
+                ).length > 0 && (
+                  <>
+                    <span className="font-semibold text-custom-wine">
+                      Types:
+                    </span>
+                    {Array.from(
+                      new Set(
+                        product.productDetails
+                          .map((d) => d.type)
+                          .filter(Boolean),
+                      ),
+                    ).map((type) => (
+                      <span
+                        key={type as string}
+                        className="px-2 py-1 border rounded text-xs bg-gray-50 border-gray-300"
+                      >
+                        {type}
+                      </span>
+                    ))}
+                  </>
+                )}
+            </div>
             {/* Description section giống trang [product-id] */}
             {product.description && (
               <div className="w-full mt-4">

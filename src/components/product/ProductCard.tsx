@@ -52,6 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     totalStock,
     totalSales,
     sizes,
+    types,
     reviewStars,
   } = product;
 
@@ -61,6 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const { addProductToCart: addToCart } = useAddProductToCart();
   const user = useSelector(selectUser);
@@ -71,8 +73,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       return;
     }
 
-    // If no color and no size selection required, add to cart directly
-    if ((!colors || colors.length === 0) && (!sizes || sizes.length === 0)) {
+    // If no color, size, and type selection required, add to cart directly
+    if (
+      (!colors || colors.length === 0) &&
+      (!sizes || sizes.length === 0) &&
+      (!types || types.length === 0)
+    ) {
       if (product.productDetails && product.productDetails.length > 0) {
         const productDetail = product.productDetails[0];
         addToCart(productDetail.id, 1);
@@ -84,6 +90,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     setIsModalOpen(true);
     setSelectedColor(null);
     setSelectedSize(null);
+    setSelectedType(null);
     setValidationError(null);
   };
 
@@ -99,6 +106,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       return;
     }
 
+    if (types && types.length > 0 && !selectedType) {
+      setValidationError("Please select a type");
+      return;
+    }
+
     setValidationError(null);
     const quantity = 1;
 
@@ -107,7 +119,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         const productDetail = product.productDetails.find(
           (detail) =>
             (!selectedColor || detail.color === selectedColor) &&
-            (!selectedSize || detail.size === selectedSize),
+            (!selectedSize || detail.size === selectedSize) &&
+            (!selectedType || detail.type === selectedType),
         );
 
         if (!productDetail) {
@@ -120,6 +133,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         console.log("Product added to cart with options:", {
           color: selectedColor,
           size: selectedSize,
+          type: selectedType,
           productDetail,
         });
         setIsModalOpen(false);
@@ -254,6 +268,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   >
                     {color}
                   </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {types && types.length > 0 && (
+          <div className="mb-4">
+            <h4 className="text-sm font-medium mb-2">Types:</h4>
+            <div className="flex gap-2">
+              {types.map((type, idx) => (
+                <button
+                  key={idx}
+                  className={`px-3 py-1 border rounded transition-colors ${
+                    selectedType === type
+                      ? "bg-custom-rose text-white"
+                      : "hover:bg-gray-200"
+                  }`}
+                  onClick={() => setSelectedType(type)}
+                >
+                  {type}
                 </button>
               ))}
             </div>

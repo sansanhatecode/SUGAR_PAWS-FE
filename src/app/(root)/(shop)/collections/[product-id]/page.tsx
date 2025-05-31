@@ -10,13 +10,14 @@ import ProductInfo from "@/components/product/ProductInfo";
 import ProductOptions from "@/components/product/ProductOptions";
 import QuantityAddToCart from "@/components/product/QuantityAddToCart";
 import ProductReviews from "@/components/product/rating/ProductReviews";
-import { ImageDetail, Review } from "@/types/product";
+import { ImageDetail, Review, ProductDetail } from "@/types/product";
 import { useGetProductDetail } from "@/hooks/queries/useProducts";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/store/slices/userSlice";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
+import { useAddProductToCart } from "@/hooks/queries/useCart";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fetchReviewsData = async (productId: string): Promise<Review[]> => {
@@ -60,11 +61,14 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState<ImageDetail | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<"description" | "reviews">(
     "description"
   );
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [selectedProductDetail, setSelectedProductDetail] =
+    useState<ProductDetail | null>(null);
   const user = useSelector(selectUser);
 
   // Effect for loading reviews and initializing selected image
@@ -107,14 +111,65 @@ export default function ProductDetailPage() {
     }
   }, [product, selectedImage]);
 
+  // Effect to update selectedProductDetail when color, size, or type changes
+  useEffect(() => {
+    if (product && product.productDetails) {
+      // Get available options from productDetails
+      const availableColors = Array.from(
+        new Set(
+          product.productDetails.map((detail) => detail.color).filter(Boolean)
+        )
+      );
+      const availableSizes = Array.from(
+        new Set(
+          product.productDetails.map((detail) => detail.size).filter(Boolean)
+        )
+      );
+      const availableTypes = Array.from(
+        new Set(
+          product.productDetails.map((detail) => detail.type).filter(Boolean)
+        )
+      );
+
+      // Check if all required selections are made
+      const hasRequiredColor = availableColors.length === 0 || selectedColor;
+      const hasRequiredSize = availableSizes.length === 0 || selectedSize;
+      const hasRequiredType = availableTypes.length === 0 || selectedType;
+
+      // Only find matching detail if all required selections are made
+      if (hasRequiredColor && hasRequiredSize && hasRequiredType) {
+        const matchingDetail = product.productDetails.find(
+          (detail) =>
+            (!availableColors.length || detail.color === selectedColor) &&
+            (!availableSizes.length || detail.size === selectedSize) &&
+            (!availableTypes.length || detail.type === selectedType)
+        );
+
+        setSelectedProductDetail(matchingDetail || null);
+
+        // Update selected image if a matching product detail is found and has an image
+        if (matchingDetail && matchingDetail.image) {
+          setSelectedImage(matchingDetail.image);
+        }
+      } else {
+        // Clear selection if not all required options are selected
+        setSelectedProductDetail(null);
+      }
+    }
+  }, [product, selectedColor, selectedSize, selectedType]);
+
   const handleColorSelect = (color: string) => setSelectedColor(color);
   const handleSizeSelect = (size: string) => setSelectedSize(size);
+  const handleTypeSelect = (type: string) => setSelectedType(type);
   const handleDecrementQuantity = () => setQuantity((q) => Math.max(1, q - 1));
   const handleIncrementQuantity = () => setQuantity((q) => q + 1);
   const handleQuantityChange = (newQuantity: number) =>
     setQuantity(newQuantity);
 
-  const handleAddToCart = () => {
+  // Import hook for adding to cart
+  const { addProductToCart } = useAddProductToCart();
+
+  const handleAddToCart = async () => {
     if (!product) return;
 
     if (!user || !user.username) {
@@ -122,12 +177,34 @@ export default function ProductDetailPage() {
       return;
     }
 
-    console.log("Adding to cart:", {
-      productId: product.id,
-      color: selectedColor,
-      size: selectedSize,
-      quantity,
-    });
+    try {
+      // Find the correct ProductDetail based on selected color, size, and type
+      const selectedProductDetail = product.productDetails?.find(
+        (detail) =>
+          (!selectedColor || detail.color === selectedColor) &&
+          (!selectedSize || detail.size === selectedSize) &&
+          (!selectedType || detail.type === selectedType)
+      );
+
+      if (!selectedProductDetail) {
+        console.error("No product available with selected options");
+        return;
+      }
+
+      // Call the API to add product to cart
+      await addProductToCart(selectedProductDetail.id, quantity);
+
+      // You could add a toast notification here to inform the user
+      console.log("Successfully added to cart:", {
+        productId: selectedProductDetail.id,
+        color: selectedColor,
+        size: selectedSize,
+        type: selectedType,
+        quantity,
+      });
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
   };
 
   const handleSubmitReview = (reviewData: {
@@ -204,7 +281,10 @@ export default function ProductDetailPage() {
         />
 
         <div className="flex flex-col gap-5">
-          <ProductInfo product={product} />
+          <ProductInfo
+            product={product}
+            selectedProductDetail={selectedProductDetail}
+          />
           <ProductOptions
             colors={product.colors}
             sizes={
@@ -213,15 +293,28 @@ export default function ProductDetailPage() {
                     new Set(
                       product.productDetails
                         .map((detail) => detail.size)
-                        .filter(Boolean)
+                        .filter((size): size is string => Boolean(size))
+                    )
+                  )
+                : []
+            }
+            types={
+              product.productDetails
+                ? Array.from(
+                    new Set(
+                      product.productDetails
+                        .map((detail) => detail.type)
+                        .filter((type): type is string => Boolean(type))
                     )
                   )
                 : []
             }
             selectedColor={selectedColor}
             selectedSize={selectedSize}
+            selectedType={selectedType}
             onColorSelect={handleColorSelect}
             onSizeSelect={handleSizeSelect}
+            onTypeSelect={handleTypeSelect}
           />
           <QuantityAddToCart
             quantity={quantity}

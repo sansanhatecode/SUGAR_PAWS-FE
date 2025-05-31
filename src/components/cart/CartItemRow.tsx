@@ -73,7 +73,7 @@ const CartItemRow: React.FC<CartItemProps> = ({
         <div className="flex flex-col justify-between">
           <h3 className="font-medium text-sm md:text-base">{product.name}</h3>
           <div className="flex flex-col gap-1 text-xs text-gray-600">
-            {/* Display current color and size */}
+            {/* Display current color, size, and type */}
             <div className="flex items-center gap-2">
               <span>
                 Color: <b>{product.color}</b>
@@ -82,6 +82,14 @@ const CartItemRow: React.FC<CartItemProps> = ({
               <span>
                 Size: <b>{product.size}</b>
               </span>
+              {product.type && (
+                <>
+                  <span className="mx-1">|</span>
+                  <span>
+                    Type: <b>{product.type}</b>
+                  </span>
+                </>
+              )}
               <button
                 onClick={() => setShowVariants(!showVariants)}
                 className="text-custom-wine text-xs ml-2 hover:underline"

@@ -250,6 +250,9 @@ export default function OrderDetailModal({
                         <Text size="xs" color="dimmed">
                           Size: {item.productDetail?.size || "N/A"} | Color:{" "}
                           {item.productDetail?.color || "N/A"}
+                          {item.productDetail?.type && (
+                            <> | Type: {item.productDetail.type}</>
+                          )}
                         </Text>
                         <Group spacing="md">
                           <Text size="sm">

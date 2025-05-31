@@ -82,7 +82,7 @@ const Pagination: React.FC<PaginationProps> = ({
         </button>
       </div>
       <div className="text-sm text-gray-500 mt-2">
-        Trang {currentPage} / {totalPages}
+        Page {currentPage} / {totalPages}
       </div>
     </div>
   );

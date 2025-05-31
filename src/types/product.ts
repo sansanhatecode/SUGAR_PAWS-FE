@@ -12,6 +12,7 @@ export type Product = {
   discount?: number;
   totalSales?: number;
   sizes?: string[];
+  types?: string[];
   reviewStars?: number;
   tags?: string[];
   rating?: number;
@@ -43,6 +44,7 @@ export type ProductDetail = {
   reviewsCount: number;
   color: string;
   size: string;
+  type: string;
   image: ImageDetail;
   moreDetails: string[];
   product?: Product;
