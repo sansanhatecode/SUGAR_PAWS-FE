@@ -1,6 +1,7 @@
 import { useUserService } from "@/api/service/userService";
 import { User } from "@/types/user";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getAuthToken } from "@/helper/storage";
 
 export function useGetMyInfo() {
   const { getMyInfo } = useUserService();
@@ -10,6 +11,7 @@ export function useGetMyInfo() {
     queryFn: () => getMyInfo(),
     staleTime: 1000 * 60 * 5,
     retry: 1,
+    enabled: !!getAuthToken(),
   });
 
   return { getMyInfo: getMyInfoQuery };

@@ -10,6 +10,10 @@ export interface SignupRequest {
   password: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
 export interface LoginResponseData {
   id: string;
   username: string;

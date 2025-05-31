@@ -4,6 +4,7 @@ const API = {
   REGISTER: "auth/signup",
   VERIFY: "auth/verify-code",
   SEND_CODE: "auth/send-code",
+  FORGOT_PASSWORD: "auth/forgot-password",
   PRODUCTS: "products/category",
   ALL_PRODUCTS: "products",
   COLORS: "products/colors",

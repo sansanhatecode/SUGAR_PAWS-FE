@@ -23,7 +23,7 @@ import {
 } from "@/hooks/queries/useCart";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUser, selectUser, setUser } from "@/store/slices/userSlice";
-import { useUserService } from "@/api/service/userService";
+import { useGetMyInfo } from "@/hooks/queries/useUser";
 import LoginRequiredModal from "./ui/LoginRequiredModal";
 import { clearStorage } from "@/helper/storage";
 import { deselectAll } from "@/store/slices/cartSlice";
@@ -37,7 +37,7 @@ const Header = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const userInfo = useSelector(selectUser);
-  const { getMyInfo } = useUserService();
+  const { getMyInfo } = useGetMyInfo();
 
   const { getCartItems } = useGetCartItems();
   const { data: cartData } = getCartItems;
@@ -46,26 +46,17 @@ const Header = () => {
 
   // Fetch user info and update Redux state
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userData = await getMyInfo();
-        if (userData) {
-          dispatch(
-            setUser({
-              username: userData.username,
-              email: userData.email,
-              name: userData.name,
-              role: userData.role,
-            })
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-
-    fetchUserInfo();
-  }, [dispatch, getMyInfo]);
+    if (getMyInfo.data) {
+      dispatch(
+        setUser({
+          username: getMyInfo.data.username,
+          email: getMyInfo.data.email,
+          name: getMyInfo.data.name,
+          role: getMyInfo.data.role,
+        })
+      );
+    }
+  }, [dispatch, getMyInfo.data]);
 
   const handleUpdateItem = (id: number, quantity: number) => {
     updateCart({ cartItemId: id, quantity: Math.max(1, quantity) });

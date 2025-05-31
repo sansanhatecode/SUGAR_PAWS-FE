@@ -18,7 +18,7 @@ export default function AuthLayout({
       <body>
         <Link
           href="/"
-          className="flex items-center gap-2 absolute top-1 left-5"
+          className="flex items-center gap-2 fixed top-4 left-5 z-[9999]"
         >
           <span
             className={`font-jua text-[40px] font-medium text-transparent bg-gradient-to-b from-custom-rose to-pink-500 hover:text-custom-rose bg-clip-text`}
@@ -33,7 +33,7 @@ export default function AuthLayout({
             className="w-auto"
           />
         </Link>
-        {children}
+        <main className="w-full relative z-10">{children}</main>
       </body>
     </html>
   );

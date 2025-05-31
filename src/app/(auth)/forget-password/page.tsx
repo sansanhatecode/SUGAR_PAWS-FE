@@ -2,71 +2,64 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useAuthorization } from "@/hooks/queries/useAuthorization";
 import { REGEX } from "@/const/common";
 import { useRouter } from "next/navigation";
-import { setAuthToken } from "@/helper/storage";
 import DefaultLoading from "@/components/loading/DefaultLoading";
 import { motion } from "framer-motion";
 
-const SignInPage = () => {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [usernameErrorMessage, setUsernameErrorMessage] = useState<string>("");
+const ForgotPasswordPage = () => {
+  const [email, setEmail] = useState<string>("");
+  const [emailErrorMessage, setEmailErrorMessage] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const { signIn } = useAuthorization();
-
+  const { forgotPassword } = useAuthorization();
   const router = useRouter();
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
 
-  const handleSignIn = async () => {
-    if (!username) {
-      setUsernameErrorMessage("Username or email is required.");
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setEmailErrorMessage("Email is required.");
       return;
     }
-    if (!password) {
-      setErrorMessage("Password is required.");
-      return;
-    }
-    if (usernameErrorMessage) return;
+    if (emailErrorMessage) return;
 
     try {
       setLoading(true);
-      const response = await signIn.mutateAsync({
-        identifier: username,
-        password,
-      });
-      if (response && response.accessToken) {
-        setAuthToken(response.accessToken);
-      } else {
-        throw new Error("Invalid response from server.");
-      }
+      setErrorMessage("");
+      setSuccessMessage("");
+
+      await forgotPassword.mutateAsync({ email });
+
+      setSuccessMessage(
+        "Password reset instructions have been sent to your email.",
+      );
       setLoading(false);
-      router.push("/");
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+
+      // Redirect to signin after 3 seconds
+      setTimeout(() => {
+        router.push("/signin");
+      }, 3000);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       setLoading(false);
-      setErrorMessage("Invalid username or password.");
+      setErrorMessage(error.message || "Failed to send password reset email.");
     }
   };
 
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setUsername(value);
-    if (!REGEX.USERNAME.test(value) && !REGEX.EMAIL.test(value)) {
-      setUsernameErrorMessage("Invalid username or email format.");
+    setEmail(value);
+    if (!REGEX.EMAIL.test(value)) {
+      setEmailErrorMessage("Please enter a valid email address.");
     } else {
-      setUsernameErrorMessage("");
+      setEmailErrorMessage("");
     }
+    // Clear messages when user types
+    setErrorMessage("");
+    setSuccessMessage("");
   };
 
   return (
@@ -101,7 +94,7 @@ const SignInPage = () => {
         >
           <Image
             src="/assets/images/signin.png"
-            alt="Sign in image"
+            alt="Forgot password image"
             fill
             className="object-cover"
           />
@@ -124,15 +117,16 @@ const SignInPage = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              Sign In
+              Forgot Password
             </motion.h1>
             <motion.p
-              className="text-[14px]"
+              className="text-[14px] text-gray-600"
               initial={{ y: -15, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
             >
-              Great to see you again! 😊
+              Enter your email address and we&apos;ll send you instructions to
+              reset your password.
             </motion.p>
 
             <motion.div
@@ -142,48 +136,25 @@ const SignInPage = () => {
               transition={{ duration: 0.5, delay: 0.6 }}
             >
               <input
-                type="text"
-                placeholder="Enter your username/email"
-                value={username}
-                onChange={handleUsernameChange}
+                type="email"
+                placeholder="Enter your email address"
+                value={email}
+                onChange={handleEmailChange}
                 className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose transition-all duration-300 focus:scale-[1.02]"
               />
-              {usernameErrorMessage && (
+              {emailErrorMessage && (
                 <motion.p
-                  className="text-red-500 text-[12px]"
+                  className="text-red-500 text-[12px] mt-1"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {usernameErrorMessage}
+                  {emailErrorMessage}
                 </motion.p>
               )}
-            </motion.div>
-            <motion.div
-              className="w-full"
-              initial={{ y: 15, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.7 }}
-            >
-              <div className="relative w-full">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-10 border-[1px] border-custom-purple rounded-[15px] pl-[20px] placeholder:text-[12px] placeholder:text-custom-purple text-[12px] focus:outline-none focus:border-custom-rose transition-all duration-300 focus:scale-[1.02]"
-                />
-                <FontAwesomeIcon
-                  width={16}
-                  height={16}
-                  icon={showPassword ? faEye : faEyeSlash}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-custom-purple hover:text-custom-rose transition-colors duration-300"
-                  onClick={togglePasswordVisibility}
-                />
-              </div>
               {errorMessage && (
                 <motion.p
-                  className="text-red-500 text-[12px]"
+                  className="text-red-500 text-[12px] mt-1"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
@@ -191,29 +162,27 @@ const SignInPage = () => {
                   {errorMessage}
                 </motion.p>
               )}
-              <motion.div
-                className="flex items-center mt-3"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.8 }}
-              >
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                  className="mr-2 w-5 h-5 appearance-none border-2 border-gray-300 rounded-md checked:bg-custom-rose checked:border-custom-pink checked:before:content-['✔'] checked:before:text-white checked:before:flex checked:before:items-center checked:before:justify-center checked:before:h-full checked:before:w-full checked:before:text-[12px] font-bold transition-all duration-300"
-                />
-                <label className="text-[12px]">Remember Me</label>
-              </motion.div>
+              {successMessage && (
+                <motion.p
+                  className="text-green-500 text-[12px] mt-1"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {successMessage}
+                </motion.p>
+              )}
             </motion.div>
+
             <motion.button
-              className="bg-custom-pink text-custom-purple w-full h-10 rounded-[10px] text-[15px] font-medium hover:bg-custom-rose hover:text-white active:bg-custom-purple active:text-white transition-all duration-300"
-              onClick={handleSignIn}
+              className="bg-custom-pink text-custom-purple w-full h-10 rounded-[10px] text-[15px] font-medium hover:bg-custom-rose hover:text-white active:bg-custom-purple active:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleForgotPassword}
+              disabled={loading || !email || emailErrorMessage !== ""}
               initial={{ y: 20, opacity: 0, scale: 0.95 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               transition={{
                 duration: 0.5,
-                delay: 0.8,
+                delay: 0.7,
                 type: "spring",
                 stiffness: 80,
                 damping: 20,
@@ -228,24 +197,26 @@ const SignInPage = () => {
                 transition: { duration: 0.1 },
               }}
             >
-              Sign In
+              {loading ? "Sending..." : "Send Reset Instructions"}
             </motion.button>
+
             <motion.div
+              className="w-full flex flex-col gap-2"
               initial={{ y: 15, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.9 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
             >
               <Link
-                href={"/forget-password"}
-                className="text-[12px] text-custom-purple italic hover:underline hover:text-custom-rose transition-colors duration-300"
+                href="/signin"
+                className="text-[12px] text-custom-purple italic hover:underline hover:text-custom-rose transition-colors duration-300 text-center"
               >
-                Forget your password?
+                ← Back to Sign In
               </Link>
-              <div>
-                <p className="text-[12px] mt-1">
+              <div className="text-center">
+                <p className="text-[12px]">
                   Don&apos;t have an account?
                   <Link
-                    href={"/signup"}
+                    href="/signup"
                     className="text-[12px] pl-2 text-custom-purple italic hover:underline hover:text-custom-rose transition-colors duration-300"
                   >
                     Go to Sign Up Page
@@ -261,4 +232,4 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default ForgotPasswordPage;
