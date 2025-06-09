@@ -18,6 +18,8 @@ import { useSelector } from "react-redux";
 import { selectUser } from "@/store/slices/userSlice";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import { useAddProductToCart } from "@/hooks/queries/useCart";
+import { showSuccessToast } from "@/components/ui/SuccessToast";
+import { showErrorToast } from "@/components/ui/ErrorToast";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fetchReviewsData = async (productId: string): Promise<Review[]> => {
@@ -158,22 +160,31 @@ export default function ProductDetailPage() {
       // If we have any selections, try to find the best match
       if (selectedColor || selectedSize || selectedType) {
         const candidates = product.productDetails.filter((detail) => {
-          const colorMatch = !selectedColor || !availableColors.length || detail.color === selectedColor;
-          const sizeMatch = !selectedSize || !availableSizes.length || detail.size === selectedSize;
-          const typeMatch = !selectedType || !availableTypes.length || detail.type === selectedType;
-          
+          const colorMatch =
+            !selectedColor ||
+            !availableColors.length ||
+            detail.color === selectedColor;
+          const sizeMatch =
+            !selectedSize ||
+            !availableSizes.length ||
+            detail.size === selectedSize;
+          const typeMatch =
+            !selectedType ||
+            !availableTypes.length ||
+            detail.type === selectedType;
+
           return colorMatch && sizeMatch && typeMatch;
         });
 
         if (candidates.length > 0) {
           // If multiple candidates, prefer the one that matches more attributes
           bestMatch = candidates.reduce((best, current) => {
-            const currentScore = 
+            const currentScore =
               (selectedColor && current.color === selectedColor ? 1 : 0) +
               (selectedSize && current.size === selectedSize ? 1 : 0) +
               (selectedType && current.type === selectedType ? 1 : 0);
-            
-            const bestScore = 
+
+            const bestScore =
               (selectedColor && best.color === selectedColor ? 1 : 0) +
               (selectedSize && best.size === selectedSize ? 1 : 0) +
               (selectedType && best.type === selectedType ? 1 : 0);
@@ -219,23 +230,33 @@ export default function ProductDetailPage() {
       );
 
       if (!selectedProductDetail) {
-        console.error("No product available with selected options");
+        showErrorToast("No product available with selected options");
         return;
       }
 
-      // Call the API to add product to cart
       await addProductToCart(selectedProductDetail.id, quantity);
-
-      // You could add a toast notification here to inform the user
-      console.log("Successfully added to cart:", {
-        productId: selectedProductDetail.id,
-        color: selectedColor,
-        size: selectedSize,
-        type: selectedType,
-        quantity,
-      });
-    } catch (error) {
+      showSuccessToast(`${product.name} added to cart successfully!`);
+    } catch (error: unknown) {
       console.error("Failed to add product to cart:", error);
+
+      // Extract error message from the API response
+      let errorMessage = "Failed to add product to cart";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error
+      ) {
+        const apiError = error as {
+          response?: { data?: { message?: string } };
+        };
+        errorMessage =
+          apiError.response?.data?.message || "Failed to add product to cart";
+      }
+
+      showErrorToast(errorMessage);
     }
   };
 

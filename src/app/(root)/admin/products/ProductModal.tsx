@@ -167,15 +167,6 @@ const ProductModal: React.FC<ProductModalProps> = ({
           value={tags}
           placeholder="Enter or select tags"
           searchable
-          creatable
-          getCreateLabel={(query) => `+ Create "${query}"`}
-          onCreate={(query) => {
-            const item = { value: query, label: query };
-            if (!tags.includes(query)) {
-              setTags((current) => [...current, query]);
-            }
-            return item;
-          }}
           onChange={(values) => setTags(values)}
           description="Product categories or search keywords (e.g. 'organic', 'gluten-free', 'dog food')"
         />

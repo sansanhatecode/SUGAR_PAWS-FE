@@ -88,7 +88,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, onClose }) => {
           {...form.getInputProps("role")}
           required
         />
-        <Group position="right" mt="xl">
+        <Group justify="flex-end" mt="xl">
           <Button variant="default" onClick={onClose} type="button">
             Cancel
           </Button>

@@ -47,10 +47,7 @@ const CategoryPageLayout = ({
             <div className="flex-1 flex flex-col gap-4 justify-center items-center min-h-[300px]">
               <p>{isEmpty}</p>
               <Link href={"/"}>
-                <CtaButton
-                  text="return to home"
-                  onClick={() => console.log("hehe")}
-                />
+                <CtaButton text="return to home" onClick={() => {}} />
               </Link>
             </div>
           ) : (

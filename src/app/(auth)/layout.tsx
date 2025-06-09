@@ -14,27 +14,25 @@ export default function AuthLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <Link
-          href="/"
-          className="flex items-center gap-2 fixed top-4 left-5 z-[9999]"
+    <main>
+      <Link
+        href="/"
+        className="flex items-center gap-2 fixed top-4 left-5 z-[9999]"
+      >
+        <span
+          className={`font-jua text-[40px] font-medium text-transparent bg-gradient-to-b from-custom-rose to-pink-500 hover:text-custom-rose bg-clip-text`}
         >
-          <span
-            className={`font-jua text-[40px] font-medium text-transparent bg-gradient-to-b from-custom-rose to-pink-500 hover:text-custom-rose bg-clip-text`}
-          >
-            Sugar Paws
-          </span>
-          <Image
-            src="/assets/favicon/sugar-paws-logo.png"
-            alt="Sugar Paws logo"
-            height={50}
-            width={40}
-            className="w-auto"
-          />
-        </Link>
-        <main className="w-full relative z-10">{children}</main>
-      </body>
-    </html>
+          Sugar Paws
+        </span>
+        <Image
+          src="/assets/favicon/sugar-paws-logo.png"
+          alt="Sugar Paws logo"
+          height={50}
+          width={40}
+          className="w-auto"
+        />
+      </Link>
+      <div className="w-full relative z-10">{children}</div>
+    </main>
   );
 }

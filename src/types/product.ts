@@ -42,9 +42,9 @@ export type ProductDetail = {
   oldPrice?: number;
   rating: number;
   reviewsCount: number;
-  color: string;
-  size: string;
-  type: string;
+  color?: string;
+  size?: string;
+  type?: string;
   image: ImageDetail;
   moreDetails: string[];
   product?: Product;

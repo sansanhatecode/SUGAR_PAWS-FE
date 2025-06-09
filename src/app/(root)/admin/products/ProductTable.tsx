@@ -345,7 +345,7 @@ const ProductTable: React.FC = () => {
                 showGlobalFilter: true,
               }}
               mantineTableProps={{
-                withBorder: true,
+                style: { border: "1px solid #e9ecef" },
                 striped: true,
                 highlightOnHover: true,
               }}
@@ -367,7 +367,7 @@ const ProductTable: React.FC = () => {
                 <Button
                   color="green"
                   onClick={handleCreateClick}
-                  leftIcon={<FiPlus size={16} />}
+                  leftSection={<FiPlus size={16} />}
                   className="ml-2"
                 >
                   Create New Product

@@ -28,9 +28,6 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
   const [showPreview, setShowPreview] = useState(false);
   const maxVisibleThumbnails = 5;
 
-  console.log("images", images);
-
-  // Preload all images when component mounts
   useEffect(() => {
     const preloadImages = () => {
       images.forEach((image) => {

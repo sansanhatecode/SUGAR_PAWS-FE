@@ -27,11 +27,24 @@ import { useGetMyInfo } from "@/hooks/queries/useUser";
 import LoginRequiredModal from "./ui/LoginRequiredModal";
 import { clearStorage } from "@/helper/storage";
 import { deselectAll } from "@/store/slices/cartSlice";
+import SearchDropdown from "./SearchDropdown";
+import { Product } from "@/types/product";
+import "@/styles/Search.css";
+
+// Extend Window interface for searchTimeout
+declare global {
+  interface Window {
+    searchTimeout: NodeJS.Timeout;
+  }
+}
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
 
   const pathname = usePathname() ?? "";
   const router = useRouter();
@@ -43,6 +56,76 @@ const Header = () => {
   const { data: cartData } = getCartItems;
   const { mutate: updateCart } = useUpdateCartItem();
   const { mutate: removeCart } = useRemoveCartItem();
+
+  // Sample product data for search
+  const sampleProducts: Product[] = [
+    {
+      id: "1",
+      name: "Premium Dog Food - Chicken & Rice",
+      minPrice: 25.99,
+      maxPrice: 45.99,
+      displayImage: ["/assets/images/products/dog-food-1.jpg"],
+      vendor: "PetNutrition",
+      colors: ["brown"],
+      totalStock: 150,
+      discount: 15,
+      rating: 4.8,
+      description: "High-quality premium dog food with real chicken and rice",
+    },
+    {
+      id: "2",
+      name: "Cat Scratching Post Tower",
+      minPrice: 89.99,
+      maxPrice: 89.99,
+      displayImage: ["/assets/images/products/cat-tower-1.jpg"],
+      vendor: "FelineHome",
+      colors: ["gray", "beige"],
+      totalStock: 45,
+      rating: 4.6,
+      description:
+        "Multi-level cat tower with scratching posts and cozy hideouts",
+    },
+    {
+      id: "3",
+      name: "Interactive Dog Toy Ball",
+      minPrice: 12.99,
+      maxPrice: 18.99,
+      displayImage: ["/assets/images/products/dog-toy-1.jpg"],
+      vendor: "PlayfulPaws",
+      colors: ["red", "blue", "green"],
+      totalStock: 200,
+      discount: 10,
+      rating: 4.5,
+      description:
+        "Durable interactive ball that keeps dogs entertained for hours",
+    },
+    {
+      id: "4",
+      name: "Orthopedic Pet Bed - Large",
+      minPrice: 75.99,
+      maxPrice: 125.99,
+      displayImage: ["/assets/images/products/pet-bed-1.jpg"],
+      vendor: "ComfortPet",
+      colors: ["brown", "gray", "navy"],
+      totalStock: 80,
+      rating: 4.9,
+      description:
+        "Memory foam orthopedic bed for senior pets and large breeds",
+    },
+    {
+      id: "5",
+      name: "Automatic Pet Water Fountain",
+      minPrice: 35.99,
+      maxPrice: 55.99,
+      displayImage: ["/assets/images/products/water-fountain-1.jpg"],
+      vendor: "HydratePet",
+      colors: ["white", "gray"],
+      totalStock: 120,
+      discount: 20,
+      rating: 4.7,
+      description: "Circulating water fountain with filtration system",
+    },
+  ];
 
   // Fetch user info and update Redux state
   useEffect(() => {
@@ -82,6 +165,50 @@ const Header = () => {
     router.push("/signin");
   };
 
+  const handleSearchIconClick = () => {
+    setIsSearchOpen(!isSearchOpen);
+    if (!isSearchOpen) {
+      // Focus on input when opening search
+      setTimeout(() => {
+        const searchInput = document.getElementById("search-input");
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }, 300);
+    } else {
+      // Clear search when closing
+      setSearchQuery("");
+      setSearchResults([]);
+    }
+  };
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    clearTimeout(window.searchTimeout);
+    window.searchTimeout = setTimeout(() => {
+      if (query.trim().length > 0) {
+        // Filter sample products based on search query
+        const filtered = sampleProducts.filter(
+          (product) =>
+            product.name.toLowerCase().includes(query.toLowerCase()) ||
+            product.vendor?.toLowerCase().includes(query.toLowerCase()) ||
+            product.description?.toLowerCase().includes(query.toLowerCase())
+        );
+        setSearchResults(filtered.slice(0, 5)); // Show max 5 results
+      } else {
+        setSearchResults([]);
+      }
+    }, 300); // 300ms debounce
+  };
+
+  const handleSearchClose = () => {
+    setIsSearchOpen(false);
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -105,11 +232,20 @@ const Header = () => {
       ) {
         setIsCartOpen(false);
       }
+
+      // Handle search outside click
+      if (
+        isSearchOpen &&
+        !target.closest(".search-container") &&
+        !target.closest(".search-icon")
+      ) {
+        handleSearchClose();
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isCartOpen]);
+  }, [isCartOpen, isSearchOpen]);
 
   useEffect(() => {
     if (isCartOpen) {
@@ -121,6 +257,18 @@ const Header = () => {
       document.body.style.overflow = "";
     };
   }, [isCartOpen]);
+
+  // Handle keyboard events for search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isSearchOpen) {
+        handleSearchClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isSearchOpen]);
 
   return (
     <>
@@ -244,10 +392,62 @@ const Header = () => {
             })}
           </ul>
           <div className="flex h-full items-center">
-            <div className="flex items-center mr-5">
-              <FiSearch
-                size={20}
-                className="hover:text-custom-rose cursor-pointer"
+            <div className="flex items-center mr-5 relative search-container">
+              <div
+                className={`flex items-center search-input-container transition-all duration-300 ease-in-out ${
+                  isSearchOpen
+                    ? "w-64 bg-white/95 backdrop-blur-md rounded-full border border-gray-300 shadow-lg expanded"
+                    : "w-auto"
+                }`}
+              >
+                <FiSearch
+                  size={20}
+                  className={`hover:text-custom-rose cursor-pointer search-icon transition-all duration-300 ${
+                    isSearchOpen
+                      ? "ml-3 text-gray-600"
+                      : "search-icon-pulse hover:scale-110"
+                  }`}
+                  onClick={handleSearchIconClick}
+                />
+                <input
+                  id="search-input"
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                  placeholder="Search products..."
+                  className={`transition-all duration-300 ease-in-out bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-500 ${
+                    isSearchOpen
+                      ? "w-48 ml-2 mr-3 py-2 opacity-100"
+                      : "w-0 opacity-0 pointer-events-none"
+                  }`}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && searchQuery.trim()) {
+                      // Navigate to search results page
+                      router.push(
+                        `/search?q=${encodeURIComponent(searchQuery)}`
+                      );
+                      handleSearchClose();
+                    }
+                  }}
+                />
+                {isSearchOpen && searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSearchResults([]);
+                    }}
+                    className="mr-3 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+
+              <SearchDropdown
+                searchResults={searchResults}
+                isVisible={isSearchOpen && searchQuery.trim().length > 0}
+                searchQuery={searchQuery}
+                onClose={handleSearchClose}
               />
             </div>
             <div className="relative group h-full px-5 group">

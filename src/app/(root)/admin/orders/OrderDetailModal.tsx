@@ -82,10 +82,10 @@ export default function OrderDetailModal({
       closeOnClickOutside={false}
     >
       <Box p="md" style={{ maxHeight: "calc(90vh - 60px)", overflow: "auto" }}>
-        <Stack spacing="md">
+        <Stack gap="md">
           {/* Order Information */}
           <Card withBorder p="md">
-            <Text size="lg" weight={600} mb="md">
+            <Text size="lg" fw={600} mb="md">
               Order Information
             </Text>
             <Grid>
@@ -152,7 +152,7 @@ export default function OrderDetailModal({
           {/* Payment Information */}
           {order.payment && (
             <Card withBorder p="md">
-              <Text size="lg" weight={600} mb="md">
+              <Text size="lg" fw={600} mb="md">
                 Payment Information
               </Text>
               <Grid>
@@ -194,7 +194,7 @@ export default function OrderDetailModal({
           {/* Shipping Address */}
           {order.shippingAddress && (
             <Card withBorder p="md">
-              <Text size="lg" weight={600} mb="md">
+              <Text size="lg" fw={600} mb="md">
                 Shipping Address
               </Text>
               <Text size="sm">
@@ -222,13 +222,13 @@ export default function OrderDetailModal({
 
           {order.orderItems && order.orderItems.length > 0 && (
             <Card withBorder p="md">
-              <Text size="lg" weight={600} mb="md">
+              <Text size="lg" fw={600} mb="md">
                 Order Items ({order.orderItems.length} items)
               </Text>
-              <Stack spacing="sm">
+              <Stack gap="sm">
                 {order.orderItems.map((item, index) => (
                   <Box key={item.id || index}>
-                    <Group spacing="md" align="flex-start">
+                    <Group gap="md" align="flex-start">
                       {item.productDetail?.image?.url && (
                         <Image
                           src={item.productDetail.image.url}
@@ -244,7 +244,7 @@ export default function OrderDetailModal({
                         />
                       )}
                       <Box style={{ flex: 1 }}>
-                        <Text weight={500} size="sm">
+                        <Text fw={500} size="sm">
                           {item.productDetail?.productName || "Unknown Product"}
                         </Text>
                         <Text size="xs" color="dimmed">
@@ -254,7 +254,7 @@ export default function OrderDetailModal({
                             <> | Type: {item.productDetail.type}</>
                           )}
                         </Text>
-                        <Group spacing="md">
+                        <Group gap="md">
                           <Text size="sm">
                             <strong>Quantity:</strong> {item.quantity}
                           </Text>
@@ -283,10 +283,10 @@ export default function OrderDetailModal({
 
           {/* Order Summary */}
           <Card withBorder p="md">
-            <Text size="lg" weight={600} mb="md">
+            <Text size="lg" fw={600} mb="md">
               Order Summary
             </Text>
-            <Group position="apart">
+            <Group justify="space-between">
               <Text size="sm">Subtotal:</Text>
               <Text size="sm">
                 {formatCurrency(
@@ -295,7 +295,7 @@ export default function OrderDetailModal({
                 VND
               </Text>
             </Group>
-            <Group position="apart">
+            <Group justify="space-between">
               <Text size="sm">Shipping Fee:</Text>
               <Text size="sm">
                 {order.shippingFee
@@ -304,11 +304,11 @@ export default function OrderDetailModal({
               </Text>
             </Group>
             <Divider my="sm" />
-            <Group position="apart">
-              <Text size="lg" weight={600}>
+            <Group justify="space-between">
+              <Text size="lg" fw={600}>
                 Total:
               </Text>
-              <Text size="lg" weight={600} color="blue">
+              <Text size="lg" fw={600} color="blue">
                 {formatCurrency(order.totalAmount)} VND
               </Text>
             </Group>

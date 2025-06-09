@@ -86,7 +86,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
 
   return (
     <div className="border rounded p-2 bg-gray-50 relative">
-      <Group spacing={4} className="mb-1">
+      <Group className="mb-1 gap-1">
         <Select
           data={BLOCK_TYPES}
           value={block.type}

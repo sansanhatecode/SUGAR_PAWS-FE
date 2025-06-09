@@ -180,6 +180,7 @@ export default function HomePage() {
               src="/assets/images/retail-store.png"
               alt="Retail Store"
               fill
+              sizes="(max-width: 928px) 50vw, (max-width: 1200px) 30vw, 360px"
               className="object-cover"
             />
           </div>
@@ -207,6 +208,7 @@ export default function HomePage() {
                 src="/assets/images/high-laced.png"
                 alt="Retail Store"
                 fill
+                sizes="(max-width: 928px) 42vw, (max-width: 1200px) 25vw, 328px"
                 className="object-cover"
               />
             </div>
@@ -255,6 +257,11 @@ export default function HomePage() {
                   src={card.image}
                   alt={card.title}
                   fill
+                  sizes={
+                    index === 0
+                      ? "(max-width: 928px) 60vw, (max-width: 1200px) 40vw, 480px"
+                      : "(max-width: 928px) 30vw, (max-width: 1200px) 20vw, 240px"
+                  }
                   className="object-cover"
                 />
                 <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center p-4">
@@ -272,6 +279,11 @@ export default function HomePage() {
                   src={card.image}
                   alt={card.title}
                   fill
+                  sizes={
+                    index === 0
+                      ? "(max-width: 928px) 30vw, (max-width: 1200px) 20vw, 240px"
+                      : "(max-width: 928px) 60vw, (max-width: 1200px) 40vw, 480px"
+                  }
                   className="object-cover"
                 />
                 <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center p-4">
@@ -288,8 +300,9 @@ export default function HomePage() {
           <Image
             src="/assets/images/footer-img.png"
             alt="footer-bg"
-            layout="fill"
-            objectFit="cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
           />
         </div>
         <div className="z-10 absolute top-72 max-w-[1200px] min-w-[928px] w-[60%] left-1/2 transform -translate-x-1/2 h-full flex justify-between gap-10 items-start text-white">

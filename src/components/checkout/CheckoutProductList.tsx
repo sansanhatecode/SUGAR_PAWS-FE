@@ -12,7 +12,6 @@ interface CheckoutProductListProps {
 const CheckoutProductList: React.FC<CheckoutProductListProps> = ({
   selectedItems,
 }) => {
-  console.log("selectedItems", selectedItems);
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="font-semibold text-lg text-custom-purple mb-4">

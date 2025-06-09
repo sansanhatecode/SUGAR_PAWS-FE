@@ -211,12 +211,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         addToCart(productDetail.id, quantity);
         showSuccessToast(`${product.name} added to cart!`);
 
-        console.log("Product added to cart with options:", {
-          color: selectedColor,
-          size: selectedSize,
-          type: selectedType,
-          productDetail,
-        });
         setIsModalOpen(false);
       }
     } catch (error) {

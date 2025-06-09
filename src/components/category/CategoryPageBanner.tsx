@@ -11,7 +11,7 @@ interface CategoryPageBannerProps {
 const CategoryPageBanner = ({
   title,
   description = "Explore our exclusive collection.",
-  imageSrc = "https://store.lolitacollective.com/cdn/shop/products/Candy-Shoppe-OTKs-Sax-x-Pink_a02047d9-622c-4238-8f34-7b4f1db67516_98x.png?v=1660765917",
+  imageSrc = "/assets/images/product-banner.jpg",
   isLoading = false,
 }: CategoryPageBannerProps) => {
   return (
@@ -24,19 +24,23 @@ const CategoryPageBanner = ({
           </div>
         </div>
       ) : (
-        <div className="bg-custom-pink h-[200px] flex items-center justify-center relative">
+        <div className="bg-custom-rose h-[200px] flex items-center justify-center relative">
           {imageSrc && (
             <Image
               fill
               src={imageSrc}
               alt={title}
-              className="absolute w-full h-full object-cover opacity-50"
+              className="absolute inset-0 w-full h-full opacity-70 object-cover blur-sm"
             />
           )}
-          <div className="relative text-center">
-            <h1 className="text-white text-[32px] font-bold">{title}</h1>
+          <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+            <h1 className="text-white text-2xl sm:text-4xl font-bold drop-shadow-md animate-fade-in">
+              {title}
+            </h1>
             {description && (
-              <p className="text-white text-[16px] mt-2">{description}</p>
+              <p className="text-white text-sm sm:text-base mt-2 max-w-xl drop-shadow-sm animate-fade-in delay-100">
+                {description}
+              </p>
             )}
           </div>
         </div>

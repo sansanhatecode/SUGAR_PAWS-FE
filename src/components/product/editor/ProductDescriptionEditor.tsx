@@ -42,7 +42,7 @@ const ProductDescriptionEditor: React.FC<ProductDescriptionEditorProps> = ({
     <div>
       <div className="flex items-center justify-between mb-2">
         <span className="font-semibold">Product Description</span>
-        <Group spacing={4}>
+        <Group gap={4}>
           {BLOCK_TYPES.map((t) => (
             <Button
               key={t.value}

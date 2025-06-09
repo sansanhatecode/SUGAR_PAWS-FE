@@ -5,7 +5,8 @@ import { CreateOrderDto, CreateOrderItemDto } from "@/api/service/orderService";
 import { PaymentMethod } from "@/types/payment";
 import { Spinner } from "@/components/ui/Spinner";
 import { useRouter } from "next/navigation";
-import { toast } from "react-hot-toast";
+import { showSuccessToast } from "@/components/ui/SuccessToast";
+import { showErrorToast } from "@/components/ui/ErrorToast";
 
 interface CheckoutSummaryProps {
   selectedItems: CartItem[];
@@ -26,53 +27,49 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
   // Calculate subtotal
   const subtotal = selectedItems.reduce(
     (sum, item) => sum + item.productDetail.price * item.quantity,
-    0
+    0,
   );
   const total = subtotal + (shippingFee || 0);
 
   const handleCreateOrder = async () => {
     if (!selectedAddressId) {
-      toast.error("Please select a shipping address");
+      showErrorToast("Please select a shipping address");
       return;
     }
 
     if (selectedItems.length === 0) {
-      toast.error("No items to checkout");
+      showErrorToast("No items to checkout");
       return;
     }
 
     try {
-      // Prepare order items
       const orderItems: CreateOrderItemDto[] = selectedItems.map((item) => ({
         productDetailId: item.productDetail.id,
         quantity: item.quantity,
       }));
 
-      // Create order data
       const orderData: CreateOrderDto = {
         shippingAddressId: selectedAddressId,
         paymentMethod: paymentMethod,
         orderItems: orderItems,
       };
 
-      // Create order
       const result = await createOrderMutation.mutateAsync(orderData);
 
-      toast.success("Order created successfully!");
+      showSuccessToast("Order created successfully!");
 
       if (result) {
-        // Check if payment method is bank transfer
         if (paymentMethod === PaymentMethod.BANK_TRANSFER) {
           router.push(`/user/orders/${result.id}/qr-code`);
         } else {
           router.push(`/user/orders/${result.id}`);
         }
       } else {
-        toast.error("Error retrieving order details");
+        showErrorToast("Error retrieving order details");
       }
     } catch (error) {
       console.error("Failed to create order:", error);
-      toast.error("Failed to create order. Please try again.");
+      showErrorToast("Failed to create order. Please try again.");
     }
   };
 

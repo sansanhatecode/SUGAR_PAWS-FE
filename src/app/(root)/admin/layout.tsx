@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import React from "react";
 import AdminNavbar from "@/components/admin/AdminNavbar";
+import AdminProvider from "@/provider/AdminProvider";
 
 export const metadata: Metadata = {
   title: "Sugar Paws",
@@ -13,11 +14,11 @@ export default function AuthLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
+    <AdminProvider>
+      <main>
         <AdminNavbar />
         {children}
-      </body>
-    </html>
+      </main>
+    </AdminProvider>
   );
 }

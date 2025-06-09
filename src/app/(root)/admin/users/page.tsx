@@ -149,10 +149,24 @@ export default function UserAdminPage() {
     enableColumnDragging: true,
     enableGlobalFilter: true,
     mantineTableProps: {
-      withBorder: true,
-      striped: true,
-      highlightOnHover: true,
+      style: {
+        border: "1px solid #e9ecef",
+      },
     },
+    mantineTableBodyRowProps: ({ row }) => ({
+      style: {
+        backgroundColor: row.index % 2 === 0 ? "#f8f9fa" : "white",
+      },
+      onMouseEnter: (e) => {
+        const target = e.target as HTMLElement;
+        target.style.backgroundColor = "#e9ecef";
+      },
+      onMouseLeave: (e) => {
+        const target = e.target as HTMLElement;
+        target.style.backgroundColor =
+          row.index % 2 === 0 ? "#f8f9fa" : "white";
+      },
+    }),
     initialState: {
       pagination: { pageSize: 10, pageIndex: 0 },
       showGlobalFilter: true,
@@ -164,7 +178,7 @@ export default function UserAdminPage() {
       <Button
         color="green"
         onClick={() => setAddUserOpen(true)}
-        leftIcon={<FaUser />}
+        leftSection={<FaUser />}
         className="ml-2"
       >
         Add User

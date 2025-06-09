@@ -92,20 +92,19 @@ export default function OrderDetailPage() {
     : "-";
 
   const trackingHistory = [
-    { time: order.createdAt, label: "Order placed" },
-    order.status === "PENDING" && {
+    order.createdAt && {
       time: order.createdAt,
       label: "Order placed",
     },
-    order.status === "CONFIRMED" && {
+    order.confirmedAt && {
       time: order.confirmedAt,
       label: "Order confirmed",
     },
-    order.status === "DELIVERED" && {
+    order.deliveredAt && {
       time: order.deliveredAt,
       label: "Order delivered",
     },
-    order.status === "COMPLETED" && {
+    order.completedAt && {
       time: order.completedAt,
       label: "Order completed",
     },
@@ -172,13 +171,13 @@ export default function OrderDetailPage() {
                       <span className="w-40 text-xs text-gray-500">
                         {item && item.time
                           ? new Date(
-                              item.time as string | number | Date
+                              item.time as string | number | Date,
                             ).toLocaleString()
                           : "-"}
                       </span>
                       <span>{item && item.label ? item.label : "-"}</span>
                     </li>
-                  ) : null
+                  ) : null,
                 )
               )}
             </ol>
@@ -210,7 +209,7 @@ export default function OrderDetailPage() {
                         ? ensureAbsoluteUrl(item.productDetail.image.url)
                         : item.productDetail?.product?.displayImage?.[0]
                           ? ensureAbsoluteUrl(
-                              item.productDetail.product?.displayImage[0]
+                              item.productDetail.product?.displayImage[0],
                             )
                           : "/assets/images/plus-size/plus-size1.png"
                     }
@@ -267,7 +266,7 @@ export default function OrderDetailPage() {
                 </div>
                 <div className="font-bold text-base whitespace-nowrap text-right text-custom-purple min-w-[90px]">
                   {formatCurrency(
-                    (item.productDetail?.price ?? 0) * item.quantity
+                    (item.productDetail?.price ?? 0) * item.quantity,
                   )}{" "}
                   <span className="text-xs font-normal text-gray-500">VND</span>
                 </div>

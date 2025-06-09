@@ -118,7 +118,6 @@ const QuickAction: React.FC<QuickActionProps> = ({
 );
 
 const AdminDashboard = () => {
-  // Mock data - replace with real API calls
   const stats = [
     {
       title: "Total Users",
@@ -256,7 +255,6 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Recent Activity */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl p-6 shadow-lg">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
@@ -299,9 +297,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Additional Dashboard Widgets */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-          {/* Sales Chart Placeholder */}
           <div className="bg-white rounded-2xl p-6 shadow-lg">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">
               Sales Overview
@@ -322,7 +318,6 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Top Products */}
           <div className="bg-white rounded-2xl p-6 shadow-lg">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">
               Top Products

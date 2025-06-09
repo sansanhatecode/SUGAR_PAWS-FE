@@ -11,9 +11,6 @@ const CheckoutShipping: React.FC<CheckoutShippingProps> = ({ addressId }) => {
     addressId || 0,
   );
 
-  console.log("Shipping Fee:", shippingFeeData?.shippingFee);
-
-  // Calculate estimated delivery dates (example: 2-4 days from now)
   const today = new Date();
   const deliveryStart = new Date(today);
   deliveryStart.setDate(today.getDate() + 2);

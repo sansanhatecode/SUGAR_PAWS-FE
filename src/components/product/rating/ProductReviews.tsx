@@ -87,121 +87,9 @@ const ReviewItem: React.FC<{ review: Review }> = ({ review }) => (
   </div>
 );
 
-const WriteReviewForm: React.FC<{
-  onSubmit: ProductReviewsProps["onSubmitReview"];
-}> = ({ onSubmit }) => {
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (rating === 0 || !content.trim() || isSubmitting) {
-      if (rating === 0) alert("Please select a star rating.");
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      await onSubmit({ rating, title, content });
-      setRating(0);
-      setTitle("");
-      setContent("");
-    } catch (error) {
-      console.error("Failed to submit review:", error);
-      alert("Failed to submit review. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Your Rating *
-          </label>
-          <div className="flex items-center space-x-1">
-            {[...Array(5)].map((_, index) => {
-              const ratingValue = index + 1;
-              return (
-                <button
-                  type="button"
-                  key={ratingValue}
-                  onClick={() => !isSubmitting && setRating(ratingValue)}
-                  onMouseEnter={() => setHoverRating(ratingValue)}
-                  onMouseLeave={() => setHoverRating(0)}
-                  className="focus:outline-none text-gray-300"
-                  aria-label={`Rate ${ratingValue} out of 5 stars`}
-                >
-                  <FaStar
-                    size={24}
-                    className={`cursor-pointer transition-colors duration-150 ${
-                      ratingValue <= (hoverRating || rating)
-                        ? "text-yellow-400"
-                        : "text-gray-300 hover:text-yellow-300"
-                    }`}
-                  />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <div>
-          <label
-            htmlFor="reviewTitle"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Review Title
-          </label>
-          <input
-            type="text"
-            id="reviewTitle"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="E.g., Great product!"
-            disabled={isSubmitting}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-100"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="reviewContent"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Review Content *
-          </label>
-          <textarea
-            id="reviewContent"
-            rows={4}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Share your detailed thoughts about the product..."
-            required
-            disabled={isSubmitting}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm disabled:bg-gray-100"
-          />
-        </div>
-        <button
-          type="submit"
-          className={`inline-flex items-center justify-center bg-custom-rose text-white px-5 py-2 rounded-lg font-semibold text-sm hover:bg-rose-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 ${
-            isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-          } ${(rating === 0 || !content.trim()) && !isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-          disabled={rating === 0 || !content.trim() || isSubmitting}
-        >
-          {isSubmitting ? "Submitting..." : "Submit Review"}
-        </button>
-      </form>
-    </div>
-  );
-};
-
 const ProductReviews: React.FC<ProductReviewsProps> = ({
   productRating,
   reviews = [],
-  onSubmitReview,
 }) => {
   const calculateDistribution = (
     reviewsToCalc: Review[]
@@ -276,13 +164,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
             </button>
           </div>
         )}
-      </div>
-
-      <div>
-        <h3 className="text-lg lg:text-xl font-semibold text-gray-800 mb-4">
-          Write Your Review
-        </h3>
-        <WriteReviewForm onSubmit={onSubmitReview} />
       </div>
     </div>
   );
