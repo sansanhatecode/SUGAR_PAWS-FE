@@ -66,7 +66,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
         email: user.email || "",
         name: user.name || "",
         username: user.username || "",
-        password: "", // Leave password empty for updates
+        password: "",
         role: user.role || "USER",
         phoneNumber: user.phoneNumber || "",
         gender: user.gender || "",
@@ -75,7 +75,8 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
         yearOfBirth: user.yearOfBirth?.toString() || "",
       });
     }
-  }, [user, open, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, open]);
 
   const handleSubmit = async (values: typeof form.values) => {
     if (!user?.id) return;

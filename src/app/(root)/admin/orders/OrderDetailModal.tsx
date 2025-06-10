@@ -72,7 +72,7 @@ export default function OrderDetailModal({
       title={`Order Details #${order.id}`}
       size="xl"
       centered
-      zIndex={1001}
+      zIndex={1010}
       styles={{
         body: { padding: 0 },
         content: { maxHeight: "90vh" },
@@ -237,10 +237,18 @@ export default function OrderDetailModal({
                             item.productDetail?.name ||
                             "Product"
                           }
-                          width={60}
-                          height={60}
+                          w={60}
+                          h={60}
                           fit="cover"
                           radius="sm"
+                          style={{
+                            width: "60px",
+                            height: "60px",
+                            minWidth: "60px",
+                            minHeight: "60px",
+                            maxWidth: "60px",
+                            maxHeight: "60px",
+                          }}
                         />
                       )}
                       <Box style={{ flex: 1 }}>
@@ -265,7 +273,7 @@ export default function OrderDetailModal({
                           <Text size="sm">
                             <strong>Total:</strong>{" "}
                             {formatCurrency(
-                              (item.productDetail?.price ?? 0) * item.quantity,
+                              (item.productDetail?.price ?? 0) * item.quantity
                             )}{" "}
                             VND
                           </Text>
@@ -290,7 +298,7 @@ export default function OrderDetailModal({
               <Text size="sm">Subtotal:</Text>
               <Text size="sm">
                 {formatCurrency(
-                  (order.totalAmount || 0) - (order.shippingFee || 0),
+                  (order.totalAmount || 0) - (order.shippingFee || 0)
                 )}{" "}
                 VND
               </Text>

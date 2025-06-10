@@ -14,7 +14,6 @@ export type Params = {
   [KEY in string]: unknown;
 };
 
-// ✅ Cấu hình base axios instance
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   paramsSerializer: {
@@ -22,7 +21,6 @@ const axiosInstance = axios.create({
   },
 });
 
-// ✅ Cấu hình token interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
@@ -36,7 +34,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// ✅ Xử lý response
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => Promise.reject(error)

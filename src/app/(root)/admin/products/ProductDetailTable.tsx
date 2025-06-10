@@ -171,9 +171,15 @@ const ProductDetailTable: React.FC<ProductDetailTableProps> = ({
         density: "xs",
         pagination: { pageIndex: 0, pageSize: 10 },
       }}
+      mantineTableProps={{
+        striped: true,
+        highlightOnHover: true,
+        withTableBorder: true,
+        withColumnBorders: false,
+      }}
       mantinePaginationProps={{
+        showRowsPerPage: true,
         rowsPerPageOptions: ["10", "20", "30", "50"],
-        withEdges: true,
       }}
     />
   );

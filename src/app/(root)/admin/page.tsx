@@ -32,7 +32,15 @@ const StatCard: React.FC<StatCardProps> = ({
   color,
 }) => (
   <div
-    className={`bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-l-4 ${color}`}
+    className={`rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-l-4 ${color} ${
+      color.includes("blue")
+        ? "bg-gradient-to-br from-blue-50 to-blue-100"
+        : color.includes("green")
+          ? "bg-gradient-to-br from-green-50 to-green-100"
+          : color.includes("purple")
+            ? "bg-gradient-to-br from-purple-50 to-purple-100"
+            : "bg-gradient-to-br from-pink-50 to-pink-100"
+    }`}
   >
     <div className="flex items-center justify-between">
       <div>
@@ -220,7 +228,7 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-custom-yellow/30 via-white to-custom-pink/30 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">

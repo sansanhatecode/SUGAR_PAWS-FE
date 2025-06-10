@@ -6,39 +6,15 @@ import {
   useUpdatePaymentStatus,
 } from "@/hooks/queries/useOrder";
 import { Order } from "@/types/order";
-import {
-  MantineReactTable,
-  useMantineReactTable,
-  type MRT_ColumnDef,
-} from "mantine-react-table";
-import { useMemo, useState, useEffect } from "react";
-import {
-  FaShoppingBag,
-  FaEdit,
-  FaTrash,
-  FaTimes,
-  FaDollarSign,
-} from "react-icons/fa";
-import {
-  Button,
-  Group,
-  Title,
-  Box,
-  LoadingOverlay,
-  Paper,
-  Modal,
-  Select,
-  Text,
-  Badge,
-} from "@mantine/core";
-import { formatCurrency } from "@/helper/renderNumber";
-import {
-  formatOrderStatus,
-  getMantineOrderStatusColor,
-  getOrderStatusSelectOptions,
-} from "@/helper/orderHelper";
+import { useState, useEffect } from "react";
+import { FaTimes, FaSync } from "react-icons/fa";
+import { Button, Title, Box, LoadingOverlay, Paper, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import OrderDetailModal from "./OrderDetailModal";
+import OrderHeader from "./OrderHeader";
+import OrderStatistics from "./OrderStatistics";
+import OrderTable from "./OrderTable";
+import OrderStatusModal from "./OrderStatusModal";
 
 export default function OrderAdminPage() {
   const { getAllOrders } = useGetAllOrders();
@@ -68,6 +44,21 @@ export default function OrderAdminPage() {
     setSelectedOrderIds(selectedIds);
   }, [rowSelection]);
 
+  // Show loading screen for initial load
+  if (isLoading && !orders) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mb-4"></div>
+          <Title order={3} className="text-gray-700 mb-2">
+            Loading Orders...
+          </Title>
+          <Text c="dimmed">Please wait while we fetch the latest data</Text>
+        </div>
+      </div>
+    );
+  }
+
   // Handle status change
   const handleStatusChange = async () => {
     if (!selectedOrder || !newStatus) return;
@@ -82,12 +73,6 @@ export default function OrderAdminPage() {
     } catch (error) {
       console.error("Failed to update order status:", error);
     }
-  };
-
-  // Format date
-  const formatDate = (date: Date | string | undefined) => {
-    if (!date) return "N/A";
-    return new Date(date).toLocaleString();
   };
 
   // Handle order deletion (in a real app, this would typically be a soft delete)
@@ -123,323 +108,131 @@ export default function OrderAdminPage() {
     }
   };
 
-  // Column definitions
-  const columns = useMemo<MRT_ColumnDef<Order>[]>(
-    () => [
-      {
-        accessorKey: "id",
-        header: "Order ID",
-        size: 40,
-      },
-      {
-        accessorKey: "userId",
-        header: "User ID",
-        size: 40,
-      },
-      {
-        accessorKey: "userName",
-        header: "User Name",
-        size: 120,
-        Cell: ({ cell }) => cell.getValue<string>() || "N/A",
-      },
-      {
-        accessorKey: "phoneNumber",
-        header: "Phone Number",
-        size: 120,
-        Cell: ({ cell }) => cell.getValue<string>() || "N/A",
-      },
-      {
-        accessorKey: "status",
-        header: "Status",
-        size: 120,
-        Cell: ({ cell }) => (
-          <Badge color={getMantineOrderStatusColor(cell.getValue<string>())}>
-            {formatOrderStatus(cell.getValue<string>())}
-          </Badge>
-        ),
-        filterVariant: "select",
-        filterSelectOptions: [
-          "PENDING",
-          "CONFIRMED",
-          "DELIVERED",
-          "COMPLETED",
-          "REQUESTCANCEL",
-          "CANCELLED",
-          "REFUNDED",
-        ],
-      },
-      {
-        accessorKey: "totalAmount",
-        header: "Total Amount",
-        size: 120,
-        Cell: ({ cell }) => `${formatCurrency(cell.getValue<number>())} VND`,
-        filterVariant: "range",
-      },
-      {
-        accessorKey: "createdAt",
-        header: "Created At",
-        size: 160,
-        Cell: ({ cell }) => formatDate(cell.getValue<string>()),
-        filterVariant: "date-range",
-      },
-      {
-        accessorKey: "updatedAt",
-        header: "Updated At",
-        size: 160,
-        Cell: ({ cell }) => formatDate(cell.getValue<string>()),
-        filterVariant: "date-range",
-      },
-      {
-        accessorKey: "shippingFee",
-        header: "Shipping Fee",
-        size: 120,
-        Cell: ({ cell }) => {
-          const fee = cell.getValue<number | null>();
-          return fee ? `${formatCurrency(fee)} VND` : "N/A";
-        },
-      },
-      {
-        accessorKey: "trackingCode",
-        header: "Tracking Code",
-        size: 120,
-        Cell: ({ cell }) => cell.getValue<string>() || "N/A",
-      },
-      {
-        accessorKey: "paidAt",
-        header: "Paid At",
-        size: 160,
-        Cell: ({ cell }) => {
-          const paidAt = cell.row.original.payment?.paidAt;
-          return paidAt ? formatDate(paidAt) : "N/A";
-        },
-        filterVariant: "date-range",
-      },
-      {
-        id: "paymentMethod",
-        header: "Payment Method",
-        size: 120,
-        Cell: ({ row }) => {
-          const payment = row.original.payment;
-          const method = payment?.method;
-          const getMethodDisplay = (method: string) => {
-            switch (method) {
-              case "CASH":
-                return "Cash on Delivery";
-              case "CREDIT_CARD":
-                return "Credit Card";
-              case "BANK_TRANSFER":
-                return "Bank Transfer";
-              default:
-                return method || "N/A";
-            }
-          };
+  // Handle status edit
+  const handleStatusEdit = (order: Order) => {
+    setSelectedOrder(order);
+    setNewStatus(order.status);
+    open();
+  };
 
-          const getMethodColor = (method: string) => {
-            switch (method) {
-              case "CASH":
-                return "green";
-              case "CREDIT_CARD":
-                return "blue";
-              case "BANK_TRANSFER":
-                return "purple";
-              default:
-                return "gray";
-            }
-          };
+  // Handle view details
+  const handleViewDetails = (order: Order) => {
+    setDetailOrder(order);
+    openDetail();
+  };
 
-          return (
-            <Badge color={getMethodColor(method || "")}>
-              {getMethodDisplay(method || "")}
-            </Badge>
-          );
-        },
-        filterVariant: "select",
-        filterSelectOptions: ["CASH", "CREDIT_CARD", "BANK_TRANSFER"],
-      },
-      {
-        id: "paidStatus",
-        header: "Payment Status",
-        size: 120,
-        Cell: ({ row }) => {
-          const payment = row.original.payment;
-          const isPaid = payment?.paidAt || payment?.status === "PAID";
-          return (
-            <Badge color={isPaid ? "green" : "red"}>
-              {isPaid ? "Paid" : "Unpaid"}
-            </Badge>
-          );
-        },
-        filterVariant: "select",
-        filterSelectOptions: ["Paid", "Unpaid"],
-      },
-      {
-        id: "actions",
-        header: "Actions",
-        size: 200,
-        Cell: ({ row }) => (
-          <Group spacing="xs">
-            <Button
-              size="xs"
-              variant="outline"
-              color="blue"
-              onClick={() => {
-                setSelectedOrder(row.original);
-                setNewStatus(row.original.status);
-                open();
-              }}
-              title="Change Status"
-            >
-              <FaEdit />
-            </Button>
-            <Button
-              size="xs"
-              variant="outline"
-              color="green"
-              onClick={() => {
-                setDetailOrder(row.original);
-                openDetail();
-              }}
-              title="View Details"
-            >
-              <FaShoppingBag />
-            </Button>
-            <Button
-              size="xs"
-              variant="outline"
-              color="red"
-              onClick={() => handleDeleteOrder(row.original.id)}
-              title="Delete Order"
-            >
-              <FaTrash />
-            </Button>
-          </Group>
-        ),
-      },
-    ],
-    [open, openDetail],
-  );
+  // Handle bulk delete
+  const handleBulkDelete = () => {
+    console.log("Bulk delete not implemented");
+  };
 
-  const table = useMantineReactTable({
-    columns,
-    data: orders || [],
-    enableColumnFilterModes: true,
-    enableColumnOrdering: true,
-    enableFilters: true,
-    enablePagination: true,
-    enableSorting: true,
-    enableRowSelection: true,
-    enableColumnDragging: true,
-    enableGlobalFilter: true,
-    mantineTableProps: {
-      withBorder: true,
-      striped: true,
-      highlightOnHover: true,
-    },
-    initialState: {
-      pagination: { pageSize: 10, pageIndex: 0 },
-      showGlobalFilter: true,
-      sorting: [{ id: "createdAt", desc: true }], // Sort by most recent first
-      rowSelection: {},
-    },
-    mantineSearchTextInputProps: {
-      placeholder: "Search all orders...",
-    },
-    getRowId: (row) => row.id.toString(),
-    state: {
-      rowSelection,
-    },
-    onRowSelectionChange: setRowSelection,
-    renderTopToolbarCustomActions: () => (
-      <Group spacing="xs">
-        <Button
-          color="red"
-          onClick={() => {
-            console.log("Bulk delete not implemented");
-          }}
-          disabled={selectedOrderIds.length === 0}
-          leftIcon={<FaTimes />}
-        >
-          Delete Selected
-        </Button>
-        <Button
-          color="yellow"
-          onClick={handleMarkAsPaid}
-          disabled={selectedOrderIds.length === 0}
-          loading={updatePaymentStatusMutation.isPending}
-          leftIcon={<FaDollarSign />}
-        >
-          Mark Selected as Paid
-        </Button>
-      </Group>
-    ),
-  });
+  // Handle export selected
+  const handleExportSelected = () => {
+    console.log("Export selected orders");
+  };
+
+  // Handle refresh
+  const handleRefresh = () => {
+    refetch();
+  };
+
+  // Handle export
+  const handleExport = () => {
+    console.log("Export functionality");
+  };
 
   if (isError) {
     return (
       <div className="p-8">
-        <Paper p="xl" shadow="md" className="bg-red-50">
-          <Title order={3} className="text-red-600">
-            Error loading orders data
-          </Title>
-          <p className="mt-2">Please try again later or contact support.</p>
+        <Paper
+          p="xl"
+          shadow="md"
+          className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200"
+        >
+          <div className="text-center">
+            <div className="bg-red-500 text-white p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <FaTimes size={24} />
+            </div>
+            <Title order={3} className="text-red-600 mb-2">
+              Error loading orders data
+            </Title>
+            <Text size="sm" c="dimmed" mb="md">
+              We encountered an issue while fetching the orders. Please try
+              again.
+            </Text>
+            <Button
+              variant="filled"
+              color="red"
+              onClick={() => refetch()}
+              leftSection={<FaSync />}
+            >
+              Retry
+            </Button>
+          </div>
         </Paper>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
+      {/* Header Section */}
+      <div className="mb-6">
+        <OrderHeader
+          isLoading={isLoading}
+          onRefresh={handleRefresh}
+          onExport={handleExport}
+        />
+
+        {/* Statistics Cards */}
+        <OrderStatistics orders={orders} />
+      </div>
+
       <Box pos="relative">
         <LoadingOverlay
           visible={isLoading || updateOrderStatusMutation.isPending}
           loaderProps={{ size: "lg", color: "blue" }}
+          className="rounded-xl"
         />
-        <MantineReactTable table={table} />
+        <Paper
+          shadow="xl"
+          p="lg"
+          className="bg-white rounded-xl border border-gray-100 overflow-hidden"
+        >
+          <div className="mb-4">
+            <Title order={3} className="text-gray-700 font-semibold mb-2">
+              📊 Orders Data Table
+            </Title>
+            <Text size="sm" c="dimmed">
+              View, filter, and manage all customer orders
+            </Text>
+          </div>
+          <OrderTable
+            data={orders || []}
+            rowSelection={rowSelection}
+            onRowSelectionChange={setRowSelection}
+            selectedOrderIds={selectedOrderIds}
+            onStatusEdit={handleStatusEdit}
+            onViewDetails={handleViewDetails}
+            onDeleteOrder={handleDeleteOrder}
+            onBulkDelete={handleBulkDelete}
+            onMarkAsPaid={handleMarkAsPaid}
+            onExportSelected={handleExportSelected}
+            isMarkingAsPaid={updatePaymentStatusMutation.isPending}
+          />
+        </Paper>
       </Box>
 
       {/* Status Change Modal */}
-      <Modal
+      <OrderStatusModal
         opened={opened}
         onClose={close}
-        title={`Change Status for Order #${selectedOrder?.id}`}
-        centered
-        zIndex={1001}
-      >
-        <Box p="md">
-          <Text size="sm" mb="md">
-            Current Status:{" "}
-            <Badge
-              color={getMantineOrderStatusColor(selectedOrder?.status || "")}
-            >
-              {formatOrderStatus(selectedOrder?.status || "")}
-            </Badge>
-          </Text>
-
-          <Select
-            label="New Status"
-            placeholder="Select new status"
-            data={getOrderStatusSelectOptions()}
-            value={newStatus}
-            onChange={(value) => setNewStatus(value || "")}
-            mb="md"
-            zIndex={1002}
-            withinPortal
-          />
-
-          <Group position="right" mt="md">
-            <Button variant="outline" onClick={close}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleStatusChange}
-              loading={updateOrderStatusMutation.isPending}
-              disabled={!newStatus || newStatus === selectedOrder?.status}
-            >
-              Update Status
-            </Button>
-          </Group>
-        </Box>
-      </Modal>
+        selectedOrder={selectedOrder}
+        newStatus={newStatus}
+        onStatusChange={(value) => setNewStatus(value || "")}
+        onConfirm={handleStatusChange}
+        isLoading={updateOrderStatusMutation.isPending}
+      />
 
       {/* Order Detail Modal */}
       <OrderDetailModal
