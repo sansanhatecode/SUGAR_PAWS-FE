@@ -347,6 +347,7 @@ const Header = () => {
                                   src={subItem.imageSrc}
                                   alt="access logo"
                                   fill
+                                  sizes="(max-width: 768px) 100vw, 200px"
                                   className="object-cover hover:scale-125 transition-all duration-500 z-10"
                                 />
                               </div>

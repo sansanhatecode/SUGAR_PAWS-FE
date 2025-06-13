@@ -13,13 +13,16 @@ import ProductReviews from "@/components/product/rating/ProductReviews";
 import { ImageDetail, Review, ProductDetail } from "@/types/product";
 import { useGetProductDetail } from "@/hooks/queries/useProducts";
 import React, { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import { useSelector } from "react-redux";
+import { usePathname, useRouter } from "next/navigation";
+import { useSelector, useDispatch } from "react-redux";
 import { selectUser } from "@/store/slices/userSlice";
 import LoginRequiredModal from "@/components/ui/LoginRequiredModal";
 import { useAddProductToCart } from "@/hooks/queries/useCart";
 import { showSuccessToast } from "@/components/ui/SuccessToast";
 import { showErrorToast } from "@/components/ui/ErrorToast";
+import { setSelectedItems } from "@/store/slices/cartSlice";
+import { CartItem } from "@/types/cart";
+import RelatedProducts from "@/components/product/RelatedProducts";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fetchReviewsData = async (productId: string): Promise<Review[]> => {
@@ -55,6 +58,8 @@ const fetchReviewsData = async (productId: string): Promise<Review[]> => {
 export default function ProductDetailPage() {
   const pathname = usePathname();
   const productId = (pathname ?? "").split("/").pop();
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   const { getProductDetail } = useGetProductDetail(productId ?? "");
   const { data: product, isLoading, error } = getProductDetail;
@@ -221,7 +226,6 @@ export default function ProductDetailPage() {
     }
 
     try {
-      // Find the correct ProductDetail based on selected color, size, and type
       const selectedProductDetail = product.productDetails?.find(
         (detail) =>
           (!selectedColor || detail.color === selectedColor) &&
@@ -237,26 +241,52 @@ export default function ProductDetailPage() {
       await addProductToCart(selectedProductDetail.id, quantity);
       showSuccessToast(`${product.name} added to cart successfully!`);
     } catch (error: unknown) {
-      console.error("Failed to add product to cart:", error);
+      if (error && typeof error === "object" && "message" in error) {
+        showErrorToast(error.message as string);
+      } else console.log(error);
+    }
+  };
 
-      // Extract error message from the API response
-      let errorMessage = "Failed to add product to cart";
+  const handleBuyNow = async () => {
+    if (!product) return;
 
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (
-        typeof error === "object" &&
-        error !== null &&
-        "response" in error
-      ) {
-        const apiError = error as {
-          response?: { data?: { message?: string } };
-        };
-        errorMessage =
-          apiError.response?.data?.message || "Failed to add product to cart";
+    if (!user || !user.username) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    try {
+      const selectedProductDetail = product.productDetails?.find(
+        (detail) =>
+          (!selectedColor || detail.color === selectedColor) &&
+          (!selectedSize || detail.size === selectedSize) &&
+          (!selectedType || detail.type === selectedType)
+      );
+
+      if (!selectedProductDetail) {
+        showErrorToast("Please select all required options");
+        return;
       }
 
-      showErrorToast(errorMessage);
+      // Create a cart item for immediate checkout
+      const cartItem: CartItem = {
+        id: Date.now(),
+        productDetail: { ...selectedProductDetail, name: product.name },
+        quantity: quantity,
+      };
+
+      // Set this item as selected for checkout
+      dispatch(setSelectedItems([cartItem]));
+
+      // Navigate to checkout page
+      router.push("/checkout");
+    } catch (error: unknown) {
+      if (error && typeof error === "object" && "message" in error) {
+        showErrorToast(error.message as string);
+      } else {
+        console.log(error);
+        showErrorToast("An error occurred. Please try again.");
+      }
     }
   };
 
@@ -375,6 +405,7 @@ export default function ProductDetailPage() {
             onIncrement={handleIncrementQuantity}
             onQuantityChange={handleQuantityChange}
             onAddToCart={handleAddToCart}
+            onBuyNow={handleBuyNow}
           />
           <DeliveryInfo />
         </div>
@@ -416,6 +447,9 @@ export default function ProductDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Related Products Section */}
+      <RelatedProducts productId={productId ?? ""} className="mt-12 mb-8" />
 
       {/* Login Required Modal */}
       <LoginRequiredModal

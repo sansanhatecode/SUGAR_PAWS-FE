@@ -50,6 +50,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
                       src={product.displayImage[0]}
                       alt={product.name}
                       fill
+                      sizes="48px"
                       className="object-cover product-image"
                     />
                   )}

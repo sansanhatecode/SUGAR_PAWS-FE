@@ -96,6 +96,7 @@ const ForgotPasswordPage = () => {
             src="/assets/images/signin.png"
             alt="Forgot password image"
             fill
+            sizes="50vw"
             className="object-cover"
           />
         </motion.div>

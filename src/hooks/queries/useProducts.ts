@@ -127,3 +127,43 @@ export function useUpdateProduct() {
     },
   });
 }
+
+export function useGetRelatedProducts(productId: string) {
+  const { getRelatedProducts } = useProductservice();
+
+  const getRelatedProductsQuery = useQuery({
+    queryKey: ["relatedProducts", productId],
+    queryFn: () => getRelatedProducts(productId),
+    enabled: !!productId,
+    staleTime: 1000 * 60 * 10, // 10 minutes since related products don't change frequently
+    retry: 1,
+  });
+
+  return {
+    getRelatedProducts: getRelatedProductsQuery,
+  };
+}
+
+export function useSearchProducts({
+  searchTerm,
+  page = 1,
+  itemPerPage = 40,
+}: {
+  searchTerm: string;
+  page?: number;
+  itemPerPage?: number;
+}) {
+  const { searchProducts } = useProductservice();
+
+  const searchProductsQuery = useQuery({
+    queryKey: ["searchProducts", searchTerm, page, itemPerPage],
+    queryFn: () => searchProducts({ searchTerm, page, itemPerPage }),
+    enabled: !!searchTerm && searchTerm.trim().length > 0,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 1,
+  });
+
+  return {
+    searchProducts: searchProductsQuery,
+  };
+}

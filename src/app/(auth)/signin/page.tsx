@@ -103,6 +103,7 @@ const SignInPage = () => {
             src="/assets/images/signin.png"
             alt="Sign in image"
             fill
+            sizes="50vw"
             className="object-cover"
           />
         </motion.div>

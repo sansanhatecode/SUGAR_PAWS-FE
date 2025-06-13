@@ -10,6 +10,7 @@ const API = {
   COLORS: "products/colors",
   SIZES: "products/sizes",
   PRODUCT_DETAIL: "products/",
+  SEARCH_PRODUCTS: "products/search",
   CART: "cart",
   CART_ITEM: "cart-item",
   ME: "users/me",

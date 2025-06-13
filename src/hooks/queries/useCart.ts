@@ -10,12 +10,11 @@ export function useAddProductToCart() {
   const addProductToCart = async (productId: number, quantity: number) => {
     try {
       const data = await addToCart(productId, quantity);
-      // Invalidate and refetch cart items after adding product
       await queryClient.invalidateQueries({ queryKey: ["cartItems"] });
       return data;
     } catch (error) {
       console.error("AddProductToCart Error:", error);
-      throw new Error("Failed to add product to cart.");
+      throw new Error(error.message);
     }
   };
 

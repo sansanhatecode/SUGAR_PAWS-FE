@@ -4,6 +4,8 @@ import { useGetMyAddresses } from "@/hooks/queries/useAddress";
 import { Spinner } from "@/components/ui/Spinner";
 import { AddressModal } from "@/components/user/AddressModal";
 import { AddressSelectModal } from "./AddressSelectModal";
+import CheckoutSectionHeader from "./CheckoutSectionHeader";
+import AddressDisplayCard from "./AddressDisplayCard";
 
 interface CheckoutAddressProps {
   setSelectedAddressId: (id: number | null) => void;
@@ -44,45 +46,45 @@ const CheckoutAddress: React.FC<CheckoutAddressProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex justify-between items-center mb-2">
-        <div className="font-semibold text-lg text-custom-purple">
-          Shipping Address
-        </div>
-        <button
-          className="text-custom-rose hover:underline text-sm"
-          onClick={() => setSelectModalOpen(true)}
-        >
-          Change
-        </button>
-      </div>
-      {isLoading ? (
-        <div className="flex justify-center py-4">
-          <Spinner size="md" />
-        </div>
-      ) : selectedAddress ? (
-        <>
-          <div className="text-base font-medium">
-            {selectedAddress.fullName}
-            <span className="font-normal">
-              {" "}
-              ({selectedAddress.phoneNumber})
-            </span>
+    <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+      {/* Header */}
+      <CheckoutSectionHeader
+        icon="📍"
+        title="Shipping Address"
+        gradient="from-custom-rose to-custom-pink"
+      />
+
+      <button
+        className="bg-custom-pink border-[1px] border-custom-wine text-custom-wine mt-2 ml-4 px-3 py-[2px] rounded-full text-[12px] transition-colors"
+        onClick={() => setSelectModalOpen(true)}
+      >
+        Change
+      </button>
+
+      {/* Content */}
+      <div className="p-4">
+        {isLoading ? (
+          <div className="flex justify-center py-6">
+            <Spinner size="md" />
           </div>
-          <div className="text-sm text-gray-600">
-            {selectedAddress.homeNumber}, {selectedAddress.ward.name},{" "}
-            {selectedAddress.ward.district.name},{" "}
-            {selectedAddress.ward.district.city.name}
-          </div>
-          {selectedAddress.moreDetail && (
-            <div className="text-gray-500 text-xs mt-1">
-              {selectedAddress.moreDetail}
+        ) : selectedAddress ? (
+          <AddressDisplayCard address={selectedAddress} compact={true} />
+        ) : (
+          <div className="text-center py-6">
+            <div className="text-custom-purple text-3xl mb-2">📍</div>
+            <div className="text-custom-dark font-medium mb-2">
+              No shipping address found.
             </div>
-          )}
-        </>
-      ) : (
-        <div className="text-gray-500 text-sm">No shipping address found.</div>
-      )}
+            <button
+              className="bg-custom-wine hover:bg-custom-wine/90 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              onClick={() => setSelectModalOpen(true)}
+            >
+              Add Address
+            </button>
+          </div>
+        )}
+      </div>
+
       <AddressSelectModal
         open={selectModalOpen}
         onClose={() => setSelectModalOpen(false)}

@@ -24,13 +24,14 @@ const CategoryPageBanner = ({
           </div>
         </div>
       ) : (
-        <div className="bg-custom-rose h-[200px] flex items-center justify-center relative">
+        <div className="h-[200px] flex items-center justify-center relative">
           {imageSrc && (
             <Image
               fill
               src={imageSrc}
               alt={title}
-              className="absolute inset-0 w-full h-full opacity-70 object-cover blur-sm"
+              sizes="100vw"
+              className="absolute inset-0 w-full h-full object-cover blur-sm"
             />
           )}
           <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">

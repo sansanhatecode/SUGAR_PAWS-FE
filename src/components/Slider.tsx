@@ -167,6 +167,7 @@ const Slider = () => {
                   src={imageSrc}
                   alt={`Slide ${index}`}
                   fill
+                  sizes="100vw"
                   className="object-cover"
                 />
                 {index === currentIndex && (

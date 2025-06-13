@@ -30,6 +30,7 @@ export default function CartItemCard({
             )}
             alt={item.productDetail?.name ?? ""}
             fill
+            sizes="112px"
             className="rounded-md object-cover"
           />
         ) : (

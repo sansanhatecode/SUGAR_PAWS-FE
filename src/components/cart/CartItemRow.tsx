@@ -62,7 +62,6 @@ const CartItemRow: React.FC<CartItemProps> = ({
               fill
               sizes="100vw"
               className="object-cover w-full h-full rounded-md"
-              // style={{ objectFit: "cover" }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-md text-center p-1 text-[10px] text-gray-500">

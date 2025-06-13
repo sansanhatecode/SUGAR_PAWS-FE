@@ -13,7 +13,7 @@ export const reactQueryDefaultConfig = {
       useErrorBoundary: false,
     },
     mutations: {
-      retry: 1, // Number of retry attempts for failed mutations
+      retry: 1,
       useErrorBoundary: false,
     },
   },

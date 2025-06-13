@@ -3,7 +3,7 @@ import { ShippingAddress } from "@/types/address";
 import { useGetMyAddresses } from "@/hooks/queries/useAddress";
 import { Spinner } from "@/components/ui/Spinner";
 import { AddressModal } from "@/components/user/AddressModal";
-import { RiCloseLine } from "react-icons/ri";
+import Modal from "@/components/ui/Modal";
 
 interface AddressSelectModalProps {
   open: boolean;
@@ -26,24 +26,8 @@ export const AddressSelectModal: React.FC<AddressSelectModalProps> = ({
   };
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 transition-opacity duration-300 ${
-        open
-          ? "opacity-100 pointer-events-auto"
-          : "opacity-0 pointer-events-none"
-      }`}
-    >
-      <div
-        className={`bg-white rounded-xl shadow-lg p-8 w-full max-w-xl relative transform transition-all duration-300 ${
-          open ? "scale-100 opacity-100" : "scale-95 opacity-0"
-        }`}
-      >
-        <button
-          className="absolute top-8 right-8 text-gray-400 hover:text-gray-700"
-          onClick={onClose}
-        >
-          <RiCloseLine size={28} />
-        </button>
+    <Modal open={open} onClose={onClose} size="medium" width="600px">
+      <div className="p-6">
         <h3 className="text-xl font-bold mb-6 text-custom-wine">
           Select shipping address
         </h3>
@@ -104,6 +88,6 @@ export const AddressSelectModal: React.FC<AddressSelectModalProps> = ({
           + Add new address
         </button>
       </div>
-    </div>
+    </Modal>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { PaymentMethod } from "@/types/payment";
 import PaymentMethodModal from "./PaymentMethodModal";
+import CheckoutSectionHeader from "./CheckoutSectionHeader";
 import { FaMoneyBillWave, FaCreditCard, FaUniversity } from "react-icons/fa";
 
 interface CheckoutPaymentProps {
@@ -41,19 +42,45 @@ const CheckoutPayment: React.FC<CheckoutPaymentProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 justify-center">
-      <div className="flex justify-between items-center">
-        <div className="font-semibold text-custom-purple">Payment Method</div>
-        <button
-          className="text-custom-rose hover:underline text-sm"
-          onClick={() => setModalOpen(true)}
-        >
-          Change
-        </button>
-      </div>
-      <div className="flex items-center gap-2 text-[14px]">
-        <span>{getPaymentMethodIcon(selectedMethod)}</span>
-        <span>{getPaymentMethodText(selectedMethod)}</span>
+    <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+      {/* Header */}
+      <CheckoutSectionHeader
+        icon="💳"
+        title="Payment Method"
+        gradient="from-custom-rose to-custom-pink"
+      />
+
+      <button
+        className="bg-custom-pink border-[1px] border-custom-wine text-custom-wine mt-2 ml-4 px-3 py-[2px] rounded-full text-[12px] transition-colors"
+        onClick={() => setModalOpen(true)}
+      >
+        Change
+      </button>
+
+      {/* Content */}
+      <div className="p-4">
+        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border-2 border-gray-200">
+            {getPaymentMethodIcon(selectedMethod)}
+          </div>
+          <div className="flex-1">
+            <div className="font-bold text-gray-800 text-base">
+              {getPaymentMethodText(selectedMethod)}
+            </div>
+            <div className="text-gray-500 text-sm">
+              {selectedMethod === PaymentMethod.CASH && "Payment upon delivery"}
+              {selectedMethod === PaymentMethod.CREDIT_CARD &&
+                "Secure online payment"}
+              {selectedMethod === PaymentMethod.BANK_TRANSFER &&
+                "Direct bank transfer"}
+            </div>
+          </div>
+          {selectedMethod === PaymentMethod.CASH && (
+            <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">
+              Most Popular
+            </span>
+          )}
+        </div>
       </div>
 
       <PaymentMethodModal

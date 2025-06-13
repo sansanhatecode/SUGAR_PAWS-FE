@@ -14,6 +14,7 @@ const AboutUsPage = () => {
               src="/assets/images/about/our-story.png"
               alt="Our Story Image"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
           </div>

@@ -11,6 +11,7 @@ const RetailLocationPage = () => {
           src="/assets/images/about/about-6.png"
           alt="Retail Store"
           fill
+          sizes="100vw"
           className="object-cover z-10"
         />
         <h1 className="text-white font-bold text-[40px] z-20">

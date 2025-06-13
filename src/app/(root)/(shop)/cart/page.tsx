@@ -107,9 +107,6 @@ const CartPage = () => {
   const handleUpdateColor = (id: number, newColor: string) => {
     const item = cartItems.find((i) => i.id === id);
     if (!item) return;
-    // Call API to update cart item color (change productDetailId)
-    // You may need to get the new productDetailId for the selected color/size
-    // For now, just update local state
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id
@@ -125,9 +122,6 @@ const CartPage = () => {
   const handleUpdateSize = (id: number, newSize: string) => {
     const item = cartItems.find((i) => i.id === id);
     if (!item) return;
-    // Call API to update cart item size (change productDetailId)
-    // You may need to get the new productDetailId for the selected color/size
-    // For now, just update local state
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id
@@ -152,7 +146,6 @@ const CartPage = () => {
     if (!voucher.trim()) return;
     setIsApplying(true);
 
-    // Simulate API call
     setTimeout(() => {
       setIsApplying(false);
       alert("Voucher code is invalid or expired");
@@ -212,7 +205,6 @@ const CartPage = () => {
                 <div className="hidden md:block md:col-span-1"></div>
               </div>
 
-              {/* Cart Items */}
               {cartItems.map((item) => (
                 <CartItemRow
                   key={String(item.id)}

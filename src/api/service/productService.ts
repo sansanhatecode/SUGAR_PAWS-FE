@@ -342,6 +342,73 @@ export function useProductservice() {
     }
   };
 
+  const searchProducts = async ({
+    searchTerm,
+    page = 1,
+    itemPerPage = 40,
+  }: {
+    searchTerm: string;
+    page?: number;
+    itemPerPage?: number;
+  }) => {
+    try {
+      if (!searchTerm || searchTerm.trim() === "") {
+        throw new Error("Search term is required");
+      }
+
+      const { data } = await Request.get<{
+        products: Product[];
+        totalProducts: number;
+      }>(API.SEARCH_PRODUCTS, {
+        name: searchTerm.trim(),
+        page,
+        itemPerPage,
+      });
+      return data;
+    } catch (error: unknown) {
+      let message = "Failed to search products.";
+      if (typeof error === "object" && error !== null) {
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        message = err.response?.data?.message || err.message || message;
+        console.error(
+          "SearchProducts Error:",
+          err.response?.data || err.message
+        );
+      } else {
+        console.error("SearchProducts Error:", error);
+      }
+      throw new Error(message);
+    }
+  };
+
+  const getRelatedProducts = async (productId: string) => {
+    try {
+      const { data } = await Request.get<Product[]>(
+        API.PRODUCT_DETAIL + productId + "/related"
+      );
+      return data;
+    } catch (error: unknown) {
+      let message = "Failed to fetch related products.";
+      if (typeof error === "object" && error !== null) {
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        message = err.response?.data?.message || err.message || message;
+        console.error(
+          "GetRelatedProducts Error:",
+          err.response?.data || err.message
+        );
+      } else {
+        console.error("GetRelatedProducts Error:", error);
+      }
+      throw new Error(message);
+    }
+  };
+
   return {
     getProducts,
     getColors,
@@ -350,5 +417,7 @@ export function useProductservice() {
     getAllProducts,
     updateProduct,
     createProduct,
+    getRelatedProducts,
+    searchProducts,
   };
 }

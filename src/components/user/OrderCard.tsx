@@ -48,6 +48,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
                   "product"
                 }
                 fill
+                sizes="48px"
                 className="object-cover"
               />
             </div>

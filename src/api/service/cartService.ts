@@ -1,6 +1,7 @@
 import { Cart, CartItem } from "@/types/cart";
 import { useRequest } from "../Request";
 import API from "../api";
+import { ApiError } from "next/dist/server/api-utils";
 
 export function useCartService() {
   const { Request } = useRequest();
@@ -12,12 +13,10 @@ export function useCartService() {
         quantity,
       });
       return data;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error("AddToCart Error:", error.response?.data || error.message);
-      throw new Error(
-        error.response?.data?.message || "Failed to add product to cart.",
-      );
+    } catch (error: unknown) {
+      if (error && typeof error === "object" && "message" in error) {
+        throw new Error(error.message as string);
+      } else console.log(error);
     }
   };
 
@@ -27,13 +26,12 @@ export function useCartService() {
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error(
-        "GetCartItems Error:",
-        error.response?.data || error.message,
-      );
-      throw new Error(
-        error.response?.data?.message || "Failed to fetch cart items.",
-      );
+      if (error instanceof ApiError) throw new Error(error.message);
+      else
+        console.error(
+          "GetCartItems Error:",
+          error.response?.data || error.message,
+        );
     }
   };
 
@@ -41,15 +39,10 @@ export function useCartService() {
     try {
       const { data } = await Request.del(`${API.CART_ITEM}/${cartItemId}`);
       return data;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error(
-        "RemoveFromCart Error:",
-        error.response?.data || error.message,
-      );
-      throw new Error(
-        error.response?.data?.message || "Failed to remove product from cart.",
-      );
+    } catch (error: unknown) {
+      if (error && typeof error === "object" && "message" in error) {
+        throw new Error(error.message as string);
+      } else throw new Error("An error happen, please try again later!");
     }
   };
 
@@ -67,12 +60,10 @@ export function useCartService() {
         },
       );
       return data;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error("UpdateCart Error:", error.response?.data || error.message);
-      throw new Error(
-        error.response?.data?.message || "Failed to update cart item.",
-      );
+    } catch (error: unknown) {
+      if (error && typeof error === "object" && "message" in error) {
+        throw new Error(error.message as string);
+      } else throw new Error("An error happen, please try again later!");
     }
   };
 
