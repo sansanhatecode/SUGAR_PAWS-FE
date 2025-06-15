@@ -20,6 +20,9 @@ const API = {
   CATEGORIES: "categories",
   PAYMENTS: "payments",
   REVIEWS: "reviews",
+  CHAT_MESSAGE: "chat/message",
+  CHAT_HISTORY: "chat/history",
+  CHAT_CLEAR: "chat/history",
 };
 
 export default API;

@@ -3,6 +3,7 @@ import React from "react";
 import "./globals.css";
 import "../lib/fontawesome";
 import { ClientProvider } from "@/provider/ClientProvider";
+import Chatbot from "@/components/Chatbot";
 
 export const metadata: Metadata = {
   title: "Sugar Paws",
@@ -63,7 +64,10 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/favicon.ico" />
       </head>
       <body>
-        <ClientProvider>{children}</ClientProvider>
+        <ClientProvider>
+          {children}
+          <Chatbot />
+        </ClientProvider>
       </body>
     </html>
   );
