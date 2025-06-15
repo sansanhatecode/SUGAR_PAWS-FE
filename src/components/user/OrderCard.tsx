@@ -4,12 +4,15 @@ import Image from "next/image";
 import { formatCurrency } from "@/helper/renderNumber";
 import { formatOrderStatus, getOrderStatusColor } from "@/helper/orderHelper";
 import type { Order } from "@/types/order";
+import { useCheckOrderReviewStatus } from "@/hooks/queries/useReviews";
 
 interface OrderCardProps {
   order: Order;
 }
 
 const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
+  const { data: reviewStatus } = useCheckOrderReviewStatus(order.id);
+
   return (
     <div className="bg-white rounded-xl shadow p-4 md:p-6 flex flex-col gap-3 border border-gray-100 hover:shadow-md transition-shadow">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
@@ -81,12 +84,22 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
         <span className="font-semibold text-base">
           Total: {formatCurrency(order.totalAmount)} VND
         </span>
-        <Link
-          href={`/user/orders/${order.id}`}
-          className="text-custom-wine text-sm font-medium hover:underline"
-        >
-          View Details
-        </Link>
+        <div className="flex gap-2 items-center">
+          <Link
+            href={`/user/orders/${order.id}`}
+            className="text-custom-wine text-sm font-medium hover:underline"
+          >
+            View Details
+          </Link>
+          {reviewStatus?.canReview && (
+            <Link
+              href={`/user/orders/${order.id}/review`}
+              className="bg-custom-wine text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-custom-wine/90 transition-colors"
+            >
+              Write Review
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );

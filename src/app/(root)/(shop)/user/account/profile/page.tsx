@@ -88,155 +88,218 @@ const ProfilePage = () => {
   };
 
   if (getMyInfo.isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-custom-yellow py-4 md:py-8 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 max-w-md mx-auto">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-custom-wine mx-auto mb-4"></div>
+            <p className="text-custom-dark">Loading profile...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (getMyInfo.isError) {
-    return <div>Failed to load profile.</div>;
+    return (
+      <div className="min-h-screen bg-custom-yellow py-4 md:py-8 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 max-w-md mx-auto">
+          <div className="text-center">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h2 className="text-2xl font-semibold mb-4 text-custom-dark">
+              Failed to load profile
+            </h2>
+            <p className="text-custom-purple">Please try again later</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-10 w-full flex flex-col items-center justify-center border border-pink-100 mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="bg-pink-100 text-custom-wine rounded-full p-3 shadow text-3xl">
-          <FaUser />
+    <div className="bg-custom-yellow">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-custom-rose to-custom-pink p-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-white text-custom-wine rounded-full p-3 shadow-lg">
+                <FaUser className="text-xl" />
+              </div>
+              <h2 className="text-2xl font-bold text-white">My Profile</h2>
+            </div>
+          </div>
+          <div className="p-6 md:p-8">
+            <form
+              className="flex flex-col gap-6 w-full"
+              onSubmit={handleSubmit(onSubmit)}
+            >
+              {/* Username Field */}
+              <div className="relative">
+                <label className="text-base font-semibold mb-2 text-custom-dark flex items-center gap-2">
+                  <FaUser className="text-custom-wine" /> Username
+                </label>
+                <input
+                  className="w-full border border-gray-300 rounded-lg px-12 py-3 bg-gray-50 text-gray-500 cursor-not-allowed text-base shadow-sm transition-all"
+                  disabled
+                  {...register("username")}
+                />
+                <FaUser className="absolute left-4 top-11 text-gray-400 text-lg pointer-events-none" />
+              </div>
+
+              {/* Name Field */}
+              <div className="relative">
+                <label className="text-base font-semibold mb-2 text-custom-dark flex items-center gap-2">
+                  <FaUser className="text-custom-wine" /> Full Name
+                </label>
+                <input
+                  className="w-full border border-gray-300 rounded-lg px-12 py-3 focus:ring-2 focus:ring-custom-wine focus:border-custom-wine focus:outline-none text-base shadow-sm transition-all hover:border-custom-rose"
+                  placeholder="Enter your full name"
+                  {...register("name", { required: "Name is required" })}
+                />
+                <FaUser className="absolute left-4 top-11 text-gray-400 text-lg pointer-events-none" />
+                {errors.name && (
+                  <span className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                    ⚠️ {errors.name.message as string}
+                  </span>
+                )}
+              </div>
+
+              {/* Email Field */}
+              <div className="relative">
+                <label className="text-base font-semibold mb-2 text-custom-dark flex items-center gap-2">
+                  <FaEnvelope className="text-custom-wine" /> Email Address
+                </label>
+                <input
+                  className="w-full border border-gray-300 rounded-lg px-12 py-3 bg-gray-50 text-gray-500 cursor-not-allowed text-base shadow-sm transition-all"
+                  disabled
+                  {...register("email")}
+                />
+                <FaEnvelope className="absolute left-4 top-11 text-gray-400 text-lg pointer-events-none" />
+              </div>
+
+              {/* Phone Field */}
+              <div className="relative">
+                <label className="text-base font-semibold mb-2 text-custom-dark flex items-center gap-2">
+                  <FaPhone className="text-custom-wine" /> Phone Number
+                </label>
+                <input
+                  className="w-full border border-gray-300 rounded-lg px-12 py-3 focus:ring-2 focus:ring-custom-wine focus:border-custom-wine focus:outline-none text-base shadow-sm transition-all hover:border-custom-rose"
+                  placeholder="Enter your phone number"
+                  {...register("phone")}
+                />
+                <FaPhone className="absolute left-4 top-11 text-gray-400 text-lg pointer-events-none" />
+              </div>
+
+              {/* Gender Selection */}
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <span className="text-base font-semibold text-custom-dark flex items-center gap-2 mb-3">
+                  <FaVenusMars className="text-custom-wine" /> Gender
+                </span>
+                <div className="flex flex-wrap gap-6">
+                  <label className="flex items-center gap-2 text-custom-dark cursor-pointer hover:text-custom-wine transition-colors">
+                    <input
+                      type="radio"
+                      value="male"
+                      {...register("gender")}
+                      className="accent-custom-wine w-4 h-4"
+                    />
+                    <span className="select-none">Male</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-custom-dark cursor-pointer hover:text-custom-wine transition-colors">
+                    <input
+                      type="radio"
+                      value="female"
+                      {...register("gender")}
+                      className="accent-custom-wine w-4 h-4"
+                    />
+                    <span className="select-none">Female</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-custom-dark cursor-pointer hover:text-custom-wine transition-colors">
+                    <input
+                      type="radio"
+                      value="other"
+                      {...register("gender")}
+                      className="accent-custom-wine w-4 h-4"
+                    />
+                    <span className="select-none">Other</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Birth Date */}
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <span className="text-base font-semibold text-custom-dark flex items-center gap-2 mb-3">
+                  <FaBirthdayCake className="text-custom-wine" /> Date of Birth
+                </span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="relative">
+                    <input
+                      className="w-full border border-gray-300 rounded-lg px-12 py-3 focus:ring-2 focus:ring-custom-wine focus:border-custom-wine focus:outline-none text-base shadow-sm transition-all hover:border-custom-rose"
+                      placeholder="Day"
+                      type="number"
+                      min="1"
+                      max="31"
+                      {...register("day")}
+                    />
+                    <FaBirthdayCake className="absolute left-4 top-3.5 text-gray-400 text-lg pointer-events-none" />
+                  </div>
+                  <div className="relative">
+                    <input
+                      className="w-full border border-gray-300 rounded-lg px-12 py-3 focus:ring-2 focus:ring-custom-wine focus:border-custom-wine focus:outline-none text-base shadow-sm transition-all hover:border-custom-rose"
+                      placeholder="Month"
+                      type="number"
+                      min="1"
+                      max="12"
+                      {...register("month")}
+                    />
+                    <FaBirthdayCake className="absolute left-4 top-3.5 text-gray-400 text-lg pointer-events-none" />
+                  </div>
+                  <div className="relative">
+                    <input
+                      className="w-full border border-gray-300 rounded-lg px-12 py-3 focus:ring-2 focus:ring-custom-wine focus:border-custom-wine focus:outline-none text-base shadow-sm transition-all hover:border-custom-rose"
+                      placeholder="Year"
+                      type="number"
+                      min="1900"
+                      max="2025"
+                      {...register("year")}
+                    />
+                    <FaBirthdayCake className="absolute left-4 top-3.5 text-gray-400 text-lg pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-4">
+                <CtaButton
+                  type="submit"
+                  text="Save Profile"
+                  onClick={() => {}} // The actual submission is handled by the form onSubmit
+                  variant="profile"
+                  isLoading={updateProfileMutation.isPending}
+                  loadingText="Saving Changes..."
+                  icon={<FaUser />}
+                  loadingIcon={<FaUser />}
+                  disabled={updateProfileMutation.isPending}
+                  className="w-full py-3"
+                />
+              </div>
+            </form>
+          </div>
         </div>
-        <h2 className="text-3xl font-bold text-custom-wine text-center tracking-tight drop-shadow-sm">
-          My Profile
-        </h2>
+
+        {/* Additional Info Section */}
+        <div className="mt-6 bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+          <h4 className="font-semibold mb-3 text-custom-dark flex items-center">
+            <span className="mr-2">ℹ️</span>
+            Account Information
+          </h4>
+          <div className="text-sm text-custom-purple space-y-1">
+            <p>• Username and email cannot be changed after registration</p>
+            <p>• Your personal information is secure and encrypted</p>
+            <p>• Contact support if you need to update restricted fields</p>
+          </div>
+        </div>
       </div>
-      <form
-        className="flex flex-col gap-5 w-full"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <div className="relative">
-          <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
-            <FaUser className="text-custom-wine" /> Username
-          </label>
-          <input
-            className="w-full border border-gray-200 rounded-lg px-10 py-2 bg-gray-100 text-gray-500 cursor-not-allowed text-base shadow-sm"
-            disabled
-            {...register("username")}
-          />
-          <FaUser className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
-        </div>
-        <div className="relative">
-          <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
-            <FaUser className="text-custom-wine" /> Name
-          </label>
-          <input
-            className="w-full border border-gray-200 rounded-lg px-10 py-2 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base shadow-sm"
-            placeholder="Enter your name"
-            {...register("name", { required: "Name is required" })}
-          />
-          <FaUser className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
-          {errors.name && (
-            <span className="text-red-500 text-sm mt-1 block">
-              {errors.name.message as string}
-            </span>
-          )}
-        </div>
-        <div className="relative">
-          <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
-            <FaEnvelope className="text-custom-wine" /> Email
-          </label>
-          <input
-            className="w-full border border-gray-200 rounded-lg px-10 py-2 bg-gray-100 text-gray-500 cursor-not-allowed text-base shadow-sm"
-            disabled
-            {...register("email")}
-          />
-          <FaEnvelope className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
-        </div>
-        <div className="relative">
-          <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
-            <FaPhone className="text-custom-wine" /> Phone Number
-          </label>
-          <input
-            className="w-full border border-gray-200 rounded-lg px-10 py-2 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base shadow-sm"
-            placeholder="Add your phone number"
-            {...register("phone")}
-          />
-          <FaPhone className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
-        </div>
-        <div className="flex flex-wrap gap-6 items-center">
-          <span className="text-base font-semibold text-gray-800 flex items-center gap-2">
-            <FaVenusMars className="text-custom-wine" /> Gender:
-          </span>
-          <label className="flex items-center gap-2 text-gray-700">
-            <input
-              type="radio"
-              value="male"
-              {...register("gender")}
-              className="accent-custom-wine"
-            />
-            Male
-          </label>
-          <label className="flex items-center gap-2 text-gray-700">
-            <input
-              type="radio"
-              value="female"
-              {...register("gender")}
-              className="accent-custom-wine"
-            />
-            Female
-          </label>
-          <label className="flex items-center gap-2 text-gray-700">
-            <input
-              type="radio"
-              value="other"
-              {...register("gender")}
-              className="accent-custom-wine"
-            />
-            Other
-          </label>
-        </div>
-        <div className="flex gap-4">
-          <div className="flex-1 relative">
-            <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
-              <FaBirthdayCake className="text-custom-wine" /> Day
-            </label>
-            <input
-              className="w-full border border-gray-200 rounded-lg px-10 py-2 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base shadow-sm"
-              placeholder="Day"
-              {...register("day")}
-            />
-            <FaBirthdayCake className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
-          </div>
-          <div className="flex-1 relative">
-            <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
-              <FaBirthdayCake className="text-custom-wine" /> Month
-            </label>
-            <input
-              className="w-full border border-gray-200 rounded-lg px-10 py-2 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base shadow-sm"
-              placeholder="Month"
-              {...register("month")}
-            />
-            <FaBirthdayCake className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
-          </div>
-          <div className="flex-1 relative">
-            <label className="text-base font-semibold mb-2 text-gray-800 flex items-center gap-2">
-              <FaBirthdayCake className="text-custom-wine" /> Year
-            </label>
-            <input
-              className="w-full border border-gray-200 rounded-lg px-10 py-2 focus:ring-2 focus:ring-custom-wine focus:outline-none text-base shadow-sm"
-              placeholder="Year"
-              {...register("year")}
-            />
-            <FaBirthdayCake className="absolute left-3 top-10 text-gray-300 text-lg pointer-events-none" />
-          </div>
-        </div>
-        <CtaButton
-          type="submit"
-          text="Save"
-          onClick={() => {}} // The actual submission is handled by the form onSubmit
-          variant="profile"
-          isLoading={updateProfileMutation.isPending}
-          loadingText="Saving..."
-          icon={<FaUser />}
-          loadingIcon={<FaUser />}
-          disabled={updateProfileMutation.isPending}
-        />
-      </form>
     </div>
   );
 };

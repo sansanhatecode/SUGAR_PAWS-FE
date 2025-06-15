@@ -48,7 +48,7 @@ const PlusSize = () => {
         </p>
         <CtaButton
           text="BROWSE ALL PLUS PRICE"
-          onClick={() => router.push("/categories/plus-size")}
+          onClick={() => router.push("/plus-size")}
         />
       </div>
       <div className="w-[50%]">

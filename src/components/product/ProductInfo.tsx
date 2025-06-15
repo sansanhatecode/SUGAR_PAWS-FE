@@ -4,6 +4,7 @@ import React from "react";
 import { FiHeart, FiShare2 } from "react-icons/fi";
 import StarRating from "./rating/StarRating";
 import { formatCurrency } from "@/helper/renderNumber";
+import { useGetProductReviewStats } from "@/hooks/queries/useReviews";
 
 interface ProductInfoProps {
   product: Product;
@@ -18,7 +19,23 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
   onWishlistClick,
   onShareClick,
 }) => {
-  // Calculate totals from all ProductDetails when no specific ProductDetail is selected
+  // Fetch review stats for the product
+  const { data: reviewStats } = useGetProductReviewStats(product.id.toString());
+
+  // Calculate recommendation percentage (4+ star reviews)
+  const calculateRecommendationPercentage = () => {
+    if (!reviewStats?.ratingDistribution || reviewStats.totalReviews === 0) {
+      return 0;
+    }
+
+    const positiveReviews =
+      (reviewStats.ratingDistribution[4] || 0) +
+      (reviewStats.ratingDistribution[5] || 0);
+    return Math.round((positiveReviews / reviewStats.totalReviews) * 100);
+  };
+
+  const recommendationPercentage = calculateRecommendationPercentage();
+
   const calculateTotals = () => {
     if (!product.productDetails?.length) {
       return {
@@ -45,7 +62,6 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
 
   const { cheapestPrice, totalStock, totalSales } = calculateTotals();
 
-  // Use selectedProductDetail data if available, otherwise use calculated totals
   const displayPrice = selectedProductDetail?.price || cheapestPrice;
   const oldPrice =
     selectedProductDetail?.oldPrice ||
@@ -93,9 +109,6 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
             {formatCurrency(oldPrice)}₫
           </span>
         )}
-        {!selectedProductDetail && product.productDetails?.length && (
-          <span className="text-sm text-gray-500 ml-2">(Cheapest option)</span>
-        )}
       </div>
 
       {/* Stock and Sales Information */}
@@ -123,7 +136,6 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
         )}
       </div>
 
-      {/* Low Stock Warning */}
       {stockInfo < 10 && stockInfo > 0 && (
         <div className="text-sm font-medium text-red-600 bg-red-50 px-3 py-1 rounded-md mb-2 flex items-center">
           <svg
@@ -152,10 +164,16 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
         <span className="font-medium">{(product.rating ?? 5).toFixed(1)}</span>
         <span className="text-gray-400 hidden sm:inline">|</span>
         <a href="#reviews-section" className="hover:underline">
-          999 Reviews
+          {reviewStats?.totalReviews !== undefined
+            ? `${reviewStats.totalReviews} ${reviewStats.totalReviews === 1 ? "Review" : "Reviews"}`
+            : "0 Reviews"}
         </a>
         <span className="text-gray-400 hidden sm:inline">|</span>
-        <span className="text-green-600 font-medium">93% Recommended</span>
+        <span className="text-green-600 font-medium">
+          {reviewStats?.totalReviews && reviewStats.totalReviews > 0
+            ? `${recommendationPercentage}% Recommended`
+            : "No recommendations yet"}
+        </span>
       </div>
     </div>
   );

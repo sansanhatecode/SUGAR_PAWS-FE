@@ -1,4 +1,9 @@
 import React from "react";
+import {
+  FiChevronLeft,
+  FiChevronRight,
+  FiMoreHorizontal,
+} from "react-icons/fi";
 
 interface PaginationProps {
   currentPage: number;
@@ -33,56 +38,76 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-2 mt-6">
-      <div className="flex items-center justify-center gap-2">
+    <div className="flex flex-col items-center justify-center gap-4 mt-8 mb-8">
+      <div className="flex items-center justify-center gap-1">
+        {/* Previous Button */}
         <button
-          className="px-3 py-1 rounded border bg-white disabled:opacity-50"
+          className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
           onClick={handlePrev}
           disabled={currentPage === 1}
+          aria-label="Previous page"
         >
-          Prev
+          <FiChevronLeft className="w-4 h-4 text-gray-600" />
         </button>
+
+        {/* First page + ellipsis */}
         {getPageNumbers()[0] > 1 && (
           <>
             <button
-              className="px-3 py-1 rounded border bg-white"
+              className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md text-sm font-medium text-gray-700"
               onClick={() => onPageChange(1)}
             >
               1
             </button>
-            <span>...</span>
+            <div className="flex items-center justify-center w-10 h-10">
+              <FiMoreHorizontal className="w-4 h-4 text-gray-400" />
+            </div>
           </>
         )}
+
+        {/* Page Numbers */}
         {getPageNumbers().map((page) => (
           <button
             key={page}
-            className={`px-3 py-1 rounded border ${page === currentPage ? "bg-black text-white" : "bg-white"}`}
+            className={`flex items-center justify-center w-10 h-10 rounded-lg border transition-all duration-200 shadow-sm text-sm font-medium ${
+              page === currentPage
+                ? "bg-custom-rose text-white border-custom-rose shadow-lg transform scale-105"
+                : "border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md text-gray-700"
+            }`}
             onClick={() => onPageChange(page)}
           >
             {page}
           </button>
         ))}
+
+        {/* Last page + ellipsis */}
         {getPageNumbers().at(-1)! < totalPages && (
           <>
-            <span>...</span>
+            <div className="flex items-center justify-center w-10 h-10">
+              <FiMoreHorizontal className="w-4 h-4 text-gray-400" />
+            </div>
             <button
-              className="px-3 py-1 rounded border bg-white"
+              className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md text-sm font-medium text-gray-700"
               onClick={() => onPageChange(totalPages)}
             >
               {totalPages}
             </button>
           </>
         )}
+
+        {/* Next Button */}
         <button
-          className="px-3 py-1 rounded border bg-white disabled:opacity-50"
+          className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
           onClick={handleNext}
           disabled={currentPage === totalPages}
+          aria-label="Next page"
         >
-          Next
+          <FiChevronRight className="w-4 h-4 text-gray-600" />
         </button>
       </div>
-      <div className="text-sm text-gray-500 mt-2">
-        Page {currentPage} / {totalPages}
+      <div className="text-sm text-gray-500">
+        Page <span className="font-medium text-custom-rose">{currentPage}</span>{" "}
+        of <span className="font-medium">{totalPages}</span>
       </div>
     </div>
   );

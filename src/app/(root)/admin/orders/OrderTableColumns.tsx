@@ -173,7 +173,7 @@ export function useOrderColumns({
       {
         id: "paymentMethod",
         header: "Payment Method",
-        size: 120,
+        size: 160,
         Cell: ({ row }) => {
           const payment = row.original.payment;
           const method = payment?.method;

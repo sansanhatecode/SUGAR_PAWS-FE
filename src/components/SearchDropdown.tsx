@@ -4,18 +4,50 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/types/product";
 import { FiSearch } from "react-icons/fi";
+import { useImageSrc } from "@/hooks/useImageSrc";
+
+// Component để hiển thị loading
+const LoadingSpinner: React.FC = () => (
+  <div className="flex items-center justify-center p-6">
+    <div className="flex items-center space-x-3">
+      <div className="animate-spin rounded-full h-5 w-5 border-2 border-custom-rose border-t-transparent"></div>
+      <span className="text-sm text-gray-600">Searching...</span>
+    </div>
+  </div>
+);
+
+// Component để xử lý image với protocol-relative URL
+const SearchResultImage: React.FC<{ src: string; alt: string }> = ({
+  src,
+  alt,
+}) => {
+  const imageSrc = useImageSrc(src);
+  return (
+    <Image
+      src={imageSrc}
+      alt={alt}
+      fill
+      sizes="48px"
+      className="object-cover product-image"
+    />
+  );
+};
 
 interface SearchDropdownProps {
   searchResults: Product[];
+  totalProducts: number;
   isVisible: boolean;
   searchQuery: string;
+  isLoading: boolean;
   onClose: () => void;
 }
 
 const SearchDropdown: React.FC<SearchDropdownProps> = ({
   searchResults,
+  totalProducts,
   isVisible,
   searchQuery,
+  isLoading,
   onClose,
 }) => {
   if (!isVisible || !searchQuery.trim()) return null;
@@ -29,29 +61,28 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
       }`}
       style={{ minWidth: "320px" }}
     >
-      {searchResults.length > 0 ? (
+      {isLoading && searchQuery.trim().length > 0 ? (
+        <LoadingSpinner />
+      ) : searchResults.length > 0 ? (
         <>
           <div className="p-3 border-b border-gray-100 text-sm text-gray-600">
-            Found {searchResults.length} product
-            {searchResults.length > 1 ? "s" : ""} for &ldquo;{searchQuery}
+            Found {totalProducts} product
+            {totalProducts > 1 ? "s" : ""} for &ldquo;{searchQuery}
             &rdquo;
           </div>
           <div className="divide-y divide-gray-100">
             {searchResults.map((product) => (
               <Link
                 key={product.id}
-                href={`/product/${product.id}`}
+                href={`/collections/${product.id}`}
                 onClick={onClose}
                 className="flex items-center p-3 hover:bg-gray-50 transition-colors duration-200 search-result-item"
               >
                 <div className="relative w-12 h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                   {product.displayImage && product.displayImage[0] && (
-                    <Image
+                    <SearchResultImage
                       src={product.displayImage[0]}
                       alt={product.name}
-                      fill
-                      sizes="48px"
-                      className="object-cover product-image"
                     />
                   )}
                 </div>
@@ -64,7 +95,6 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
                       ${product.minPrice}
                       {product.maxPrice > product.minPrice && (
                         <span className="text-gray-500">
-                          {" "}
                           - ${product.maxPrice}
                         </span>
                       )}
@@ -92,14 +122,15 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
               </Link>
             ))}
           </div>
-          {searchResults.length > 5 && (
-            <div className="p-3 border-t border-gray-100 text-center">
+          {totalProducts > searchResults.length && (
+            <div className="p-3 border-t border-gray-100 text-center bg-gray-50">
               <Link
                 href={`/search?q=${encodeURIComponent(searchQuery)}`}
                 onClick={onClose}
-                className="text-sm text-custom-rose hover:text-custom-rose font-medium"
+                className="inline-flex items-center text-sm text-custom-rose hover:text-custom-rose/80 font-medium transition-colors"
               >
-                View all {searchResults.length} results
+                <FiSearch className="h-4 w-4 mr-2" />
+                View all {totalProducts} results
               </Link>
             </div>
           )}

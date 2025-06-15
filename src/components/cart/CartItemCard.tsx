@@ -1,7 +1,8 @@
 // components/CartItemCard.tsx
-import { ensureAbsoluteUrl, formatCurrency } from "@/helper/renderNumber";
+import { formatCurrency } from "@/helper/renderNumber";
 import { CartItem } from "@/types/cart";
 import Image from "next/image";
+import { useImageSrc } from "@/hooks/useImageSrc";
 
 type Props = {
   item: CartItem;
@@ -16,18 +17,20 @@ export default function CartItemCard({
   onDecrease,
   onRemove,
 }: Props) {
+  const imageSrc = useImageSrc(
+    item.productDetail?.image?.url ??
+      (item.productDetail?.displayImage &&
+      item.productDetail?.displayImage?.length > 0
+        ? item.productDetail?.displayImage[0]
+        : null),
+  );
+
   return (
     <div className="flex gap-6 py-4 border-b text-[12px] text-custom-dark items-stretch">
       <div className="w-[112px] min-h-[112px] relative aspect-square">
         {item.productDetail?.image?.url || item.productDetail?.displayImage ? (
           <Image
-            src={ensureAbsoluteUrl(
-              item.productDetail?.image?.url ??
-                (item.productDetail?.displayImage &&
-                item.productDetail?.displayImage?.length > 0
-                  ? item.productDetail?.displayImage[0]
-                  : ""),
-            )}
+            src={imageSrc}
             alt={item.productDetail?.name ?? ""}
             fill
             sizes="112px"

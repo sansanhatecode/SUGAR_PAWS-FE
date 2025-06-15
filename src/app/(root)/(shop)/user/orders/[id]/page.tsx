@@ -37,11 +37,11 @@ const statusToStepIndex = (status: string) => {
       return 3;
     case "CANCELLED":
     case "REFUNDED":
-      return 2; // treat as stopped at delivered step
+      return 2;
     case "REQUESTCANCEL":
-      return 1; // treat as stopped at confirmed step
+      return 1;
     default:
-      return 0; // default to first step if unknown
+      return 0;
   }
 };
 

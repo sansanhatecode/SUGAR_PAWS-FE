@@ -14,6 +14,31 @@ import LoginRequiredModal from "../ui/LoginRequiredModal";
 import { showSuccessToast } from "../ui/SuccessToast";
 import { showErrorToast } from "../ui/ErrorToast";
 import ProductOptionsSelector from "./ProductOptionsSelector";
+import { useImageSrc } from "@/hooks/useImageSrc";
+
+// Component để xử lý product images với protocol-relative URLs
+const ProductImage: React.FC<{
+  src: string;
+  alt: string;
+  fill?: boolean;
+  sizes?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  priority?: boolean;
+}> = ({ src, alt, fill, sizes, className, style, priority }) => {
+  const imageSrc = useImageSrc(src);
+  return (
+    <Image
+      src={imageSrc}
+      alt={alt}
+      fill={fill}
+      sizes={sizes}
+      className={className}
+      style={style}
+      priority={priority}
+    />
+  );
+};
 
 type ProductCardProps = {
   product: Product;
@@ -93,11 +118,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     setSelectedSize(null);
     setSelectedType(null);
     setValidationError(null);
-    // Set initial preview image with proper protocol
-    const initialImage = displayImage[0].startsWith("//")
-      ? `https:${displayImage[0]}`
-      : displayImage[0];
-    setPreviewImage(initialImage);
+    // Set initial preview image - useImageSrc will handle protocol conversion
+    setPreviewImage(displayImage[0]);
   };
 
   const updatePreviewImage = (
@@ -161,35 +183,36 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       }
 
       if (bestMatch && bestMatch.image) {
-        const imageUrl = bestMatch.image.url.startsWith("//")
-          ? `https:${bestMatch.image.url}`
-          : bestMatch.image.url;
-        setPreviewImage(imageUrl);
+        // useImageSrc will handle protocol conversion in the component
+        setPreviewImage(bestMatch.image.url);
       } else {
-        // Fallback to display image with proper protocol
-        const fallbackImage = displayImage[0].startsWith("//")
-          ? `https:${displayImage[0]}`
-          : displayImage[0];
-        setPreviewImage(fallbackImage);
+        // Fallback to display image - useImageSrc will handle protocol conversion
+        setPreviewImage(displayImage[0]);
       }
     }
   };
 
   const addProductToCart = () => {
-    // Validate selections
-    if (colors.length > 0 && !selectedColor) {
-      setValidationError("Please select a color");
-      return;
-    }
+    // Check if product has multiple productDetails, then validation is required
+    const hasMultipleDetails =
+      product.productDetails && product.productDetails.length > 1;
 
-    if (sizes && sizes.length > 0 && !selectedSize) {
-      setValidationError("Please select a size");
-      return;
-    }
+    if (hasMultipleDetails) {
+      // Validate selections for products with multiple details
+      if (colors.length > 0 && !selectedColor) {
+        setValidationError("Please select a color");
+        return;
+      }
 
-    if (types && types.length > 0 && !selectedType) {
-      setValidationError("Please select a type");
-      return;
+      if (sizes && sizes.length > 0 && !selectedSize) {
+        setValidationError("Please select a size");
+        return;
+      }
+
+      if (types && types.length > 0 && !selectedType) {
+        setValidationError("Please select a type");
+        return;
+      }
     }
 
     setValidationError(null);
@@ -231,12 +254,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         onMouseLeave={() => setHovered(false)}
       >
         {/* Primary image */}
-        <Image
-          src={
-            displayImage[0].startsWith("//")
-              ? `https:${displayImage[0]}`
-              : displayImage[0]
-          }
+        <ProductImage
+          src={displayImage[0]}
           alt={name}
           fill
           sizes="(max-width: 768px) 100vw, (min-width: 769px) 50vw"
@@ -244,15 +263,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           style={{ opacity: hovered && displayImage[1] ? 0 : 1 }}
           priority
         />
-
         {/* Hover image - only rendered if it exists */}
         {displayImage[1] && (
-          <Image
-            src={
-              displayImage[1].startsWith("//")
-                ? `https:${displayImage[1]}`
-                : displayImage[1]
-            }
+          <ProductImage
+            src={displayImage[1]}
             alt={`${name} - hover view`}
             fill
             sizes="(max-width: 768px) 100vw, (min-width: 769px) 50vw"
@@ -314,6 +328,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             updatePreviewImage(selectedColor, selectedSize, type);
           }}
           onAddToCart={addProductToCart}
+          productDetails={product.productDetails}
         />
       </Modal>
 

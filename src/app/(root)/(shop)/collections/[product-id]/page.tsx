@@ -58,6 +58,11 @@ export default function ProductDetailPage() {
     "description"
   );
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [optionErrors, setOptionErrors] = useState<{
+    color?: string;
+    size?: string;
+    type?: string;
+  }>({});
   const [selectedProductDetail, setSelectedProductDetail] =
     useState<ProductDetail | null>(null);
   const user = useSelector(selectUser);
@@ -90,10 +95,8 @@ export default function ProductDetailPage() {
     }
   }, [product, selectedImage]);
 
-  // Effect to update selectedProductDetail when color, size, or type changes
   useEffect(() => {
     if (product && product.productDetails) {
-      // Get available options from productDetails
       const availableColors = Array.from(
         new Set(
           product.productDetails.map((detail) => detail.color).filter(Boolean)
@@ -110,12 +113,10 @@ export default function ProductDetailPage() {
         )
       );
 
-      // Check if all required selections are made
       const hasRequiredColor = availableColors.length === 0 || selectedColor;
       const hasRequiredSize = availableSizes.length === 0 || selectedSize;
       const hasRequiredType = availableTypes.length === 0 || selectedType;
 
-      // Only find matching detail if all required selections are made for setSelectedProductDetail
       if (hasRequiredColor && hasRequiredSize && hasRequiredType) {
         const matchingDetail = product.productDetails.find(
           (detail) =>
@@ -126,15 +127,11 @@ export default function ProductDetailPage() {
 
         setSelectedProductDetail(matchingDetail || null);
       } else {
-        // Clear selection if not all required options are selected
         setSelectedProductDetail(null);
       }
 
-      // For image preview, find best matching detail even with partial selections
-      // Priority: try to match as many selected attributes as possible
       let bestMatch = null;
 
-      // If we have any selections, try to find the best match
       if (selectedColor || selectedSize || selectedType) {
         const candidates = product.productDetails.filter((detail) => {
           const colorMatch =
@@ -178,9 +175,29 @@ export default function ProductDetailPage() {
     }
   }, [product, selectedColor, selectedSize, selectedType]);
 
-  const handleColorSelect = (color: string) => setSelectedColor(color);
-  const handleSizeSelect = (size: string) => setSelectedSize(size);
-  const handleTypeSelect = (type: string) => setSelectedType(type);
+  const handleColorSelect = (color: string) => {
+    setSelectedColor(color);
+    // Clear color error when user selects a color
+    if (optionErrors.color) {
+      setOptionErrors((prev) => ({ ...prev, color: undefined }));
+    }
+  };
+
+  const handleSizeSelect = (size: string) => {
+    setSelectedSize(size);
+    // Clear size error when user selects a size
+    if (optionErrors.size) {
+      setOptionErrors((prev) => ({ ...prev, size: undefined }));
+    }
+  };
+
+  const handleTypeSelect = (type: string) => {
+    setSelectedType(type);
+    // Clear type error when user selects a type
+    if (optionErrors.type) {
+      setOptionErrors((prev) => ({ ...prev, type: undefined }));
+    }
+  };
   const handleDecrementQuantity = () => setQuantity((q) => Math.max(1, q - 1));
   const handleIncrementQuantity = () => setQuantity((q) => q + 1);
   const handleQuantityChange = (newQuantity: number) =>
@@ -195,6 +212,53 @@ export default function ProductDetailPage() {
     if (!user || !user.username) {
       setIsLoginModalOpen(true);
       return;
+    }
+
+    // Clear previous errors
+    setOptionErrors({});
+
+    // Check if product has multiple productDetails, then validation is required
+    const hasMultipleDetails =
+      product.productDetails && product.productDetails.length > 1;
+
+    if (hasMultipleDetails) {
+      const errors: { color?: string; size?: string; type?: string } = {};
+
+      // Get available options from productDetails
+      const availableColors = Array.from(
+        new Set(
+          product.productDetails!.map((detail) => detail.color).filter(Boolean)
+        )
+      );
+      const availableSizes = Array.from(
+        new Set(
+          product.productDetails!.map((detail) => detail.size).filter(Boolean)
+        )
+      );
+      const availableTypes = Array.from(
+        new Set(
+          product.productDetails!.map((detail) => detail.type).filter(Boolean)
+        )
+      );
+
+      // Validate required selections
+      if (availableColors.length > 0 && !selectedColor) {
+        errors.color = "Please select a color";
+      }
+
+      if (availableSizes.length > 0 && !selectedSize) {
+        errors.size = "Please select a size";
+      }
+
+      if (availableTypes.length > 0 && !selectedType) {
+        errors.type = "Please select a type";
+      }
+
+      // If there are validation errors, show them and return
+      if (Object.keys(errors).length > 0) {
+        setOptionErrors(errors);
+        return;
+      }
     }
 
     try {
@@ -225,6 +289,53 @@ export default function ProductDetailPage() {
     if (!user || !user.username) {
       setIsLoginModalOpen(true);
       return;
+    }
+
+    // Clear previous errors
+    setOptionErrors({});
+
+    // Check if product has multiple productDetails, then validation is required
+    const hasMultipleDetails =
+      product.productDetails && product.productDetails.length > 1;
+
+    if (hasMultipleDetails) {
+      const errors: { color?: string; size?: string; type?: string } = {};
+
+      // Get available options from productDetails
+      const availableColors = Array.from(
+        new Set(
+          product.productDetails!.map((detail) => detail.color).filter(Boolean)
+        )
+      );
+      const availableSizes = Array.from(
+        new Set(
+          product.productDetails!.map((detail) => detail.size).filter(Boolean)
+        )
+      );
+      const availableTypes = Array.from(
+        new Set(
+          product.productDetails!.map((detail) => detail.type).filter(Boolean)
+        )
+      );
+
+      // Validate required selections
+      if (availableColors.length > 0 && !selectedColor) {
+        errors.color = "Please select a color";
+      }
+
+      if (availableSizes.length > 0 && !selectedSize) {
+        errors.size = "Please select a size";
+      }
+
+      if (availableTypes.length > 0 && !selectedType) {
+        errors.type = "Please select a type";
+      }
+
+      // If there are validation errors, show them and return
+      if (Object.keys(errors).length > 0) {
+        setOptionErrors(errors);
+        return;
+      }
     }
 
     try {
@@ -353,6 +464,8 @@ export default function ProductDetailPage() {
             onColorSelect={handleColorSelect}
             onSizeSelect={handleSizeSelect}
             onTypeSelect={handleTypeSelect}
+            productDetails={product.productDetails}
+            errors={optionErrors}
           />
           <QuantityAddToCart
             quantity={quantity}
@@ -407,7 +520,6 @@ export default function ProductDetailPage() {
       {/* Related Products Section */}
       <RelatedProducts productId={productId ?? ""} className="mt-12 mb-8" />
 
-      {/* Login Required Modal */}
       <LoginRequiredModal
         open={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}

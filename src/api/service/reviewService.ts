@@ -1,4 +1,4 @@
-import { useRequest } from "../Request";
+import { useRequest, Params } from "../Request";
 import API from "../api";
 
 export interface ReviewResponse {
@@ -22,6 +22,23 @@ export interface ReviewStatsResponse {
   ratingDistribution: { [key: number]: number };
 }
 
+export interface OrderReviewStatusResponse {
+  canReview: boolean;
+  completedItems: number;
+  reviewedItems: number;
+  pendingReviewItems: {
+    orderItemId: number;
+    productName: string;
+    productId: number;
+  }[];
+}
+
+export interface CreateReviewRequest extends Params {
+  orderItemId: number;
+  rating: number;
+  comment?: string;
+}
+
 export function useReviewService() {
   const { Request } = useRequest();
 
@@ -33,9 +50,12 @@ export function useReviewService() {
         `/${API.REVIEWS}/product/${productId}`,
       );
       return data || [];
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error("Failed to fetch reviews:", error);
-      throw error;
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch reviews.",
+      );
     }
   };
 
@@ -49,14 +69,82 @@ export function useReviewService() {
       return (
         data || { totalReviews: 0, averageRating: 0, ratingDistribution: {} }
       );
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error("Failed to fetch review stats:", error);
-      throw error;
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch review stats.",
+      );
+    }
+  };
+
+  const checkOrderReviewStatus = async (
+    orderId: number,
+  ): Promise<OrderReviewStatusResponse> => {
+    try {
+      const { data } = await Request.get<OrderReviewStatusResponse>(
+        `/${API.REVIEWS}/order/${orderId}/status`,
+      );
+      return (
+        data || {
+          canReview: false,
+          completedItems: 0,
+          reviewedItems: 0,
+          pendingReviewItems: [],
+        }
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Failed to check order review status:", error);
+      throw new Error(
+        error.response?.data?.message || "Failed to check order review status.",
+      );
+    }
+  };
+
+  const createReview = async (
+    reviewData: CreateReviewRequest,
+  ): Promise<ReviewResponse> => {
+    try {
+      const { data } = await Request.post<ReviewResponse>(
+        `/${API.REVIEWS}`,
+        reviewData,
+      );
+      if (!data) {
+        throw new Error("No data returned from create review request");
+      }
+      return data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Failed to create review:", error);
+      throw new Error(
+        error.response?.data?.message || "Failed to create review.",
+      );
+    }
+  };
+
+  const getReviewsByOrderId = async (
+    orderId: number,
+  ): Promise<ReviewResponse[]> => {
+    try {
+      const { data } = await Request.get<ReviewResponse[]>(
+        `/${API.REVIEWS}/order/${orderId}`,
+      );
+      return data || [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Failed to fetch order reviews:", error);
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch order reviews.",
+      );
     }
   };
 
   return {
     getReviewsByProductId,
     getReviewStatsByProductId,
+    checkOrderReviewStatus,
+    createReview,
+    getReviewsByOrderId,
   };
 }
