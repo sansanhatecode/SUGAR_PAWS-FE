@@ -19,6 +19,7 @@ const API = {
   SHIPPING_FEE: "orders/shipping-fee",
   CATEGORIES: "categories",
   PAYMENTS: "payments",
+  REVIEWS: "reviews",
 };
 
 export default API;

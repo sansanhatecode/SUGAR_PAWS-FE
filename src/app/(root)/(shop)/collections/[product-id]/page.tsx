@@ -10,8 +10,12 @@ import ProductInfo from "@/components/product/ProductInfo";
 import ProductOptions from "@/components/product/ProductOptions";
 import QuantityAddToCart from "@/components/product/QuantityAddToCart";
 import ProductReviews from "@/components/product/rating/ProductReviews";
-import { ImageDetail, Review, ProductDetail } from "@/types/product";
+import { ImageDetail, ProductDetail } from "@/types/product";
 import { useGetProductDetail } from "@/hooks/queries/useProducts";
+import {
+  useGetProductReviews,
+  useGetProductReviewStats,
+} from "@/hooks/queries/useReviews";
 import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
@@ -25,34 +29,10 @@ import { CartItem } from "@/types/cart";
 import RelatedProducts from "@/components/product/RelatedProducts";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const fetchReviewsData = async (productId: string): Promise<Review[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 150));
-  return [
-    {
-      id: 1,
-      name: "Nicolas Cage",
-      rating: 5,
-      time: "2 days ago",
-      title: "Amazing!",
-      comment: "Great product, fast delivery.",
-    },
-    {
-      id: 2,
-      name: "Robert Downey Jr",
-      rating: 4,
-      time: "1 week ago",
-      title: "Good Value",
-      comment: "Solid build quality for the price.",
-    },
-    {
-      id: 3,
-      name: "Tony Stark",
-      rating: 5,
-      time: "2 weeks ago",
-      title: "Excellent!",
-      comment: "Exactly what I needed.",
-    },
-  ];
+const fetchReviewsData = async (productId: string) => {
+  // This function is now replaced by the useGetProductReviews hook
+  // Keeping for backward compatibility but not used
+  return [];
 };
 
 export default function ProductDetailPage() {
@@ -64,7 +44,11 @@ export default function ProductDetailPage() {
   const { getProductDetail } = useGetProductDetail(productId ?? "");
   const { data: product, isLoading, error } = getProductDetail;
 
-  const [reviews, setReviews] = useState<Review[]>([]);
+  // Fetch reviews data using API
+  const { data: reviews = [], isLoading: reviewsLoading } =
+    useGetProductReviews(productId ?? "");
+  const { data: reviewStats } = useGetProductReviewStats(productId ?? "");
+
   const [selectedImage, setSelectedImage] = useState<ImageDetail | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
@@ -78,19 +62,7 @@ export default function ProductDetailPage() {
     useState<ProductDetail | null>(null);
   const user = useSelector(selectUser);
 
-  // Effect for loading reviews and initializing selected image
-  useEffect(() => {
-    const loadReviews = async () => {
-      try {
-        const reviewsData = await fetchReviewsData(productId ?? "");
-        setReviews(reviewsData);
-      } catch (err) {
-        console.error("Failed to load reviews:", err);
-      }
-    };
-    loadReviews();
-  }, [productId]);
-
+  // Effect for initializing selected image
   useEffect(() => {
     if (product) {
       const images: ImageDetail[] = product.displayImage.map((url) => ({
@@ -290,24 +262,7 @@ export default function ProductDetailPage() {
     }
   };
 
-  const handleSubmitReview = (reviewData: {
-    rating: number;
-    title: string;
-    content: string;
-  }) => {
-    if (!product) return;
-    const newReview: Review = {
-      id: Date.now(),
-      name: "Current User",
-      rating: reviewData.rating,
-      time: "Just now",
-      title: reviewData.title,
-      comment: reviewData.content,
-    };
-    setReviews((prev) => [newReview, ...prev]);
-  };
-
-  if (isLoading) return <DefaultLoading />;
+  if (isLoading || reviewsLoading) return <DefaultLoading />;
   if (error) {
     return (
       <div className="container mx-auto text-center py-20 text-red-600">
@@ -431,7 +386,7 @@ export default function ProductDetailPage() {
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            Reviews ({reviews.length})
+            Reviews ({reviewStats?.totalReviews ?? reviews.length})
           </button>
         </div>
 
@@ -440,9 +395,10 @@ export default function ProductDetailPage() {
             <ProductDescription description={product.description} />
           ) : (
             <ProductReviews
-              productRating={product.rating ?? 5}
+              productRating={reviewStats?.averageRating ?? product.rating ?? 5}
               reviews={reviews}
-              onSubmitReview={handleSubmitReview}
+              totalReviews={reviewStats?.totalReviews}
+              ratingDistribution={reviewStats?.ratingDistribution}
             />
           )}
         </div>

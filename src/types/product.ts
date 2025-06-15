@@ -63,11 +63,21 @@ export type ImageDetail = {
 
 export type Review = {
   id: number;
-  name: string;
+  orderItemId: number;
   rating: number;
-  time: string;
-  title: string;
-  comment: string;
+  comment?: string;
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+  userName?: string;
+  productName?: string;
+  productId?: number;
+  orderDate?: string;
+  orderId?: number;
+  // Legacy fields for compatibility
+  name?: string;
+  time?: string;
+  title?: string;
 };
 
 export type GetProductsRequest = {

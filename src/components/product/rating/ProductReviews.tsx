@@ -7,11 +7,8 @@ import StarRating from "./StarRating";
 interface ProductReviewsProps {
   productRating: number;
   reviews: Review[];
-  onSubmitReview: (reviewData: {
-    rating: number;
-    title: string;
-    content: string;
-  }) => void;
+  totalReviews?: number;
+  ratingDistribution?: { [key: number]: number };
 }
 
 const RatingSummary: React.FC<{
@@ -51,45 +48,67 @@ const RatingSummary: React.FC<{
   </div>
 );
 
-const ReviewItem: React.FC<{ review: Review }> = ({ review }) => (
-  <div className="pt-5 first:pt-0">
-    <div className="flex items-start gap-3 mb-2">
-      <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold text-sm">
-        {review.name.substring(0, 2).toUpperCase()}
-      </div>
-      <div className="flex-grow">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1">
-          <p className="font-semibold text-sm text-gray-900">{review.name}</p>
-          <p className="text-xs text-gray-500 mt-0.5 sm:mt-0">{review.time}</p>
+const ReviewItem: React.FC<{ review: Review }> = ({ review }) => {
+  const displayName = review.userName || review.name || "Anonymous";
+  const displayTime =
+    review.time ||
+    (review.createdAt ? new Date(review.createdAt).toLocaleDateString() : "");
+  const displayTitle = review.title || "";
+  const displayComment = review.comment || "";
+
+  return (
+    <div className="pt-5 first:pt-0">
+      <div className="flex items-start gap-3 mb-2">
+        <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold text-sm">
+          {displayName.substring(0, 2).toUpperCase()}
         </div>
-        <StarRating rating={review.rating} size={16} className="mb-1.5" />
+        <div className="flex-grow">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1">
+            <p className="font-semibold text-sm text-gray-900">{displayName}</p>
+            <p className="text-xs text-gray-500 mt-0.5 sm:mt-0">
+              {displayTime}
+            </p>
+          </div>
+          <StarRating rating={review.rating} size={16} className="mb-1.5" />
+          {review.isVerified && (
+            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+              Verified Purchase
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="pl-0 md:pl-13">
+        {displayTitle && (
+          <h4 className="font-medium text-base text-gray-800 mb-1">
+            {displayTitle}
+          </h4>
+        )}
+        <p className="text-sm text-gray-600 leading-relaxed">
+          {displayComment}
+        </p>
+        <div className="flex gap-4 mt-3 text-xs text-gray-500">
+          <button className="hover:text-indigo-600 transition-colors font-medium">
+            Helpful
+          </button>
+          <span className="text-gray-300">|</span>
+          <button className="hover:text-indigo-600 transition-colors font-medium">
+            Reply
+          </button>
+          <span className="text-gray-300">|</span>
+          <button className="hover:text-red-600 transition-colors font-medium">
+            Report
+          </button>
+        </div>
       </div>
     </div>
-    <div className="pl-0 md:pl-13">
-      <h4 className="font-medium text-base text-gray-800 mb-1">
-        {review.title}
-      </h4>
-      <p className="text-sm text-gray-600 leading-relaxed">{review.comment}</p>
-      <div className="flex gap-4 mt-3 text-xs text-gray-500">
-        <button className="hover:text-indigo-600 transition-colors font-medium">
-          Helpful
-        </button>
-        <span className="text-gray-300">|</span>
-        <button className="hover:text-indigo-600 transition-colors font-medium">
-          Reply
-        </button>
-        <span className="text-gray-300">|</span>
-        <button className="hover:text-red-600 transition-colors font-medium">
-          Report
-        </button>
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 const ProductReviews: React.FC<ProductReviewsProps> = ({
   productRating,
   reviews = [],
+  totalReviews,
+  ratingDistribution,
 }) => {
   const calculateDistribution = (
     reviewsToCalc: Review[]
@@ -120,8 +139,9 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
     return distribution;
   };
 
-  const ratingDistribution = calculateDistribution(reviews);
-  const totalReviews = reviews.length;
+  const finalRatingDistribution =
+    ratingDistribution || calculateDistribution(reviews);
+  const finalTotalReviews = totalReviews || reviews.length;
   const [visibleReviews, setVisibleReviews] = useState(5);
   const showViewAllButton = reviews.length > visibleReviews;
   const handleViewAll = () => setVisibleReviews(reviews.length);
@@ -134,16 +154,16 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
         </h2>
         <RatingSummary
           rating={productRating}
-          distribution={ratingDistribution}
-          totalReviews={totalReviews}
+          distribution={finalRatingDistribution}
+          totalReviews={finalTotalReviews}
         />
       </div>
 
       <div>
         <h3 className="text-lg lg:text-xl font-semibold text-gray-800 mb-4">
-          Reviews ({totalReviews})
+          Reviews ({finalTotalReviews})
         </h3>
-        {totalReviews > 0 ? (
+        {finalTotalReviews > 0 ? (
           <div className="space-y-5 mb-6">
             {reviews.slice(0, visibleReviews).map((review) => (
               <ReviewItem key={review.id ?? Math.random()} review={review} />
