@@ -44,7 +44,7 @@ const Chatbot = () => {
       isUser: false,
       timestamp: new Date(),
     }),
-    []
+    [],
   );
 
   // Convert ChatMessage from API to local Message format
@@ -71,10 +71,10 @@ const Chatbot = () => {
       });
 
       return messages.sort(
-        (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
+        (a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
       );
     },
-    []
+    [],
   );
 
   // Load chat history when component mounts or when chat opens
@@ -91,7 +91,7 @@ const Chatbot = () => {
       const response = await chatService.getChatHistory(50, 0);
       if (response.data && response.data.data.length > 0) {
         const historyMessages = convertChatHistoryToMessages(
-          response.data.data
+          response.data.data,
         );
         setMessages(historyMessages);
         setShowQuickActions(false);
