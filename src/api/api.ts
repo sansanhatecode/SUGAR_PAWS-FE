@@ -17,12 +17,14 @@ const API = {
   ORDERS: "orders",
   ALL_ORDERS: "orders/all",
   SHIPPING_FEE: "orders/shipping-fee",
+  ORDER_CALCULATE_TOTAL: "orders/calculate-total",
   CATEGORIES: "categories",
   PAYMENTS: "payments",
   REVIEWS: "reviews",
   CHAT_MESSAGE: "chat/message",
   CHAT_HISTORY: "chat/history",
   CHAT_CLEAR: "chat/history",
+  VOUCHERS: "vouchers",
 };
 
 export default API;

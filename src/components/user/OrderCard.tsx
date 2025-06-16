@@ -81,9 +81,19 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
         )}
       </div>
       <div className="flex justify-between items-center mt-2">
-        <span className="font-semibold text-base">
-          Total: {formatCurrency(order.totalAmount)} VND
-        </span>
+        <div className="flex flex-col">
+          {order.voucher &&
+            order.discountAmount &&
+            order.discountAmount > 0 && (
+              <div className="text-xs text-green-600 mb-1">
+                Voucher: {order.voucher.code} (-
+                {formatCurrency(order.discountAmount)} VND)
+              </div>
+            )}
+          <span className="font-semibold text-base">
+            Total: {formatCurrency(order.totalAmount)} VND
+          </span>
+        </div>
         <div className="flex gap-2 items-center">
           <Link
             href={`/user/orders/${order.id}`}

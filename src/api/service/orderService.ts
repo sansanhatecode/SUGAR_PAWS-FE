@@ -1,4 +1,4 @@
-import { Order, OrderStatus } from "@/types/order";
+import { Order, OrderStatus, OrderCalculation } from "@/types/order";
 import { useRequest } from "../Request";
 import API from "../api";
 import { Payment, PaymentMethod } from "@/types/payment";
@@ -15,6 +15,13 @@ export type CreateOrderDto = {
   trackingCode?: string;
   status?: OrderStatus;
   orderItems: CreateOrderItemDto[];
+  voucherCode?: string; // New field for voucher
+};
+
+export type CalculateOrderTotalDto = {
+  orderItems: CreateOrderItemDto[];
+  shippingAddressId: number;
+  voucherCode?: string;
 };
 
 export function useOrderService() {
@@ -185,6 +192,27 @@ export function useOrderService() {
     }
   };
 
+  const calculateOrderTotal = async (
+    calculateData: CalculateOrderTotalDto,
+  ): Promise<OrderCalculation | undefined> => {
+    try {
+      const { data } = await Request.post<OrderCalculation>(
+        API.ORDER_CALCULATE_TOTAL,
+        calculateData,
+      );
+      return data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error(
+        "CalculateOrderTotal Error:",
+        error.response?.data || error.message,
+      );
+      throw new Error(
+        error.response?.data?.message || "Failed to calculate order total.",
+      );
+    }
+  };
+
   return {
     createOrder,
     getOrders,
@@ -195,5 +223,6 @@ export function useOrderService() {
     updateOrderStatus,
     getAllOrders,
     updatePaymentStatus,
+    calculateOrderTotal,
   };
 }

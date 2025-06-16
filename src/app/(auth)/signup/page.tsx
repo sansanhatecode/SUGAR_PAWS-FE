@@ -15,6 +15,8 @@ import { motion } from "framer-motion";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState({
@@ -31,6 +33,10 @@ const SignUpPage = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleSignUp = async () => {
@@ -221,7 +227,7 @@ const SignUpPage = () => {
             >
               <div className="relative w-full">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showConfirmPassword ? "text" : "password"}
                   name="reenterPassword"
                   placeholder="Re-enter Password"
                   value={formData.reenterPassword}
@@ -231,9 +237,9 @@ const SignUpPage = () => {
                 <FontAwesomeIcon
                   width={16}
                   height={16}
-                  icon={showPassword ? faEye : faEyeSlash}
+                  icon={showConfirmPassword ? faEye : faEyeSlash}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-custom-purple hover:text-custom-rose transition-colors duration-300"
-                  onClick={togglePasswordVisibility}
+                  onClick={toggleConfirmPasswordVisibility}
                 />
               </div>
               {errorMessage && (

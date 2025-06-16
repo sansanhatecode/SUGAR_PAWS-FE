@@ -280,9 +280,26 @@ export default function OrderDetailPage() {
           <div className="flex justify-between text-base">
             <span>Subtotal</span>
             <span>
-              {formatCurrency(order.totalAmount - (order.shippingFee || 0))} VND
+              {formatCurrency(
+                order.originalAmount ||
+                  order.totalAmount - (order.shippingFee || 0),
+              )}{" "}
+              VND
             </span>
           </div>
+          {order.voucher &&
+            order.discountAmount &&
+            order.discountAmount > 0 && (
+              <div className="flex justify-between text-base text-green-600">
+                <span className="flex items-center gap-1">
+                  Voucher Discount
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full ml-1">
+                    {order.voucher.code}
+                  </span>
+                </span>
+                <span>-{formatCurrency(order.discountAmount)} VND</span>
+              </div>
+            )}
           <div className="flex justify-between text-base">
             <span>Shipping Fee</span>
             <span>{formatCurrency(order.shippingFee || 0)} VND</span>

@@ -1,4 +1,8 @@
-import { useOrderService, CreateOrderDto } from "@/api/service/orderService";
+import {
+  useOrderService,
+  CreateOrderDto,
+  CalculateOrderTotalDto,
+} from "@/api/service/orderService";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/store/slices/userSlice";
@@ -140,6 +144,19 @@ export function useUpdatePaymentStatus() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["all-orders"] });
+    },
+  });
+}
+
+export function useCalculateOrderTotal() {
+  const { calculateOrderTotal } = useOrderService();
+
+  return useMutation({
+    mutationFn: async (calculateData: CalculateOrderTotalDto) => {
+      return await calculateOrderTotal(calculateData);
+    },
+    onError: (error) => {
+      console.error("Failed to calculate order total:", error);
     },
   });
 }

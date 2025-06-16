@@ -9,6 +9,7 @@ import { showSuccessToast } from "@/components/ui/SuccessToast";
 import { showErrorToast } from "@/components/ui/ErrorToast";
 import CheckoutSectionHeader from "./CheckoutSectionHeader";
 import CtaButton from "@/components/ui/CtaButton";
+import { useCheckoutContext } from "@/provider/CheckoutProvider";
 
 interface CheckoutSummaryProps {
   selectedItems: CartItem[];
@@ -25,13 +26,20 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
 }) => {
   const router = useRouter();
   const createOrderMutation = useCreateOrder();
+  const { selectedVoucher, voucherCode, orderCalculation } =
+    useCheckoutContext();
 
   // Calculate subtotal
   const subtotal = selectedItems.reduce(
     (sum, item) => sum + item.productDetail.price * item.quantity,
     0,
   );
-  const total = subtotal + (shippingFee || 0);
+
+  // Use order calculation if available (with voucher), otherwise use basic calculation
+  const finalAmount = orderCalculation
+    ? orderCalculation.finalAmount
+    : subtotal + (shippingFee || 0);
+  const discountAmount = orderCalculation?.discountAmount || 0;
 
   const handleCreateOrder = async () => {
     if (!selectedAddressId) {
@@ -54,6 +62,7 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
         shippingAddressId: selectedAddressId,
         paymentMethod: paymentMethod,
         orderItems: orderItems,
+        voucherCode: voucherCode || undefined, // Add voucher code if available
       };
 
       const result = await createOrderMutation.mutateAsync(orderData);
@@ -112,13 +121,32 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
             </span>
           </div>
 
+          {/* Discount Section */}
+          {discountAmount > 0 && selectedVoucher && (
+            <div className="flex justify-between items-center text-custom-dark text-sm">
+              <span className="font-medium text-green-600">
+                {selectedVoucher.type === "SHIPPING"
+                  ? "Shipping Discount"
+                  : "Product Discount"}{" "}
+                ({selectedVoucher.code})
+              </span>
+              <span className="font-semibold text-green-600">
+                -
+                {discountAmount.toLocaleString("en-US", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+              </span>
+            </div>
+          )}
+
           <div className="border-t border-custom-pink/30 pt-3">
             <div className="flex justify-between items-center">
               <span className="text-lg font-bold text-custom-dark">
                 Total Payment
               </span>
               <span className="text-xl font-bold text-custom-wine">
-                {total.toLocaleString("en-US", {
+                {finalAmount.toLocaleString("en-US", {
                   style: "currency",
                   currency: "VND",
                 })}
