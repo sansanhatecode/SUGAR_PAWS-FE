@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useUserVouchers } from "@/hooks/queries/useVoucher";
-import { UserVoucher } from "@/api/service/voucherService";
 import {
   FaCheckCircle,
   FaTimesCircle,
@@ -12,6 +11,30 @@ import {
 import { Spinner } from "@/components/ui/Spinner";
 import { showSuccessToast } from "@/components/ui/SuccessToast";
 import { formatDate } from "@/utils/dateUtils";
+import { Voucher as VoucherType } from "@/types/order";
+
+// Define the interface for API response structure
+interface Voucher
+  extends Omit<
+    VoucherType,
+    | "startDate"
+    | "endDate"
+    | "createdAt"
+    | "updatedAt"
+    | "description"
+    | "maxDiscountAmount"
+    | "minOrderAmount"
+    | "maxUsageCount"
+  > {
+  description: string | null;
+  maxDiscountAmount: number | null;
+  minOrderAmount: number | null;
+  maxUsageCount: number | null;
+  startDate: string;
+  endDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 // Helper function to format currency
 const formatCurrency = (amount: number): string => {
@@ -22,9 +45,9 @@ const formatCurrency = (amount: number): string => {
 };
 
 const VoucherPage = () => {
-  const { data: userVouchers, isLoading, isError } = useUserVouchers();
+  const { data: vouchers, isLoading, isError } = useUserVouchers();
   const [activeTab, setActiveTab] = useState<"available" | "used" | "expired">(
-    "available",
+    "available"
   );
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -35,14 +58,15 @@ const VoucherPage = () => {
 
   // Filter vouchers based on active tab and search term
   const getFilteredVouchers = () => {
-    if (!userVouchers) return [];
+    if (!vouchers || !Array.isArray(vouchers)) return [];
 
     const now = new Date();
 
-    return userVouchers.filter((userVoucher) => {
-      const voucher = userVoucher.voucher;
+    return vouchers.filter((voucher) => {
+      // Check if voucher has ended or is still active
       const isExpired = new Date(voucher.endDate) < now;
-      const isUsed = userVoucher.usedAt !== null;
+      // For the demo, we'll consider vouchers with currentUsageCount > 0 as "used"
+      const isUsed = voucher.currentUsageCount > 0;
 
       // Filter by tab
       const matchesTab =
@@ -77,7 +101,7 @@ const VoucherPage = () => {
   };
 
   // Render the discount caption with more details
-  const getDiscountCaption = (voucher: UserVoucher["voucher"]) => {
+  const getDiscountCaption = (voucher: Voucher) => {
     let caption = "";
 
     if (voucher.type === "SHIPPING") {
@@ -202,7 +226,7 @@ const VoucherPage = () => {
 
       {/* Voucher List */}
       <div className="flex flex-col gap-4">
-        {!userVouchers || filteredVouchers.length === 0 ? (
+        {!vouchers || filteredVouchers.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
             <div className="text-gray-400 text-4xl mb-4">🔍</div>
             <p className="text-base font-medium text-gray-600">
@@ -215,13 +239,12 @@ const VoucherPage = () => {
             </p>
           </div>
         ) : (
-          filteredVouchers.map((userVoucher) => {
-            const voucher = userVoucher.voucher;
+          filteredVouchers.map((voucher) => {
             return (
               <div
-                key={userVoucher.id}
+                key={voucher.id}
                 className={`border rounded-xl overflow-hidden shadow-sm bg-gradient-to-r ${getVoucherColor(
-                  voucher.type,
+                  voucher.type
                 )} relative hover:shadow-md transition-all`}
               >
                 <div className="p-4">
