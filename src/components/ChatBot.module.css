@@ -184,3 +184,36 @@
   align-items: center;
   justify-content: center;
 }
+
+/* Chat link styles for markdown links */
+.chatLink {
+  color: #6366f1;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  padding: 1px 3px;
+}
+
+.chatLink:hover {
+  color: #4f46e5;
+  text-decoration: none;
+  background-color: rgba(99, 102, 241, 0.1);
+  transform: translateY(-1px);
+}
+
+.chatLink:active {
+  transform: translateY(0);
+  background-color: rgba(99, 102, 241, 0.15);
+}
+
+/* Ensure links look good in bot messages */
+.chatLinkInBot {
+  color: #7c3aed;
+}
+
+.chatLinkInBot:hover {
+  color: #6d28d9;
+  background-color: rgba(124, 58, 237, 0.1);
+}

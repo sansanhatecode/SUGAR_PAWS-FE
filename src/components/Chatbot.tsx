@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
   HiChatBubbleLeftRight,
   HiMiniSparkles,
@@ -10,6 +10,8 @@ import { IoSend, IoClose, IoInformationCircle } from "react-icons/io5";
 import { BsRobot, BsHeartFill, BsStars } from "react-icons/bs";
 import { RiShoppingBag3Fill, RiTruckFill } from "react-icons/ri";
 import { FaPaw, FaRegClock, FaShieldAlt } from "react-icons/fa";
+import ReactMarkdown from 'react-markdown';
+import { useRouter } from 'next/navigation';
 import styles from "./ChatBot.module.css";
 import { useChatService, ChatMessage } from "@/api/service/chatService";
 import { getAuthToken } from "@/helper/storage";
@@ -19,6 +21,11 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  responseFormat?: 'markdown' | 'text';
+}
+
+interface ChatResponse extends ChatMessage {
+  responseFormat?: 'markdown' | 'text';
 }
 
 const Chatbot = () => {
@@ -29,6 +36,52 @@ const Chatbot = () => {
   const [showQuickActions, setShowQuickActions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatService = useChatService();
+  const router = useRouter();
+
+  // Handle link clicks in chat messages
+  const handleLinkClick = useCallback((event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    event.preventDefault();
+    
+    if (href.startsWith('/collections/')) {
+      // Navigate to product page
+      router.push(href);
+    } else if (href.startsWith('/')) {
+      // Navigate to internal page
+      router.push(href);
+    } else if (href.startsWith('http')) {
+      // External link
+      window.open(href, '_blank', 'noopener,noreferrer');
+    }
+  }, [router]);
+  // Component to render message content based on format
+  const MessageContent = ({ message }: { message: Message }) => {
+    if (!message.isUser && message.responseFormat === 'markdown') {
+      return (
+        <ReactMarkdown
+          components={{
+            a: ({ href, children }) => (
+              <a 
+                href={href} 
+                className={`${styles.chatLink} ${styles.chatLinkInBot}`}
+                onClick={(e) => handleLinkClick(e, href || '#')}
+              >
+                {children}
+              </a>
+            ),
+            p: ({ children }) => <span className="block mb-2 last:mb-0">{children}</span>,
+            ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
+            li: ({ children }) => <li className="mb-1">{children}</li>,
+            strong: ({ children }) => <strong className="font-semibold text-custom-dark">{children}</strong>,
+            em: ({ children }) => <em className="italic">{children}</em>,
+          }}
+        >
+          {message.text}
+        </ReactMarkdown>
+      );
+    }
+    
+    return <div className="whitespace-pre-line">{message.text}</div>;
+  };
 
   const quickActions = [
     { text: "Product Info", icon: <RiShoppingBag3Fill className="w-4 h-4" /> },
@@ -44,9 +97,8 @@ const Chatbot = () => {
       isUser: false,
       timestamp: new Date(),
     }),
-    [],
+    []
   );
-
   // Convert ChatMessage from API to local Message format
   const convertChatHistoryToMessages = useCallback(
     (chatHistory: ChatMessage[]): Message[] => {
@@ -59,22 +111,21 @@ const Chatbot = () => {
           text: chat.message,
           isUser: true,
           timestamp: new Date(chat.createdAt),
-        });
-
-        // Add bot response
+        });        // Add bot response with responseFormat
         messages.push({
           id: `bot-${chat.id}`,
           text: chat.response,
           isUser: false,
           timestamp: new Date(chat.createdAt),
+          responseFormat: (chat as unknown as ChatResponse).responseFormat || 'text',
         });
       });
 
       return messages.sort(
-        (a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
+        (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
       );
     },
-    [],
+    []
   );
 
   // Load chat history when component mounts or when chat opens
@@ -91,7 +142,7 @@ const Chatbot = () => {
       const response = await chatService.getChatHistory(50, 0);
       if (response.data && response.data.data.length > 0) {
         const historyMessages = convertChatHistoryToMessages(
-          response.data.data,
+          response.data.data
         );
         setMessages(historyMessages);
         setShowQuickActions(false);
@@ -143,16 +194,14 @@ const Chatbot = () => {
     const messageText = inputText;
     setInputText("");
     setIsTyping(true);
-    setShowQuickActions(false);
-
-    try {
+    setShowQuickActions(false);    try {
       const response = await chatService.sendMessage(messageText);
-      if (response.data) {
-        const botMessage: Message = {
+      if (response.data) {        const botMessage: Message = {
           id: `bot-${response.data.id}`,
           text: response.data.response,
           isUser: false,
           timestamp: new Date(response.data.createdAt),
+          responseFormat: (response.data as unknown as ChatResponse).responseFormat || 'text',
         };
         setMessages((prev) => [...prev, botMessage]);
       }
@@ -284,7 +333,7 @@ const Chatbot = () => {
                         : "bg-white text-custom-dark border border-custom-pink/20 rounded-bl-md shadow-sm"
                     }`}
                   >
-                    <div className="whitespace-pre-line">{message.text}</div>
+                    <MessageContent message={message} />
                     <div
                       className={`text-xs mt-2 flex items-center gap-1 ${
                         message.isUser ? "text-white/70" : "text-gray-500"
