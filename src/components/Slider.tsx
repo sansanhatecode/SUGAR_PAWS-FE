@@ -67,11 +67,38 @@ const sliderItems: SliderItem[] = [
   },
 ];
 
-const Slider = () => {
-  const [currentIndex, setCurrentIndex] = useState(1);
+const Slider = () => {  const [currentIndex, setCurrentIndex] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState<Set<string>>(new Set());
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
+
+  // Preload images
+  useEffect(() => {
+    const preloadImages = async () => {        const imagePromises = sliderItems.map((item) => {
+        return new Promise<string>((resolve, reject) => {
+          const img = new window.Image();
+          img.onload = () => resolve(item.imageSrc);
+          img.onerror = () => {
+            console.error(`Failed to load image: ${item.imageSrc}`);
+            setImageErrors(prev => new Set([...prev, item.imageSrc]));
+            reject(new Error(`Failed to load ${item.imageSrc}`));
+          };
+          img.src = item.imageSrc;
+        });
+      });
+
+      try {
+        const loadedImages = await Promise.all(imagePromises);
+        setImagesLoaded(new Set(loadedImages));
+      } catch (error) {
+        console.error('Error preloading images:', error);
+      }
+    };
+
+    preloadImages();
+  }, []);
 
   const extendedItems = [
     sliderItems[sliderItems.length - 1],
@@ -86,14 +113,16 @@ const Slider = () => {
     } else if (currentIndex === sliderItems.length + 1) {
       setCurrentIndex(1);
     }
-  };
-
-  const startAutoSlide = useCallback(() => {
-    intervalRef.current = setInterval(() => {
-      setIsTransitioning(true);
-      setCurrentIndex((prev) => prev + 1);
-    }, 5000);
-  }, []);
+  };  const startAutoSlide = useCallback(() => {
+    // Chỉ bắt đầu auto slide khi đã load đủ ảnh (hoặc có lỗi)
+    const totalProcessed = imagesLoaded.size + imageErrors.size;
+    if (totalProcessed >= sliderItems.length) {
+      intervalRef.current = setInterval(() => {
+        setIsTransitioning(true);
+        setCurrentIndex((prev) => prev + 1);
+      }, 5000);
+    }
+  }, [imagesLoaded.size, imageErrors.size]);
 
   const stopAutoSlide = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -111,12 +140,13 @@ const Slider = () => {
     setIsTransitioning(true);
     setCurrentIndex((prevIndex) => (prevIndex + 1) % extendedItems.length);
     startAutoSlide();
-  };
-
-  useEffect(() => {
-    startAutoSlide();
+  };  useEffect(() => {
+    const totalProcessed = imagesLoaded.size + imageErrors.size;
+    if (totalProcessed >= sliderItems.length) {
+      startAutoSlide();
+    }
     return () => stopAutoSlide();
-  }, [startAutoSlide]);
+  }, [startAutoSlide, imagesLoaded.size, imageErrors.size]);
 
   return (
     <div className="relative w-full h-[520px] overflow-hidden group">
@@ -148,8 +178,7 @@ const Slider = () => {
               : "none",
           }}
           onTransitionEnd={handleTransitionEnd}
-        >
-          {extendedItems.map(
+        >          {extendedItems.map(
             (
               {
                 imageSrc,
@@ -161,16 +190,40 @@ const Slider = () => {
                 textColor,
               },
               index,
-            ) => (
-              <div key={index} className="relative w-full h-full flex-shrink-0">
-                <Image
-                  src={imageSrc}
-                  alt={`Slide ${index}`}
-                  fill
-                  sizes="100vw"
-                  className="object-cover"
-                />
-                {index === currentIndex && (
+            ) => (              <div key={`${imageSrc}-${index}`} className="relative w-full h-full flex-shrink-0">
+                {!imagesLoaded.has(imageSrc) && !imageErrors.has(imageSrc) && (
+                  <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+                    <div className="text-gray-500">Loading...</div>
+                  </div>
+                )}
+                {imageErrors.has(imageSrc) && (
+                  <div className="absolute inset-0 bg-gray-300 flex items-center justify-center">
+                    <div className="text-gray-600">Image not found</div>
+                  </div>
+                )}
+                {!imageErrors.has(imageSrc) && (
+                  <Image
+                    src={imageSrc}
+                    alt={`Slide ${index}`}
+                    fill
+                    sizes="100vw"
+                    className={`object-cover transition-opacity duration-300 ${
+                      imagesLoaded.has(imageSrc) ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    priority={index <= 2} // Ưu tiên load 3 ảnh đầu
+                    loading={index <= 2 ? "eager" : "lazy"}
+                    quality={90}
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx4f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyDnyDzSlVSmzQCCQv0TyFJ5Qw=="
+                    onLoad={() => {
+                      setImagesLoaded(prev => new Set([...prev, imageSrc]));
+                    }}
+                    onError={() => {
+                      setImageErrors(prev => new Set([...prev, imageSrc]));
+                    }}
+                  />
+                )}
+                {index === currentIndex && (imagesLoaded.has(imageSrc) || imageErrors.has(imageSrc)) && (
                   <div
                     className={`absolute h-full flex flex-col justify-center z-50 top-0 ${align === "left" ? "left-24 items-start" : "right-24 items-end"}`}
                   >
@@ -200,7 +253,7 @@ const Slider = () => {
                         </p>
                       ))}
                     {ctaButtons?.length && (
-                      <div className="flex space-x-4 mt-4">
+                      <div className="flex space-x-4 mt-4 mb-0">
                         {ctaButtons.map(({ text, link }) => (
                           <CtaButton
                             key={text}
