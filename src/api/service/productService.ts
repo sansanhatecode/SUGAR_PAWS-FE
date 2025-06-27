@@ -409,6 +409,54 @@ export function useProductservice() {
     }
   };
 
+  const deleteProduct = async (productId: string) => {
+    try {
+      const { data } = await Request.del(API.ALL_PRODUCTS + "/" + productId);
+      return data;
+    } catch (error: unknown) {
+      let message = "Failed to delete product.";
+      if (typeof error === "object" && error !== null) {
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        message = err.response?.data?.message || err.message || message;
+        console.error(
+          "DeleteProduct Error:",
+          err.response?.data || err.message
+        );
+      } else {
+        console.error("DeleteProduct Error:", error);
+      }
+      throw new Error(message);
+    }
+  };
+
+  const deleteManyProducts = async (productIds: string[]) => {
+    try {
+      const { data } = await Request.del(API.ALL_PRODUCTS, undefined, {
+        productIds: productIds.map((id) => parseInt(id, 10)),
+      });
+      return data;
+    } catch (error: unknown) {
+      let message = "Failed to delete products.";
+      if (typeof error === "object" && error !== null) {
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        message = err.response?.data?.message || err.message || message;
+        console.error(
+          "DeleteManyProducts Error:",
+          err.response?.data || err.message
+        );
+      } else {
+        console.error("DeleteManyProducts Error:", error);
+      }
+      throw new Error(message);
+    }
+  };
+
   return {
     getProducts,
     getColors,
@@ -419,5 +467,7 @@ export function useProductservice() {
     createProduct,
     getRelatedProducts,
     searchProducts,
+    deleteProduct,
+    deleteManyProducts,
   };
 }

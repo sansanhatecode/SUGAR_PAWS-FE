@@ -7,7 +7,7 @@ import {
   useMantineReactTable,
   type MRT_RowSelectionState,
 } from "mantine-react-table";
-import { FiEye, FiEdit, FiPlus, FiGrid } from "react-icons/fi";
+import { FiEye, FiEdit, FiPlus, FiGrid, FiTrash } from "react-icons/fi";
 import { Product } from "@/types/product";
 import { Category } from "@/types/category";
 
@@ -24,6 +24,7 @@ interface ProductTableProps {
   onEditProduct: (product: Product) => void;
   onViewDetails: (product: Product) => void;
   onViewDetailTable: (productId: string) => void;
+  onDeleteProduct: (product: Product) => void;
   onBulkDelete: () => void;
   onExportSelected: () => void;
   pagination: { pageIndex: number; pageSize: number };
@@ -43,6 +44,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   onEditProduct,
   onViewDetails,
   onViewDetailTable,
+  onDeleteProduct,
   onBulkDelete,
   onExportSelected,
   pagination,
@@ -264,7 +266,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
     {
       header: "Actions",
       accessorKey: "actions",
-      size: 160,
+      size: 200,
       Cell: ({ row }) => (
         <Group gap="xs">
           <Tooltip label="View Product Details">
@@ -301,6 +303,18 @@ const ProductTable: React.FC<ProductTableProps> = ({
               }}
             >
               <FiEdit />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Delete Product">
+            <ActionIcon
+              variant="light"
+              color="red"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteProduct(row.original);
+              }}
+            >
+              <FiTrash />
             </ActionIcon>
           </Tooltip>
         </Group>

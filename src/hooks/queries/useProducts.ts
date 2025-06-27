@@ -167,3 +167,31 @@ export function useSearchProducts({
     searchProducts: searchProductsQuery,
   };
 }
+
+export function useDeleteProduct() {
+  const { deleteProduct } = useProductservice();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (productId: string) => deleteProduct(productId),
+    onSuccess: () => {
+      // Invalidate and refetch relevant queries
+      queryClient.invalidateQueries({ queryKey: ["allProducts"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+}
+
+export function useDeleteManyProducts() {
+  const { deleteManyProducts } = useProductservice();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (productIds: string[]) => deleteManyProducts(productIds),
+    onSuccess: () => {
+      // Invalidate and refetch relevant queries
+      queryClient.invalidateQueries({ queryKey: ["allProducts"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+}

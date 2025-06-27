@@ -5,10 +5,16 @@ import {
   useGetAllProducts,
   useUpdateProduct,
   useCreateProduct,
+  useDeleteProduct,
+  useDeleteManyProducts,
 } from "@/hooks/queries/useProducts";
 import { Product } from "@/types/product";
 import { FaTimes, FaSync } from "react-icons/fa";
 import { Button, Title, Box, LoadingOverlay, Paper, Text } from "@mantine/core";
+import { showErrorToast } from "@/components/ui/ErrorToast";
+import { showSuccessToast } from "@/components/ui/SuccessToast";
+import { showWarningToast } from "@/components/ui/WarningToast";
+import { showConfirmToast } from "@/components/ui/ConfirmToast";
 import ProductTable from "./ProductTable";
 import ProductHeader from "./ProductHeader";
 import ProductModal from "./ProductModal";
@@ -40,6 +46,8 @@ const AdminProductsPage = () => {
   // Mutations
   const { mutateAsync: updateProduct } = useUpdateProduct();
   const { mutateAsync: createProduct } = useCreateProduct();
+  const { mutateAsync: deleteProduct } = useDeleteProduct();
+  const { mutateAsync: deleteManyProducts } = useDeleteManyProducts();
 
   // Selected products for batch operations
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
@@ -104,14 +112,51 @@ const AdminProductsPage = () => {
     console.log("Export products functionality");
   };
 
-  // Handle bulk delete
-  const handleBulkDelete = () => {
-    console.log("Bulk delete not implemented");
-  };
-
   // Handle export selected
   const handleExportSelected = () => {
     console.log("Export selected products");
+  };
+
+  // Handle delete product
+  const handleDeleteProduct = async (product: Product) => {
+    showConfirmToast(
+      `Are you sure you want to delete "${product.name}"?`,
+      async () => {
+        try {
+          await deleteProduct(product.id);
+          showSuccessToast(`Product "${product.name}" deleted successfully`);
+          refetch();
+        } catch (error) {
+          console.error("Failed to delete product:", error);
+          showErrorToast("Failed to delete product. Please try again.");
+        }
+      },
+    );
+  };
+
+  // Handle bulk delete
+  const handleBulkDelete = async () => {
+    if (selectedProductIds.length === 0) {
+      showWarningToast("Please select products to delete");
+      return;
+    }
+
+    showConfirmToast(
+      `Are you sure you want to delete ${selectedProductIds.length} selected products?`,
+      async () => {
+        try {
+          await deleteManyProducts(selectedProductIds);
+          showSuccessToast(
+            `${selectedProductIds.length} products deleted successfully`,
+          );
+          setRowSelection({});
+          refetch();
+        } catch (error) {
+          console.error("Failed to delete products:", error);
+          showErrorToast("Failed to delete products. Please try again.");
+        }
+      },
+    );
   };
 
   if (error) {
@@ -186,6 +231,7 @@ const AdminProductsPage = () => {
             onEditProduct={handleEditProduct}
             onViewDetails={handleViewDetails}
             onViewDetailTable={handleViewDetailTable}
+            onDeleteProduct={handleDeleteProduct}
             onBulkDelete={handleBulkDelete}
             onExportSelected={handleExportSelected}
             pagination={pagination}
@@ -209,6 +255,9 @@ const AdminProductsPage = () => {
                 updateData: formData,
                 images: formData.images,
               });
+              showSuccessToast(
+                `Product "${editProduct.name}" updated successfully`,
+              );
             } else {
               await createProduct({
                 productData: {
@@ -217,11 +266,13 @@ const AdminProductsPage = () => {
                 },
                 images: formData.images,
               });
+              showSuccessToast("Product created successfully");
             }
             setProductModalOpen(false);
             refetch();
           } catch (error) {
             console.error("Failed to save product:", error);
+            showErrorToast("Failed to save product. Please try again.");
           }
         }}
       />

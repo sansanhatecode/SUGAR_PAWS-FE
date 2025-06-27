@@ -22,16 +22,18 @@ const ErrorToast = ({ t, message }: { t: Toast; message: string }) => (
 
 export function showErrorToast(message: string) {
   toast.error(
-    <div className="flex items-center gap-2">
-      <FaExclamationCircle size={40} />
-      <span>{message}</span>
+    <div className="flex items-center gap-2 max-w-md">
+      <FaExclamationCircle size={20} className="flex-shrink-0" />
+      <span className="break-words">{message}</span>
     </div>,
     {
       style: {
         background: "#ef4444",
         color: "#fff",
         minWidth: "250px",
+        maxWidth: "400px",
         fontWeight: 500,
+        padding: "12px 16px",
       },
       icon: null,
       position: "top-center",
