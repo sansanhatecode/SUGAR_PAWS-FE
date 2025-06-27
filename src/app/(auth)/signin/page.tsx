@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { setAuthToken } from "@/helper/storage";
 import DefaultLoading from "@/components/loading/DefaultLoading";
 import { motion } from "framer-motion";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/store/slices/userSlice";
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -22,7 +24,7 @@ const SignInPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { signIn } = useAuthorization();
-
+  const dispatch = useDispatch();
   const router = useRouter();
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -45,13 +47,32 @@ const SignInPage = () => {
         identifier: username,
         password,
       });
+
       if (response && response.accessToken) {
+        // Lưu token
         setAuthToken(response.accessToken);
+
+        // Cập nhật Redux state với thông tin user
+        dispatch(
+          setUser({
+            username: response.username,
+            email: response.email,
+            name: response.name,
+            role: response.role,
+          }),
+        );
+
+        setLoading(false);
+
+        // Điều hướng dựa trên role
+        if (response.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/");
+        }
       } else {
         throw new Error("Invalid response from server.");
       }
-      setLoading(false);
-      router.push("/");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setLoading(false);

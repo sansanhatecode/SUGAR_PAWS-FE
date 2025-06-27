@@ -19,5 +19,6 @@ export interface LoginResponseData {
   username: string;
   email: string;
   name: string;
+  role: string;
   accessToken: string;
 }

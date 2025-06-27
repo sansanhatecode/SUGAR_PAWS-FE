@@ -38,7 +38,6 @@ const ForgotPasswordPage = () => {
       );
       setLoading(false);
 
-      // Redirect to signin after 3 seconds
       setTimeout(() => {
         router.push("/signin");
       }, 3000);
